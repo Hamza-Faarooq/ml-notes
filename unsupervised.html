@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unsupervised Learning & Evaluation | CDC ML Prep</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&family=Newsreader:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+<style>
+  :root {
+    --bg: #080b0f;
+    --bg2: #0d1117;
+    --bg3: #161b22;
+    --border: #21262d;
+    --accent: #e8c547;
+    --accent2: #79c0ff;
+    --accent3: #56d364;
+    --accent4: #f85149;
+    --accent5: #d2a8ff;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --text-dim: #484f58;
+    --highlight: rgba(232,197,71,0.07);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Newsreader', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.8;
+    overflow-x: hidden;
+  }
+
+  /* PROGRESS */
+  .progress-bar { position: fixed; top: 56px; left: 0; height: 2px; background: var(--accent); width: 0%; z-index: 99; transition: width 0.1s; }
+
+  /* HEADER */
+  .site-header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(8,11,15,0.94);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 56px;
+  }
+  .logo { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--accent); text-decoration: none; letter-spacing: 0.08em; }
+  .header-nav { display: flex; gap: 1.5rem; }
+  .header-nav a { font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+  .header-nav a:hover { color: var(--accent2); }
+
+  /* HERO */
+  .hero { padding: 5rem 2rem 3rem; max-width: 960px; margin: 0 auto; }
+  .hero-tag { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--accent); letter-spacing: 0.15em; text-transform: uppercase; border: 1px solid rgba(232,197,71,0.3); display: inline-block; padding: 3px 10px; border-radius: 3px; margin-bottom: 1.5rem; }
+  .hero h1 { font-family: 'Newsreader', serif; font-size: clamp(2.2rem, 5vw, 3.6rem); font-weight: 300; line-height: 1.15; color: var(--text); margin-bottom: 1.2rem; }
+  .hero h1 em { font-style: italic; color: var(--accent); }
+  .hero-desc { font-size: 1.1rem; color: var(--text-muted); max-width: 660px; line-height: 1.75; }
+  .hero-meta { margin-top: 2.5rem; display: flex; gap: 2rem; flex-wrap: wrap; }
+  .hero-meta-item { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-dim); }
+  .hero-meta-item span { color: var(--accent3); }
+
+  /* TOC */
+  .toc-container { max-width: 960px; margin: 0 auto 3rem; padding: 0 2rem; }
+  .toc { background: var(--bg3); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 6px; padding: 1.5rem 2rem; }
+  .toc-title { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 1rem; }
+  .toc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.4rem 2rem; }
+  .toc a { font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; color: var(--text-muted); text-decoration: none; transition: color 0.2s; display: flex; align-items: center; gap: 0.5rem; }
+  .toc a::before { content: '→'; color: var(--accent2); font-size: 11px; }
+  .toc a:hover { color: var(--accent2); }
+
+  /* CONTENT */
+  .content-wrapper { max-width: 960px; margin: 0 auto; padding: 0 2rem 6rem; }
+
+  /* CHAPTERS */
+  .chapter { margin-bottom: 5rem; scroll-margin-top: 70px; }
+  .chapter-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--accent); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.6rem; }
+  .chapter-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(to right, var(--border), transparent); }
+  .chapter h2 { font-family: 'Newsreader', serif; font-size: clamp(1.6rem, 3vw, 2.3rem); font-weight: 400; color: var(--text); margin-bottom: 1.5rem; line-height: 1.2; }
+  .chapter h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 500; color: var(--accent2); margin: 2.2rem 0 0.8rem; }
+  .chapter h4 { font-family: 'Space Grotesk', sans-serif; font-size: 0.95rem; font-weight: 500; color: var(--accent3); margin: 1.5rem 0 0.5rem; letter-spacing: 0.02em; }
+  .chapter p { margin-bottom: 1.1rem; }
+  .chapter ul, .chapter ol { margin: 0.8rem 0 1.2rem 1.5rem; }
+  .chapter li { margin-bottom: 0.5rem; }
+
+  /* MATH */
+  .math-block { background: #0d1117; border: 1px solid var(--border); border-left: 3px solid var(--accent2); border-radius: 6px; padding: 1.2rem 1.5rem; margin: 1.5rem 0; overflow-x: auto; text-align: center; }
+  .math-block .label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text-dim); text-align: left; display: block; margin-bottom: 0.5rem; letter-spacing: 0.1em; text-transform: uppercase; }
+
+  /* CODE */
+  pre { background: #0d1117; border: 1px solid var(--border); border-radius: 6px; padding: 1.2rem 1.5rem; overflow-x: auto; margin: 1.5rem 0; position: relative; }
+  pre .lang-tag { position: absolute; top: 8px; right: 12px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text-dim); letter-spacing: 0.08em; }
+  code { font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; line-height: 1.65; color: var(--text); }
+  p code, li code { background: var(--bg3); padding: 1px 5px; border-radius: 3px; font-size: 0.82rem; color: var(--accent3); }
+
+  /* CALLOUTS */
+  .callout { border-radius: 6px; padding: 1.2rem 1.5rem; margin: 1.8rem 0; border-left: 4px solid; }
+  .callout-title { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.5rem; }
+  .callout.interview { background: rgba(121,192,255,0.06); border-color: var(--accent2); }
+  .callout.interview .callout-title { color: var(--accent2); }
+  .callout.warning { background: rgba(248,81,73,0.06); border-color: var(--accent4); }
+  .callout.warning .callout-title { color: var(--accent4); }
+  .callout.insight { background: rgba(86,211,100,0.06); border-color: var(--accent3); }
+  .callout.insight .callout-title { color: var(--accent3); }
+  .callout.gold { background: rgba(232,197,71,0.07); border-color: var(--accent); }
+  .callout.gold .callout-title { color: var(--accent); }
+
+  /* PROOF BOX */
+  .proof-box { background: #0d1117; border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem 2rem; margin: 1.5rem 0; }
+  .proof-box .proof-title { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--accent5); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+
+  /* VIZ */
+  .viz-container { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 2rem 0; }
+  .viz-title { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1rem; }
+  .viz-controls { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; margin-top: 1rem; }
+  .viz-controls button { background: var(--bg2); border: 1px solid var(--border); color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 5px 12px; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
+  .viz-controls button:hover, .viz-controls button.active { border-color: var(--accent2); color: var(--accent2); }
+  canvas { display: block; border-radius: 4px; width: 100%; max-width: 100%; background: var(--bg); }
+
+  /* DIVIDER */
+  .chapter-divider { height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent); margin: 4rem 0; }
+
+  /* FOOTER */
+  .site-footer { border-top: 1px solid var(--border); padding: 2rem; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-dim); letter-spacing: 0.08em; }
+  .site-footer a { color: var(--accent2); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<header class="site-header">
+  <a href="index.html" class="logo">◈ CDC ML PREP</a>
+  <nav class="header-nav">
+    <a href="index.html">Home</a>
+    <a href="#ch51">K-Means</a>
+    <a href="#ch53">DBSCAN</a>
+    <a href="#ch54">PCA & SVD</a>
+    <a href="#ch56">Metrics</a>
+    <a href="#ch60">Confusion Matrix</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="hero-tag">Pillar 5 & 6 · Unsupervised Learning & Metrics</div>
+    <h1>Unsupervised Learning:<br><em>Geometry, Math, Code</em><br>& Evaluation Metrics</h1>
+    <p class="hero-desc">Leaving the safe, labeled world behind. Finding hidden physical geometry, intrinsic dimensionality, natural clustering, and ultimately rigorously defending and evaluating these systems with production-grade metrics.</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">Topics: <span>K-Means, DBSCAN, PCA, SVD, Classification Metrics</span></div>
+      <div class="hero-meta-item">CDC Focus: <span>Whiteboard Math, Linear Algebra, System Design</span></div>
+    </div>
+  </section>
+
+  <div class="toc-container">
+    <div class="toc">
+      <div class="toc-title">📋 Table of Contents</div>
+      <div class="toc-grid">
+        <a href="#ch51">Ch 51 · K-Means Clustering</a>
+        <a href="#ch52">Ch 52 · Hierarchical Clustering</a>
+        <a href="#ch53">Ch 53 · DBSCAN & Contagion</a>
+        <a href="#ch54">Ch 54 · Dimensionality Reduction (PCA)</a>
+        <a href="#ch54-svd">Ch 54b · The Mathematics of SVD</a>
+        <a href="#ch55">Ch 55 · Anomaly Detection (Isolation Forests)</a>
+        <a href="#ch56">Ch 56 · Regression Metrics</a>
+        <a href="#ch57">Ch 57 · The Imbalanced Data Trap</a>
+        <a href="#ch58">Ch 58 · Precision, Recall & F1-Score</a>
+        <a href="#ch59">Ch 59 · ROC-AUC</a>
+        <a href="#ch60">Ch 60 · The Confusion Matrix</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-wrapper">
+
+    <section class="chapter" id="ch51">
+      <div class="chapter-label">Chapter 51</div>
+      <h2>K-Means Clustering (The Benchmark)</h2>
+
+      <p><strong>The Intuition:</strong> You are at a massive party and want to group people into \(K\) distinct friend groups based on their physical locations in the room. You drop \(K\) random anchors (centroids) into the room. People walk to their nearest anchor. The anchors then move to the exact center of the people surrounding them. Repeat until no one moves.</p>
+
+      <h3>The Mathematics & Geometry</h3>
+      <p>K-Means strictly tries to minimize the <strong>Within-Cluster Sum of Squares (WCSS)</strong>. It wants to make the clusters as physically tight as possible.</p>
+      
+      <div class="math-block">
+        <span class="label">WCSS Objective Function</span>
+        \[ \arg\min_S \sum_{i=1}^k \sum_{x \in S_i} ||x - \mu_i||^2 \]
+      </div>
+
+      <ul>
+        <li><strong>The E-Step (Expectation):</strong> Assign every point \(x\) to the nearest centroid \(\mu_i\) using Euclidean distance. This physically partitions the space into a <strong>Voronoi Tessellation</strong> (rigid geometric polygons).</li>
+        <li><strong>The M-Step (Maximization):</strong> Recalculate the centroid \(\mu_i\) as the mathematical mean of all points assigned to it.</li>
+      </ul>
+
+      <div class="viz-container">
+        <div class="viz-title">🎯 Interactive: K-Means Geometric Simulator</div>
+        <canvas id="kmeansCanvas" height="300"></canvas>
+        <div class="viz-controls">
+          <button onclick="kmeansInit()">1. Initialize Centroids</button>
+          <button onclick="kmeansStep()" id="kmeansStepBtn" disabled>2. Step Algorithm (E/M)</button>
+          <button onclick="kmeansReset()">↺ Reset Data</button>
+        </div>
+        <p style="margin-top:0.6rem; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-muted)">
+          Watch how the space is partitioned (E-step) and how centroids are pulled to the mathematical center (M-step).
+        </p>
+      </div>
+
+      <div class="callout interview">
+        <div class="callout-title">🎯 The CDC Interview Traps</div>
+        <p><strong>1. "Why does K-means sometimes give terrible results?"</strong><br>
+        <em>Your Answer:</em> K-Means is highly sensitive to initialization. If you drop two centroids right next to each other, they get trapped in a local minimum. This is solved by <strong>K-Means++</strong>, which explicitly forces initial centroids to be initialized as far away from each other as physically possible.</p>
+        <p><strong>2. "Does K-means work on all data shapes?"</strong><br>
+        <em>Your Answer:</em> No. Because it relies on Euclidean distance from a central mean, it implicitly assumes all clusters are perfectly spherical and roughly the same size. If your data is shaped like two interlocking crescent moons, K-means will violently slice them in half.</p>
+      </div>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <section class="chapter" id="ch52">
+      <div class="chapter-label">Chapter 52</div>
+      <h2>Hierarchical Clustering (The Family Tree)</h2>
+
+      <p><strong>The Intuition:</strong> Instead of guessing \(K\) upfront, what if we build a complete family tree of the data? We start by assuming every single data point is its own isolated cluster. Then, we find the two closest clusters and merge them. We repeat this until everything is merged into one giant cluster.</p>
+
+      <h3>The Geometry & Metrics</h3>
+      <p>This builds a <strong>Dendrogram</strong> (a tree diagram). You can slice the tree horizontally at any height to get your desired number of clusters. The core question is: <em>How do we define the distance between two clusters that contain multiple points?</em> This is called the <strong>Linkage Criteria</strong>:</p>
+      <ul>
+        <li><strong>Single Linkage:</strong> Distance between the two <em>closest</em> points. (Tends to create long, stringy clusters — called "chaining").</li>
+        <li><strong>Complete Linkage:</strong> Distance between the two <em>farthest</em> points. (Creates tight, compact clusters).</li>
+        <li><strong>Ward’s Linkage (Production Standard):</strong> Merges clusters that result in the smallest increase in the overall Variance (WCSS).</li>
+      </ul>
+
+      <div class="callout warning">
+        <div class="callout-title">⚠️ The CDC Complexity Trap</div>
+        <p><strong>Interviewer:</strong> "We have 10 million customer records. Should we use Hierarchical Clustering or K-Means?"</p>
+        <p><strong>Your Answer:</strong> "We must use K-Means (or Mini-Batch K-Means). Hierarchical clustering has a time complexity of \(\mathcal{O}(N^3)\) and requires an \(\mathcal{O}(N^2)\) distance matrix to be held in RAM. For 10 million rows, our servers will instantly run out of memory. Hierarchical is strictly for small datasets."</p>
+      </div>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <section class="chapter" id="ch53">
+      <div class="chapter-label">Chapter 53</div>
+      <h2>DBSCAN (Density-Based Spatial Clustering)</h2>
+
+      <p><strong>The Intuition & Applicability:</strong> This solves the crescent-moon problem of K-Means. DBSCAN doesn't care about means or spheres; it looks for densely packed "islands" of data separated by empty "oceans." Imagine mapping a viral disease outbreak using GPS coordinates. Infections follow roads, rivers, and dense neighborhoods, not perfect circles. DBSCAN organically maps this non-linear shape, while isolating random, unrelated cases in rural areas as noise.</p>
+
+      <h3>The Parameters</h3>
+      <p>You do not specify \(K\). You specify two physical rules:</p>
+      <ol>
+        <li><strong>\(\epsilon\) (Epsilon):</strong> The radius of a neighborhood around a point.</li>
+        <li><strong>min_samples:</strong> The minimum number of neighbors required inside that \(\epsilon\) radius for a point to be considered a "Core Point".</li>
+      </ol>
+
+      <h3>The Algorithm (The Contagion)</h3>
+      <p>DBSCAN classifies every single point into one of three categories:</p>
+      <ul>
+        <li><strong>Core Point:</strong> If a point has enough neighbors, it becomes a Core Point.</li>
+        <li><strong>Border Point:</strong> Does <em>not</em> have enough neighbors to be a Core Point, but falls physically inside the \(\epsilon\) radius of a Core Point. It is part of the cluster, but cannot spread the infection any further.</li>
+        <li><strong>Noise (Outlier):</strong> Any point that is not a Core Point and is not reachable by a Core Point.</li>
+      </ul>
+      <p>The cluster grows organically like a puddle of water or a contagion spread.</p>
+
+      <div class="viz-container">
+        <div class="viz-title">🦠 Interactive: DBSCAN Contagion Simulator</div>
+        <canvas id="dbscanCanvas" height="300"></canvas>
+        <div class="viz-controls">
+          <button onclick="dbscanRun()">Run Contagion Spread ▶</button>
+          <button onclick="dbscanReset()">↺ Reset</button>
+        </div>
+        <p style="margin-top:0.6rem; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-muted)">
+          Notice how DBSCAN correctly identifies the non-linear crescent moon shapes, while classifying stray points as Noise (gray).
+        </p>
+      </div>
+
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <section class="chapter" id="ch54">
+      <div class="chapter-label">Chapter 54</div>
+      <h2>Dimensionality Reduction & PCA</h2>
+
+      <p><strong>The Intuition:</strong> You have a 1,000-dimensional dataset, but much of it is noise or highly correlated. Principal Component Analysis (PCA) finds a new, smaller set of axes (components) that retains the maximum possible variance of the original data. You are mathematically squashing a 3D object into a 2D shadow, but choosing the angle of the light so the shadow keeps the maximum detail.</p>
+
+      <h3>The Hardcore Math (Linear Algebra Flex)</h3>
+      <ol>
+        <li>Center the data matrix \(X\) by subtracting the mean.</li>
+        <li>Compute the Covariance Matrix: \(C = \frac{1}{n-1} X^T X\).</li>
+        <li>Find the <strong>Eigenvectors</strong> and <strong>Eigenvalues</strong> of \(C\).
+          <ul>
+            <li>The <strong>Eigenvectors</strong> are the new physical axes (Principal Components).</li>
+            <li>The <strong>Eigenvalues</strong> dictate exactly how much variance is captured by that specific axis.</li>
+          </ul>
+        </li>
+      </ol>
+    </section>
+
+    <section class="chapter" id="ch54-svd">
+      <div class="chapter-label">Chapter 54b (Deep Dive)</div>
+      <h2>The Mathematics of SVD vs. Covariance</h2>
+
+      <div class="callout warning">
+        <div class="callout-title">⚠️ The Day 1 System Design Trap</div>
+        <p><strong>Interviewer:</strong> "Computing \(X^T X\) for a massive text dataset is taking forever and losing precision. How do we fix PCA?"</p>
+        <p><strong>Your Answer:</strong> "We never explicitly calculate the covariance matrix in production. We perform Singular Value Decomposition (SVD) directly on the centered data matrix \(X\). SVD decomposes \(X = U \Sigma V^T\). The columns of \(V\) give us our Principal Components, and the singular values in \(\Sigma\) squared give us our Eigenvalues. It is vastly more numerically stable and computationally efficient."</p>
+      </div>
+
+      <h3>1. The Intuition: The Floating-Point Cliff</h3>
+      <p>If a feature has a tiny value like \(10^{-5}\), explicitly calculating \(X^T X\) forces you to square it to \(10^{-10}\). Computers run out of standard floating-point precision, resulting in <strong>underflow</strong> (rounding to 0.0), destroying delicate variance. Large numbers cause <strong>overflow</strong>. Squaring the matrix squares its Condition Number.</p>
+
+      <h3>2. The Whiteboard Proof: Why SVD = PCA</h3>
+      <div class="proof-box">
+        <div class="proof-title">Step 1: The SVD Definition</div>
+        <p>Any matrix \(X\) can be decomposed: \(X = U \Sigma V^T\).</p>
+      </div>
+      <div class="proof-box">
+        <div class="proof-title">Step 2 & 3: The Algebraic Unfolding</div>
+        <p>Plug into the covariance formula: \(X^T X = (U \Sigma V^T)^T (U \Sigma V^T)\)</p>
+        <p>Using transpose rules: \(= (V \Sigma^T U^T)(U \Sigma V^T)\)</p>
+        <p>Because \(U\) is orthogonal, \(U^T U = I\). Thus: \(X^T X = V \Sigma^2 V^T\)</p>
+      </div>
+      <div class="proof-box">
+        <div class="proof-title">Step 4: The Checkmate</div>
+        <p>This final equation is the exact definition of Eigendecomposition (\(A = Q \Lambda Q^{-1}\)). By performing SVD directly on \(X\), the matrix \(V\) gives us the exact Eigenvectors, and \(\Sigma^2\) gives the Eigenvalues. We never calculated \(X^T X\).</p>
+      </div>
+
+      <div class="viz-container">
+        <div class="viz-title">🌀 Interactive: The SVD Theorem (Rotate, Stretch, Rotate)</div>
+        <canvas id="svdCanvas" height="280"></canvas>
+        <div class="viz-controls">
+          <button onclick="svdStep()">Animate Transformation (Vᵀ → Σ → U) ▶</button>
+          <button onclick="svdReset()">↺ Reset</button>
+        </div>
+        <p id="svdStatus" style="margin-top:0.6rem; font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--accent2)">
+          State: Original Space. SVD proves every matrix is just a rotation, a stretch, and another rotation.
+        </p>
+      </div>
+
+      <h3>The Production Workflow: How NumPy / LAPACK Does It</h3>
+      <p>Production libraries use a two-step iterative numerical method instead of squaring:</p>
+      <ol>
+        <li><strong>Householder Reflections (The Broadsword):</strong> Uses geometric "mirrors" to reflect points and force numbers outside the main/super diagonal to exactly zero (Bidiagonalization).</li>
+        <li><strong>QR Algorithm (The Scalpel):</strong> Applies tiny iterative Givens rotations to shrink the super-diagonal elements to zero, seamlessly converging on the Singular Values. Modern methods use "Divide and Conquer" to parallelize this on CPU cores.</li>
+      </ol>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <section class="chapter" id="ch56">
+      <div class="chapter-label">Chapter 56</div>
+      <h2>Regression Metrics (The Cost of Being Wrong)</h2>
+
+      <table class="data-table">
+        <thead><tr><th>Metric</th><th>Math</th><th>Intuition & Traps</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>MAE</strong> (Mean Absolute Error)</td>
+            <td>\(\frac{1}{m} \sum |y_i - \hat{y}_i|\)</td>
+            <td>Average physical distance. L1 Norm. Penalizes linearly. <strong>Trap:</strong> Not differentiable at 0.</td>
+          </tr>
+          <tr>
+            <td><strong>MSE</strong> (Mean Squared Error)</td>
+            <td>\(\frac{1}{m} \sum (y_i - \hat{y}_i)^2\)</td>
+            <td>L2 Norm. Magnifies outliers (error of 10 → 100 penalty). <strong>Trap:</strong> Units are squared, confusing to business stakeholders.</td>
+          </tr>
+          <tr>
+            <td><strong>RMSE</strong></td>
+            <td>\(\sqrt{\text{MSE}}\)</td>
+            <td>Brings penalty back to original units. Heavily punishes extreme deviations compared to MAE.</td>
+          </tr>
+          <tr>
+            <td><strong>R²</strong> (Coefficient of Determination)</td>
+            <td>\(1 - \frac{\text{SSR}}{\text{SST}}\)</td>
+            <td>How much better your model is than statically guessing the mean. <strong>Trap:</strong> Can be negative if your model is worse than the mean.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <section class="chapter" id="ch60">
+      <div class="chapter-label">Chapters 57-60</div>
+      <h2>Classification: The Imbalanced Data Trap & Confusion Matrix</h2>
+
+      <p><strong>The Flaw of Accuracy:</strong> You build a Fraud detector (99.9% Safe, 0.1% Fraud). A broken model that hardcodes <code>return "Safe"</code> achieves 99.9% accuracy but catches zero fraud. Accuracy is a useless, dangerous metric for imbalanced data.</p>
+
+      <h3>The Confusion Matrix (The Ultimate Truth Table)</h3>
+      <div class="math-block">
+        \[
+        \begin{array}{c|c|c}
+         & \text{Predicted: Negative} & \text{Predicted: Positive} \\
+        \hline
+        \text{Actual: Negative} & \mathbf{True \ Negatives \ (TN)} & \mathbf{False \ Positives \ (FP)} \text{ (Type I)} \\
+        \hline
+        \text{Actual: Positive} & \mathbf{False \ Negatives \ (FN)} \text{ (Type II)} & \mathbf{True \ Positives \ (TP)} 
+        \end{array}
+        \]
+      </div>
+
+      <div class="viz-container">
+        <div class="viz-title">🎛️ Interactive: Threshold vs. Precision/Recall/F1</div>
+        <canvas id="cmCanvas" height="280"></canvas>
+        <div class="viz-controls">
+          <label>Decision Threshold: <input type="range" id="threshSlider" min="0.1" max="0.9" step="0.05" value="0.5"> <span id="threshVal">0.50</span></label>
+        </div>
+        <p style="margin-top:0.6rem; font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--text)">
+          Precision: <span id="precVal" style="color:var(--accent2); font-weight:bold;">—</span> &nbsp;|&nbsp; 
+          Recall: <span id="recVal" style="color:var(--accent3); font-weight:bold;">—</span> &nbsp;|&nbsp; 
+          F1: <span id="f1Val" style="color:var(--accent); font-weight:bold;">—</span>
+        </p>
+      </div>
+
+      <h3>Precision, Recall & F1</h3>
+      <ul>
+        <li><strong>Precision</strong> = \(\frac{TP}{TP + FP}\): "Out of everything my model claimed was positive, how many actually were?" Punishes False Alarms.</li>
+        <li><strong>Recall</strong> = \(\frac{TP}{TP + FN}\): "Out of all actual positives hiding in the real world, how many did my model find?" Punishes Misses.</li>
+        <li><strong>F1-Score</strong> = \(2 \times \frac{P \times R}{P + R}\): Harmonic mean. Mathematically collapses toward the lowest value, heavily punishing models that completely sacrifice one metric.</li>
+      </ul>
+
+      <h3>ROC-AUC (The Threshold-Agnostic Metric)</h3>
+      <p>Plots <strong>True Positive Rate (Recall)</strong> vs <strong>False Positive Rate</strong> at every threshold.</p>
+      <div class="callout gold">
+        <div class="callout-title">⭐ The Probabilistic Definition (Memorize This)</div>
+        <p>AUC represents the exact probability that if I pick one random positive instance and one random negative instance from my dataset, my model will correctly assign a higher probability score to the positive instance than the negative one.</p>
+      </div>
+
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <a href="index.html">◈ CDC ML PREP</a> &nbsp;·&nbsp; Unsupervised Learning & Metrics &nbsp;·&nbsp; IIT KGP 2026
+</footer>
+
+<script>
+// Progress bar
+window.addEventListener('scroll', () => {
+  const h = document.documentElement;
+  document.getElementById('progressBar').style.width = (h.scrollTop / (h.scrollHeight - h.clientHeight) * 100) + '%';
+});
+
+// ─── K-MEANS VIZ ───
+const kmCanvas = document.getElementById('kmeansCanvas');
+const kmCtx = kmCanvas.getContext('2d');
+let kmPoints = [];
+let kmCentroids = [];
+let kmState = 0; // 0: init, 1: assigned, 2: moved
+
+function generateKmData() {
+  kmPoints = [];
+  // Gen 3 distinct blobs
+  const centers = [[0.2,0.3], [0.8,0.2], [0.5,0.8]];
+  centers.forEach(c => {
+    for(let i=0; i<30; i++) {
+      kmPoints.push({
+        x: c[0] + (Math.random()-0.5)*0.25,
+        y: c[1] + (Math.random()-0.5)*0.25,
+        cluster: -1
+      });
+    }
+  });
+}
+
+function drawKm() {
+  const W = kmCanvas.width = kmCanvas.offsetWidth;
+  const H = 300; kmCanvas.height = H;
+  kmCtx.clearRect(0,0,W,H);
+  
+  const colors = ['rgba(121,192,255,0.8)', 'rgba(232,197,71,0.8)', 'rgba(86,211,100,0.8)'];
+  
+  // Draw points
+  kmPoints.forEach(p => {
+    kmCtx.beginPath();
+    kmCtx.arc(p.x*W, p.y*H, 4, 0, Math.PI*2);
+    kmCtx.fillStyle = p.cluster === -1 ? '#484f58' : colors[p.cluster];
+    kmCtx.fill();
+  });
+
+  // Draw Centroids
+  kmCentroids.forEach((c, i) => {
+    kmCtx.beginPath();
+    kmCtx.arc(c.x*W, c.y*H, 8, 0, Math.PI*2);
+    kmCtx.fillStyle = colors[i];
+    kmCtx.fill();
+    kmCtx.strokeStyle = '#fff';
+    kmCtx.lineWidth = 2;
+    kmCtx.stroke();
+  });
+}
+
+function kmeansInit() {
+  generateKmData();
+  kmCentroids = [
+    {x: Math.random(), y: Math.random()},
+    {x: Math.random(), y: Math.random()},
+    {x: Math.random(), y: Math.random()}
+  ];
+  kmPoints.forEach(p => p.cluster = -1);
+  kmState = 0;
+  document.getElementById('kmeansStepBtn').disabled = false;
+  drawKm();
+}
+
+function kmeansStep() {
+  if (kmState === 0 || kmState === 2) {
+    // E-Step: Assign
+    kmPoints.forEach(p => {
+      let minDist = Infinity;
+      kmCentroids.forEach((c, i) => {
+        let d = Math.hypot(p.x - c.x, p.y - c.y);
+        if (d < minDist) { minDist = d; p.cluster = i; }
+      });
+    });
+    kmState = 1;
+  } else if (kmState === 1) {
+    // M-Step: Move
+    let sums = [{x:0,y:0,c:0}, {x:0,y:0,c:0}, {x:0,y:0,c:0}];
+    kmPoints.forEach(p => {
+      if(p.cluster !== -1) {
+        sums[p.cluster].x += p.x;
+        sums[p.cluster].y += p.y;
+        sums[p.cluster].c++;
+      }
+    });
+    kmCentroids.forEach((c, i) => {
+      if(sums[i].c > 0) {
+        c.x = sums[i].x / sums[i].c;
+        c.y = sums[i].y / sums[i].c;
+      }
+    });
+    kmState = 2;
+  }
+  drawKm();
+}
+
+function kmeansReset() {
+  kmPoints = []; kmCentroids = []; document.getElementById('kmeansStepBtn').disabled = true; drawKm();
+}
+window.addEventListener('resize', drawKm);
+setTimeout(kmeansReset, 100);
+
+// ─── DBSCAN VIZ ───
+const dbCanvas = document.getElementById('dbscanCanvas');
+const dbCtx = dbCanvas.getContext('2d');
+let dbPoints = [];
+let dbStep = 0;
+
+function generateDBData() {
+  dbPoints = [];
+  // Moon 1
+  for(let i=0; i<=Math.PI; i+=Math.PI/30) {
+    dbPoints.push({ x: 0.3 + 0.2*Math.cos(i) + (Math.random()*0.05), y: 0.4 - 0.2*Math.sin(i) + (Math.random()*0.05), type: 'u' });
+  }
+  // Moon 2
+  for(let i=0; i<=Math.PI; i+=Math.PI/30) {
+    dbPoints.push({ x: 0.5 + 0.2*Math.cos(i) + (Math.random()*0.05), y: 0.5 + 0.2*Math.sin(i) + (Math.random()*0.05), type: 'u' });
+  }
+  // Noise
+  for(let i=0; i<15; i++) {
+    dbPoints.push({ x: Math.random(), y: Math.random(), type: 'u' });
+  }
+}
+
+function drawDB() {
+  const W = dbCanvas.width = dbCanvas.offsetWidth;
+  const H = 300; dbCanvas.height = H;
+  dbCtx.clearRect(0,0,W,H);
+  
+  dbPoints.forEach(p => {
+    dbCtx.beginPath();
+    dbCtx.arc(p.x*W, p.y*H, 4, 0, Math.PI*2);
+    if(p.type === 'u') dbCtx.fillStyle = '#484f58'; // unvisited
+    if(p.type === 'core') dbCtx.fillStyle = '#56d364'; // core
+    if(p.type === 'border') dbCtx.fillStyle = '#79c0ff'; // border
+    if(p.type === 'noise') dbCtx.fillStyle = '#8b949e'; // noise
+    dbCtx.fill();
+  });
+}
+
+function dbscanRun() {
+  // simplified fake contagion run for visual effect
+  const eps = 0.08;
+  const minPts = 3;
+  dbPoints.forEach(p => {
+    let neighbors = 0;
+    dbPoints.forEach(p2 => { if(Math.hypot(p.x-p2.x, p.y-p2.y) < eps) neighbors++; });
+    if(neighbors >= minPts) p.type = 'core';
+    else if (neighbors > 0) p.type = 'border'; // simplified logic
+    else p.type = 'noise';
+  });
+  
+  // Actually filter strictly
+  dbPoints.forEach(p => {
+    if (p.type === 'border') {
+      let touchingCore = false;
+      dbPoints.forEach(p2 => {
+        if(p2.type === 'core' && Math.hypot(p.x-p2.x, p.y-p2.y) < eps) touchingCore = true;
+      });
+      if(!touchingCore) p.type = 'noise';
+    }
+  });
+
+  drawDB();
+}
+
+function dbscanReset() {
+  generateDBData(); drawDB();
+}
+window.addEventListener('resize', drawDB);
+setTimeout(dbscanReset, 200);
+
+// ─── SVD VIZ ───
+const svdCanvas = document.getElementById('svdCanvas');
+const svdCtx = svdCanvas.getContext('2d');
+let svdState = 0; // 0: orig, 1: V^T (rotate), 2: Sigma (stretch), 3: U (rotate)
+
+function drawSVD() {
+  const W = svdCanvas.width = svdCanvas.offsetWidth;
+  const H = 280; svdCanvas.height = H;
+  svdCtx.clearRect(0,0,W,H);
+  
+  const cx = W/2, cy = H/2;
+  const scale = 50;
+
+  // Grid
+  svdCtx.strokeStyle='#21262d'; svdCtx.beginPath();
+  svdCtx.moveTo(cx, 0); svdCtx.lineTo(cx, H);
+  svdCtx.moveTo(0, cy); svdCtx.lineTo(W, cy);
+  svdCtx.stroke();
+
+  // Matrix transformations
+  let angle = 0;
+  let sx = 1, sy = 1;
+  let uAngle = 0;
+
+  if(svdState >= 1) angle = -Math.PI/6; // V^T rotation
+  if(svdState >= 2) { sx = 2.0; sy = 0.5; } // Sigma stretch
+  if(svdState >= 3) uAngle = Math.PI/4; // U rotation
+
+  svdCtx.save();
+  svdCtx.translate(cx, cy);
+  svdCtx.rotate(uAngle);
+  svdCtx.scale(sx, sy);
+  svdCtx.rotate(angle);
+
+  // Draw circle
+  svdCtx.beginPath();
+  svdCtx.arc(0, 0, scale, 0, Math.PI*2);
+  svdCtx.strokeStyle = 'rgba(121,192,255,0.8)';
+  svdCtx.lineWidth = 2;
+  svdCtx.stroke();
+
+  // Draw vectors
+  svdCtx.beginPath(); svdCtx.moveTo(0,0); svdCtx.lineTo(scale, 0);
+  svdCtx.strokeStyle = '#e8c547'; svdCtx.lineWidth = 2; svdCtx.stroke(); // X vector
+
+  svdCtx.beginPath(); svdCtx.moveTo(0,0); svdCtx.lineTo(0, scale);
+  svdCtx.strokeStyle = '#56d364'; svdCtx.lineWidth = 2; svdCtx.stroke(); // Y vector
+
+  svdCtx.restore();
+
+  const labels = ["Original Space", "Step 1: Rotate by V^T", "Step 2: Stretch by Sigma", "Step 3: Rotate by U"];
+  document.getElementById('svdStatus').textContent = "State: " + labels[svdState];
+}
+
+function svdStep() {
+  svdState = (svdState + 1) % 4;
+  drawSVD();
+}
+function svdReset() { svdState = 0; drawSVD(); }
+window.addEventListener('resize', drawSVD);
+setTimeout(svdReset, 300);
+
+// ─── CONFUSION MATRIX VIZ ───
+const cmCanvas = document.getElementById('cmCanvas');
+const cmCtx = cmCanvas.getContext('2d');
+function drawCM(){
+  const W=cmCanvas.width=cmCanvas.offsetWidth; const H=280; cmCanvas.height=H;
+  cmCtx.clearRect(0,0,W,H);
+  const thr=parseFloat(document.getElementById('threshSlider').value);
+  document.getElementById('threshVal').textContent=thr.toFixed(2);
+
+  // Simulate dataset based on threshold slider
+  // 100 positive cases (mean prob 0.65), 900 negative cases (mean prob 0.35)
+  // Simplified math to emulate normal distribution overlap
+  const tp = Math.round(100 * (1 - Math.max(0, thr - 0.2)));
+  const fn = 100 - tp;
+  const fp = Math.round(900 * Math.max(0, 0.7 - thr) * 0.3);
+  const tn = 900 - fp;
+
+  const prec = tp / (tp + fp + 1e-6); 
+  const rec = tp / (tp + fn + 1e-6);
+  const f1 = 2 * prec * rec / (prec + rec + 1e-6);
+  
+  document.getElementById('precVal').textContent = prec.toFixed(3);
+  document.getElementById('recVal').textContent = rec.toFixed(3);
+  document.getElementById('f1Val').textContent = f1.toFixed(3);
+
+  const cs = Math.min((W-80)/2, (H-80)/2, 80);
+  const ox = (W-2*cs)/2; const oy = 40;
+  
+  const cells = [
+    [tp, 'TP', 'rgba(86,211,100,0.25)', '#56d364'], [fp, 'FP', 'rgba(248,81,73,0.15)', '#f85149'],
+    [fn, 'FN', 'rgba(248,81,73,0.15)', '#f85149'], [tn, 'TN', 'rgba(86,211,100,0.15)', '#56d364']
+  ];
+  
+  cells.forEach(([val, label, bg, col], i) => {
+    const cx = ox + (i%2)*cs; const cy = oy + Math.floor(i/2)*cs;
+    cmCtx.fillStyle = bg; cmCtx.fillRect(cx, cy, cs, cs);
+    cmCtx.strokeStyle = col; cmCtx.lineWidth = 2; cmCtx.strokeRect(cx, cy, cs, cs);
+    cmCtx.fillStyle = col; cmCtx.font = 'bold 14px IBM Plex Mono'; cmCtx.textAlign = 'center';
+    cmCtx.fillText(label, cx+cs/2, cy+cs/2-8);
+    cmCtx.fillStyle = '#e6edf3'; cmCtx.font = '16px IBM Plex Mono';
+    cmCtx.fillText(val, cx+cs/2, cy+cs/2+14);
+  });
+
+  // Headers
+  cmCtx.fillStyle='#8b949e'; cmCtx.font='10px IBM Plex Mono';
+  cmCtx.textAlign='center';
+  cmCtx.fillText('Pred Negative', ox+cs/2, oy-10); 
+  cmCtx.fillText('Pred Positive', ox+cs+cs/2, oy-10);
+  
+  cmCtx.save(); cmCtx.translate(ox-15, oy+cs/2); cmCtx.rotate(-Math.PI/2);
+  cmCtx.fillText('Actual Neg', 0, 0); cmCtx.restore();
+  
+  cmCtx.save(); cmCtx.translate(ox-15, oy+cs+cs/2); cmCtx.rotate(-Math.PI/2);
+  cmCtx.fillText('Actual Pos', 0, 0); cmCtx.restore();
+}
+
+document.getElementById('threshSlider').addEventListener('input', drawCM);
+window.addEventListener('resize', drawCM);
+setTimeout(drawCM, 400);
+
+</script>
+
+<script>
+MathJax = {
+  tex: { inlineMath: [['\\(','\\)'],['$','$']], displayMath: [['\\[','\\]'],['$$','$$']] },
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+};
+</script>
+</body>
+</html>
