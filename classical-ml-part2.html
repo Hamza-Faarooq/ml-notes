@@ -1,0 +1,1746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Classical ML Part 2 — Bias-Variance, Trees, SVMs, AdaBoost | CDC ML Prep</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&family=Newsreader:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+<style>
+  :root {
+    --bg: #080b0f;
+    --bg2: #0d1117;
+    --bg3: #161b22;
+    --border: #21262d;
+    --accent: #e8c547;
+    --accent2: #79c0ff;
+    --accent3: #56d364;
+    --accent4: #f85149;
+    --accent5: #d2a8ff;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --text-dim: #484f58;
+    --highlight: rgba(232,197,71,0.07);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Newsreader', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.8;
+    overflow-x: hidden;
+  }
+
+  /* PROGRESS */
+  .progress-bar { position: fixed; top: 56px; left: 0; height: 2px; background: var(--accent); width: 0%; z-index: 99; transition: width 0.1s; }
+
+  /* HEADER */
+  .site-header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(8,11,15,0.94);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 56px;
+  }
+  .logo { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--accent); text-decoration: none; letter-spacing: 0.08em; }
+  .header-nav { display: flex; gap: 1.5rem; }
+  .header-nav a { font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+  .header-nav a:hover { color: var(--accent2); }
+
+  /* HERO */
+  .hero { padding: 5rem 2rem 3rem; max-width: 960px; margin: 0 auto; }
+  .hero-tag { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--accent); letter-spacing: 0.15em; text-transform: uppercase; border: 1px solid rgba(232,197,71,0.3); display: inline-block; padding: 3px 10px; border-radius: 3px; margin-bottom: 1.5rem; }
+  .hero h1 { font-family: 'Newsreader', serif; font-size: clamp(2.2rem, 5vw, 3.6rem); font-weight: 300; line-height: 1.15; color: var(--text); margin-bottom: 1.2rem; }
+  .hero h1 em { font-style: italic; color: var(--accent); }
+  .hero-desc { font-size: 1.1rem; color: var(--text-muted); max-width: 660px; line-height: 1.75; }
+  .hero-meta { margin-top: 2.5rem; display: flex; gap: 2rem; flex-wrap: wrap; }
+  .hero-meta-item { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-dim); }
+  .hero-meta-item span { color: var(--accent3); }
+
+  /* TOC */
+  .toc-container { max-width: 960px; margin: 0 auto 3rem; padding: 0 2rem; }
+  .toc { background: var(--bg3); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 6px; padding: 1.5rem 2rem; }
+  .toc-title { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 1rem; }
+  .toc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.4rem 2rem; }
+  .toc a { font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; color: var(--text-muted); text-decoration: none; transition: color 0.2s; display: flex; align-items: center; gap: 0.5rem; }
+  .toc a::before { content: '→'; color: var(--accent2); font-size: 11px; }
+  .toc a:hover { color: var(--accent2); }
+
+  /* CONTENT */
+  .content-wrapper { max-width: 960px; margin: 0 auto; padding: 0 2rem 6rem; }
+
+  /* CHAPTERS */
+  .chapter { margin-bottom: 5rem; scroll-margin-top: 70px; }
+  .chapter-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--accent); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.6rem; }
+  .chapter-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(to right, var(--border), transparent); }
+  .chapter h2 { font-family: 'Newsreader', serif; font-size: clamp(1.6rem, 3vw, 2.3rem); font-weight: 400; color: var(--text); margin-bottom: 1.5rem; line-height: 1.2; }
+  .chapter h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 500; color: var(--accent2); margin: 2.2rem 0 0.8rem; }
+  .chapter h4 { font-family: 'Space Grotesk', sans-serif; font-size: 0.95rem; font-weight: 500; color: var(--accent3); margin: 1.5rem 0 0.5rem; letter-spacing: 0.02em; }
+  .chapter p { margin-bottom: 1.1rem; }
+  .chapter ul, .chapter ol { margin: 0.8rem 0 1.2rem 1.5rem; }
+  .chapter li { margin-bottom: 0.5rem; }
+
+  /* MATH */
+  .math-block { background: #0d1117; border: 1px solid var(--border); border-left: 3px solid var(--accent2); border-radius: 6px; padding: 1.2rem 1.5rem; margin: 1.5rem 0; overflow-x: auto; text-align: center; }
+  .math-block .label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text-dim); text-align: left; display: block; margin-bottom: 0.5rem; letter-spacing: 0.1em; text-transform: uppercase; }
+
+  /* CODE */
+  pre { background: #0d1117; border: 1px solid var(--border); border-radius: 6px; padding: 1.2rem 1.5rem; overflow-x: auto; margin: 1.5rem 0; position: relative; }
+  pre .lang-tag { position: absolute; top: 8px; right: 12px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text-dim); letter-spacing: 0.08em; }
+  code { font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; line-height: 1.65; color: var(--text); }
+  p code, li code { background: var(--bg3); padding: 1px 5px; border-radius: 3px; font-size: 0.82rem; color: var(--accent3); }
+  .kw { color: #f85149; } .fn { color: #d2a8ff; } .st { color: #a5d6ff; } .cm { color: #8b949e; font-style: italic; } .num { color: #79c0ff; } .cl { color: #ffa657; }
+
+  /* CALLOUTS */
+  .callout { border-radius: 6px; padding: 1.2rem 1.5rem; margin: 1.8rem 0; border-left: 4px solid; }
+  .callout-title { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.5rem; }
+  .callout.interview { background: rgba(121,192,255,0.06); border-color: var(--accent2); }
+  .callout.interview .callout-title { color: var(--accent2); }
+  .callout.warning { background: rgba(248,81,73,0.06); border-color: var(--accent4); }
+  .callout.warning .callout-title { color: var(--accent4); }
+  .callout.insight { background: rgba(86,211,100,0.06); border-color: var(--accent3); }
+  .callout.insight .callout-title { color: var(--accent3); }
+  .callout.gold { background: rgba(232,197,71,0.07); border-color: var(--accent); }
+  .callout.gold .callout-title { color: var(--accent); }
+  .callout.purple { background: rgba(210,168,255,0.07); border-color: var(--accent5); }
+  .callout.purple .callout-title { color: var(--accent5); }
+
+  /* Q&A */
+  .qa-block { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin: 2rem 0; }
+  .qa-q { background: var(--bg3); padding: 1rem 1.4rem; font-family: 'Space Grotesk', sans-serif; font-size: 0.95rem; font-weight: 500; color: var(--accent2); display: flex; align-items: flex-start; gap: 0.8rem; }
+  .qa-q::before { content: 'Q'; background: var(--accent2); color: var(--bg); font-size: 11px; font-weight: 700; padding: 1px 6px; border-radius: 3px; flex-shrink: 0; margin-top: 2px; font-family: 'IBM Plex Mono', monospace; }
+  .qa-a { background: var(--bg2); padding: 1rem 1.4rem; border-top: 1px solid var(--border); display: flex; align-items: flex-start; gap: 0.8rem; font-size: 0.95rem; }
+  .qa-a::before { content: 'A'; background: var(--accent3); color: var(--bg); font-size: 11px; font-weight: 700; padding: 1px 6px; border-radius: 3px; flex-shrink: 0; margin-top: 2px; font-family: 'IBM Plex Mono', monospace; }
+
+  /* TABLES */
+  .data-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.9rem; }
+  .data-table th { background: var(--bg3); font-family: 'Space Grotesk', sans-serif; font-size: 0.85rem; font-weight: 500; color: var(--text); padding: 0.8rem 1rem; border-bottom: 2px solid var(--accent); border-right: 1px solid var(--border); }
+  .data-table td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); vertical-align: top; }
+  .data-table tr:hover td { background: var(--highlight); }
+
+  /* STEP LIST */
+  .step-list { list-style: none; margin: 1rem 0 1.5rem; padding: 0; }
+  .step-list li { display: flex; gap: 1rem; align-items: flex-start; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+  .step-list li:last-child { border-bottom: none; }
+  .step-num { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; background: var(--accent); color: var(--bg); width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+
+  /* VIZ */
+  .viz-container { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 2rem 0; }
+  .viz-title { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1rem; }
+  .viz-controls { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; margin-top: 1rem; }
+  .viz-controls label { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 0.5rem; }
+  .viz-controls input[type=range] { accent-color: var(--accent); width: 120px; }
+  .viz-controls button { background: var(--bg2); border: 1px solid var(--border); color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 5px 12px; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
+  .viz-controls button:hover, .viz-controls button.active { border-color: var(--accent2); color: var(--accent2); }
+  canvas { display: block; border-radius: 4px; width: 100%; max-width: 100%; }
+
+  /* BADGE */
+  .badge { display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 2px 8px; border-radius: 3px; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 600; margin: 0 2px; }
+  .badge-blue { background: rgba(121,192,255,0.15); color: var(--accent2); }
+  .badge-green { background: rgba(86,211,100,0.15); color: var(--accent3); }
+  .badge-gold { background: rgba(232,197,71,0.15); color: var(--accent); }
+  .badge-red { background: rgba(248,81,73,0.15); color: var(--accent4); }
+  .badge-purple { background: rgba(210,168,255,0.15); color: var(--accent5); }
+
+  /* HIGHLIGHT */
+  .highlight-box { background: var(--highlight); border: 1px solid rgba(232,197,71,0.2); border-radius: 6px; padding: 1rem 1.4rem; margin: 1.5rem 0; }
+
+  /* DIVIDER */
+  .chapter-divider { height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent); margin: 4rem 0; }
+
+  /* PROOF BOX */
+  .proof-box { background: #0d1117; border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem 2rem; margin: 1.5rem 0; }
+  .proof-box .proof-title { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--accent5); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+
+  /* FOOTER */
+  .site-footer { border-top: 1px solid var(--border); padding: 2rem; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-dim); letter-spacing: 0.08em; }
+  .site-footer a { color: var(--accent2); text-decoration: none; }
+
+  @media (max-width: 640px) {
+    .hero { padding: 3rem 1.2rem 2rem; }
+    .content-wrapper { padding: 0 1.2rem 4rem; }
+    .toc-grid { grid-template-columns: 1fr; }
+    .header-nav { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<header class="site-header">
+  <a href="index.html" class="logo">◈ CDC ML PREP</a>
+  <nav class="header-nav">
+    <a href="index.html">Home</a>
+    <a href="supervised-learning.html">Part 1</a>
+    <a href="#ch45">Bias-Variance</a>
+    <a href="#ch-trees">Trees</a>
+    <a href="#ch48">SVMs</a>
+    <a href="#ch50">AdaBoost</a>
+  </nav>
+</header>
+
+<main>
+
+  <section class="hero">
+    <div class="hero-tag">Pillar 1 · Classical ML — Part 2</div>
+    <h1>Advanced Classical ML:<br><em>Bias-Variance, Trees,</em><br>SVMs & Boosting</h1>
+    <p class="hero-desc">Bias-Variance decomposition, overfitting/underfitting, K-fold cross-validation, the full tree ensemble family (Random Forests → XGBoost → LightGBM → CatBoost), SVM Lagrangian duality with full algebraic derivation, AdaBoost, and evaluation metrics for imbalanced data.</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">Continues from: <span>Supervised Learning Part 1</span></div>
+      <div class="hero-meta-item">Chapters: <span>45–55</span></div>
+      <div class="hero-meta-item">CDC Focus: <span>Day 1 ML/Quant Roles</span></div>
+    </div>
+  </section>
+
+  <div class="toc-container">
+    <div class="toc">
+      <div class="toc-title">📋 Table of Contents</div>
+      <div class="toc-grid">
+        <a href="#ch45">Ch 45 · Bias-Variance Decomposition</a>
+        <a href="#ch46">Ch 46 · Cross-Validation</a>
+        <a href="#ch47">Ch 47 · Regularization in the BV Framework</a>
+        <a href="#ch-trees">Ch 34–43 · Decision Trees Deep Dive</a>
+        <a href="#ch-rf">Random Forests (Bagging)</a>
+        <a href="#ch-gbm">Gradient Boosting</a>
+        <a href="#ch-xgb">XGBoost — 2nd Order Math</a>
+        <a href="#ch-lgbm">LightGBM vs CatBoost</a>
+        <a href="#ch-catboost">CatBoost Symmetry & Regularization</a>
+        <a href="#ch48">Ch 48 · SVM — Margin & Primal Form</a>
+        <a href="#ch49">Ch 49 · Lagrangian Duality — Full Derivation</a>
+        <a href="#ch-kernel-origin">Kernel Formula: The Origin Story</a>
+        <a href="#ch-kernel-complexity">Kernel Computational Complexity</a>
+        <a href="#ch-mercer">Mercer's Theorem</a>
+        <a href="#ch50">Ch 50 · AdaBoost</a>
+        <a href="#ch51">Ch 51 · Evaluation Metrics</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-wrapper">
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- CH 45: BIAS VARIANCE -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <section class="chapter" id="ch45">
+      <div class="chapter-label">Chapter 45</div>
+      <h2>The Bias-Variance Tradeoff — The Heart of ML Theory</h2>
+
+      <p>Every time you train a model, you are fighting a war on two fronts simultaneously. You cannot completely eliminate both Bias and Variance at once. Understanding this tradeoff is the foundational diagnostic skill of a machine learning engineer.</p>
+
+      <h3>The Mathematical Decomposition</h3>
+      <p>Assume the true data-generating process is \(y = f(x) + \epsilon\), where \(\epsilon\) is irreducible noise with \(E[\epsilon] = 0\) and \(\text{Var}(\epsilon) = \sigma^2\). Our learned model is \(\hat{f}(x)\).</p>
+      <p>If we compute the Expected Mean Squared Error on unseen data, it decomposes perfectly into three distinct, non-negative components:</p>
+
+      <div class="math-block">
+        <span class="label">Bias-Variance Decomposition</span>
+        \[ \mathbb{E}\!\left[(y - \hat{f}(x))^2\right] = \underbrace{\text{Bias}(\hat{f}(x))^2}_{\text{systematic error}} + \underbrace{\text{Var}(\hat{f}(x))}_{\text{sensitivity to data}} + \underbrace{\sigma^2}_{\text{irreducible noise}} \]
+      </div>
+
+      <p>Where:</p>
+      <ul>
+        <li>\(\text{Bias}(\hat{f}(x)) = \mathbb{E}[\hat{f}(x)] - f(x)\) — How far your model's average prediction is from truth</li>
+        <li>\(\text{Var}(\hat{f}(x)) = \mathbb{E}[(\hat{f}(x) - \mathbb{E}[\hat{f}(x)])^2]\) — How much the model changes when trained on different data</li>
+        <li>\(\sigma^2\) — The irreducible noise inherent in the universe. No model can overcome this.</li>
+      </ul>
+
+      <h3>Physical Intuition: The Dart Analogy</h3>
+      <table class="data-table">
+        <thead><tr><th>Scenario</th><th>Bias</th><th>Variance</th><th>Meaning</th><th>Example Model</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Clustered at center ✓</strong></td><td>Low</td><td>Low</td><td>Accurate + Consistent. The goal.</td><td>Well-tuned Random Forest</td></tr>
+          <tr><td><strong>Spread around center</strong></td><td>Low</td><td>High</td><td>Right on average, but wildly inconsistent</td><td>Deep Decision Tree, 1-NN</td></tr>
+          <tr><td><strong>Clustered off-center</strong></td><td>High</td><td>Low</td><td>Consistently wrong in the same direction</td><td>Linear model on curved data</td></tr>
+          <tr><td><strong>Spread off-center ✗</strong></td><td>High</td><td>High</td><td>Wrong AND inconsistent. Worst case.</td><td>Wrong architecture entirely</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Overfitting vs Underfitting</h3>
+      <p>These are the physical symptoms of high Variance and high Bias respectively:</p>
+
+      <table class="data-table">
+        <thead><tr><th>Condition</th><th>Bias</th><th>Variance</th><th>Training Error</th><th>Test Error</th><th>Cause</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="badge badge-gold">Underfitting</span></td>
+            <td>High</td><td>Low</td>
+            <td>High</td><td>High (similar to train)</td>
+            <td>Model too simple; can't capture the true pattern</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-red">Overfitting</span></td>
+            <td>Low</td><td>High</td>
+            <td>Near 0%</td><td>Much higher than train</td>
+            <td>Model memorizes noise in training data</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-green">Just Right</span></td>
+            <td>Low</td><td>Low</td>
+            <td>Low</td><td>Low (close to train)</td>
+            <td>Correct model complexity for the problem</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Interactive Bias-Variance viz -->
+      <div class="viz-container">
+        <div class="viz-title">📊 Interactive: Bias-Variance — Training vs Test Error</div>
+        <canvas id="bvCanvas" height="260"></canvas>
+        <div class="viz-controls">
+          <label>Model Complexity: <input type="range" id="complexSlider" min="1" max="10" step="1" value="3"> <span id="complexVal">3</span></label>
+        </div>
+        <p style="margin-top:0.8rem; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-muted)">
+          As complexity increases: Training Error falls monotonically. Test Error forms a U-shape — the sweet spot is the minimum.
+        </p>
+      </div>
+
+      <div class="callout interview">
+        <div class="callout-title">🎯 Hard Interview: Why does LOOCV have high variance despite low bias?</div>
+        <p><strong>Q:</strong> Leave-One-Out Cross-Validation trains on the maximum data possible. Why do we prefer K=5 or K=10 in practice?</p>
+        <p><strong>Exact Answer:</strong> "Two reasons. First, computational cost — LOOCV trains \(m\) separate models. But more critically: the Bias-Variance tradeoff exists within cross-validation itself. Each of the \(m\) LOOCV training sets overlaps by 99.99%, making their error estimates highly correlated. The variance of an average of highly correlated variables is much larger than the variance of independent ones (the formula for the variance of a sum includes covariance terms). K=5 or K=10 provides training sets with less overlap, producing more independent error estimates with a better statistical sweet spot between bias and variance."</p>
+      </div>
+
+      <div class="callout interview">
+        <div class="callout-title">🎯 Hard Interview: Adding trees to a Random Forest to fix overfitting</div>
+        <p><strong>Q:</strong> Your Random Forest is heavily overfitting. You increase trees from 100 to 1,000. Will this fix it?</p>
+        <p><strong>Exact Answer:</strong> "No. Adding more trees strictly decreases the variance of the ensemble's average (by the law of large numbers), but the variance reduction asymptotically approaches a floor determined by the individual tree depth — it cannot go below the average correlation between trees. Overfitting caused by trees being too deep is a bias-variance issue at the individual tree level. To fix it, I must constrain the base learners: decrease <code>max_depth</code>, increase <code>min_samples_split</code>, or reduce <code>max_features</code>."</p>
+      </div>
+
+      <div class="callout interview">
+        <div class="callout-title">🎯 Hard Interview: Why do overfitted models have massive weights?</div>
+        <p><strong>Exact Answer:</strong> "To force a polynomial curve to pass through every noisy data point, the function must execute violent, sharp turns geometrically. Algebraically, the only way a polynomial can spike up and immediately spike back down between two closely-spaced points is through astronomical coefficients with opposing signs that cancel each other out. Regularization prevents this by imposing a strict mathematical budget — a norm constraint — on the magnitude of contortions the curve can perform."</p>
+      </div>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- CH 46: CROSS VALIDATION -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <section class="chapter" id="ch46">
+      <div class="chapter-label">Chapter 46</div>
+      <h2>Cross-Validation — The Reality Check</h2>
+
+      <p><strong>The Problem:</strong> We know overfitting is bad. So how do we tune hyperparameters (like polynomial degree, or \(\lambda\)) without peeking at the test set? Looking at your test set to make training decisions is called <strong>Data Leakage</strong> — the cardinal sin of ML. Your test error estimate becomes invalid the moment you use it to make any decision.</p>
+
+      <h3>K-Fold Cross-Validation</h3>
+      <p>We simulate the future by hiding portions of our own training data from ourselves:</p>
+
+      <ol class="step-list">
+        <li><div class="step-num">1</div><div>Shuffle the training dataset and split it into \(K\) equally sized "folds." Common choices: \(K = 5\) or \(K = 10\).</div></li>
+        <li><div class="step-num">2</div><div>Train the model on \(K-1\) folds combined.</div></li>
+        <li><div class="step-num">3</div><div>Evaluate the model on the 1 held-out fold. Record this validation error.</div></li>
+        <li><div class="step-num">4</div><div>Rotate the held-out fold. Repeat exactly \(K\) times so every fold acts as the validation set once.</div></li>
+        <li><div class="step-num">5</div><div>Final CV Score = Average of all \(K\) recorded errors (often reported with standard deviation).</div></li>
+      </ol>
+
+      <!-- CV visualization -->
+      <div class="viz-container">
+        <div class="viz-title">🔄 Interactive: K-Fold Cross-Validation — Watch the Folds Rotate</div>
+        <canvas id="cvCanvas" height="200"></canvas>
+        <div class="viz-controls">
+          <label>K (folds): <input type="range" id="kfoldSlider" min="2" max="10" step="1" value="5"> <span id="kfoldVal">5</span></label>
+          <button onclick="nextFold()">Next Fold ▶</button>
+          <button onclick="resetCV()">↺ Reset</button>
+        </div>
+        <p style="margin-top:0.6rem; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-muted)">
+          Orange = current validation fold. Blue = training folds. Every fold gets its turn as validation.
+        </p>
+      </div>
+
+      <h3>Types of Cross-Validation</h3>
+      <table class="data-table">
+        <thead><tr><th>Type</th><th>K Value</th><th>Pros</th><th>Cons</th><th>Use When</th></tr></thead>
+        <tbody>
+          <tr><td><strong>K-Fold</strong></td><td>5 or 10</td><td>Good bias-variance balance, computationally feasible</td><td>Random splits may misrepresent class balance</td><td>Default choice</td></tr>
+          <tr><td><strong>Stratified K-Fold</strong></td><td>5 or 10</td><td>Preserves class ratio in each fold</td><td>Slightly more complex</td><td>Imbalanced classification</td></tr>
+          <tr><td><strong>LOOCV</strong></td><td>\(m\) (all data)</td><td>Minimal bias in error estimate, uses maximum data</td><td>\(m\) model fits; high variance estimate; expensive</td><td>Tiny datasets (&lt;50 examples)</td></tr>
+          <tr><td><strong>Time Series CV</strong></td><td>Rolling window</td><td>Respects temporal order, no future leakage</td><td>Less data per fold</td><td>Any time-series problem</td></tr>
+        </tbody>
+      </table>
+
+      <pre><code><span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> KFold, StratifiedKFold, cross_val_score
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># Standard K-Fold</span>
+kf = KFold(n_splits=<span class="num">5</span>, shuffle=<span class="kw">True</span>, random_state=<span class="num">42</span>)
+scores = cross_val_score(model, X, y, cv=kf, scoring=<span class="st">'neg_mean_squared_error'</span>)
+<span class="fn">print</span>(<span class="st">f"CV MSE: {-scores.mean():.4f} ± {scores.std():.4f}"</span>)
+
+<span class="cm"># Stratified K-Fold (for imbalanced classification)</span>
+skf = StratifiedKFold(n_splits=<span class="num">5</span>, shuffle=<span class="kw">True</span>, random_state=<span class="num">42</span>)
+scores = cross_val_score(model, X, y, cv=skf, scoring=<span class="st">'roc_auc'</span>)
+
+<span class="cm"># Hyperparameter tuning with CV</span>
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> GridSearchCV
+
+param_grid = {<span class="st">'max_depth'</span>: [<span class="num">3</span>,<span class="num">5</span>,<span class="num">7</span>], <span class="st">'n_estimators'</span>: [<span class="num">50</span>,<span class="num">100</span>,<span class="num">200</span>]}
+grid_search = GridSearchCV(
+    RandomForestClassifier(), param_grid, cv=<span class="num">5</span>,
+    scoring=<span class="st">'f1'</span>, n_jobs=<span class="num">-1</span>
+)
+grid_search.fit(X_train, y_train)
+<span class="fn">print</span>(<span class="st">"Best params:"</span>, grid_search.best_params_)<span class="lang-tag">python</span></code></pre>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- CH 47: REGULARIZATION IN BV FRAMEWORK -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <section class="chapter" id="ch47">
+      <div class="chapter-label">Chapter 47</div>
+      <h2>Regularization — The Bias-Variance Control Knob</h2>
+
+      <p>We proved in Part 1 that L1/L2 regularization prevents overfitting by penalizing large weights. Here we connect that math to the Bias-Variance framework and show exactly how \(\lambda\) controls the tradeoff.</p>
+
+      <div class="math-block">
+        <span class="label">Regularization as a BV Dial</span>
+        \[ \lambda = 0 \;\Rightarrow\; \text{High Variance (Overfitting)} \qquad \lambda \to \infty \;\Rightarrow\; \text{High Bias (Underfitting)} \]
+      </div>
+
+      <p>The goal of cross-validation is to find the exact \(\lambda\) at the minimum of the U-shaped Total Error curve:</p>
+      <div class="math-block">
+        \[ \text{Total Error} = \text{Bias}^2 + \text{Variance} + \sigma^2 \]
+      </div>
+
+      <!-- Lambda sweep viz -->
+      <div class="viz-container">
+        <div class="viz-title">🎛️ Interactive: λ Control — Bias-Variance Tradeoff</div>
+        <canvas id="lambdaCanvas" height="240"></canvas>
+        <div class="viz-controls">
+          <label>λ (log scale): <input type="range" id="lambdaSweepSlider" min="0" max="100" step="1" value="15"> <span id="lambdaSweepVal">0.01</span></label>
+        </div>
+        <p style="margin-top:0.6rem; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-muted)">
+          Bias² (gold), Variance (blue), Total Error (white). The optimal λ sits at the white curve's minimum.
+        </p>
+      </div>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- TREE BASED MODELS -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <section class="chapter" id="ch-trees">
+      <div class="chapter-label">Chapters 34–43 (Deep Dive)</div>
+      <h2>Tree-Based Models — Complete Taxonomy</h2>
+
+      <p>Tree algorithms dominate real-world tabular data in production. For structured data (CSV files, databases, financial datasets), suggesting an SVM or Neural Network before tree ensembles is a red flag in an interview. Here is the complete evolutionary timeline.</p>
+
+      <h3>Phase 1: Decision Trees — The Base Learner</h3>
+
+      <p>Instead of drawing a continuous algebraic boundary, a Decision Tree draws a series of rectangular cuts via "Yes/No" questions, carving the feature space into boxes. At every node, the algorithm picks the split that produces the most "pure" child boxes.</p>
+
+      <h4>Measuring Purity: Entropy</h4>
+      <div class="math-block">
+        <span class="label">Entropy (Information Theory)</span>
+        \[ H(S) = -\sum_{i=1}^k p_i \log_2(p_i) \]
+      </div>
+      <p>\(p_i\) = fraction of examples in box \(S\) belonging to class \(i\). A 50/50 split gives maximum entropy = 1.0. A pure box gives entropy = 0.0.</p>
+
+      <h4>Measuring Purity: Gini Impurity (Default in scikit-learn)</h4>
+      <div class="math-block">
+        <span class="label">Gini Impurity (avoids log — faster in practice)</span>
+        \[ \text{Gini}(S) = 1 - \sum_{i=1}^k p_i^2 \]
+      </div>
+
+      <h4>The Splitting Rule: Information Gain</h4>
+      <div class="math-block">
+        \[ \text{IG} = H(\text{parent}) - \frac{|L|}{|S|}H(\text{left}) - \frac{|R|}{|S|}H(\text{right}) \]
+      </div>
+      <p>The algorithm executes the split with maximum Information Gain. This is a greedy local decision — it doesn't globally optimize the whole tree.</p>
+
+      <!-- Decision tree viz -->
+      <div class="viz-container">
+        <div class="viz-title">🌳 Interactive: Decision Tree — Watch Information Gain</div>
+        <canvas id="treeCanvas" height="280"></canvas>
+        <div class="viz-controls">
+          <label>Split threshold: <input type="range" id="splitSlider" min="1" max="9" step="0.5" value="5"> <span id="splitVal">5.0</span></label>
+          <button onclick="toggleFeature()" id="featBtn">Feature: X₁</button>
+        </div>
+        <p style="margin-top:0.6rem; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-muted)">
+          IG: <span id="igDisplay" style="color:var(--accent)">—</span> &nbsp;|&nbsp; Move the threshold to maximize Information Gain
+        </p>
+      </div>
+
+      <div class="callout warning">
+        <div class="callout-title">⚠️ The Fatal Flaw: High Variance</div>
+        <p>A fully grown tree creates a tiny box around every single data point — training error 0%, test error catastrophic. Decision trees are <strong>high-variance, highly unstable</strong>: changing one data point can cascade and restructure the entire tree. Fix: build an ensemble.</p>
+      </div>
+
+      <pre><code><span class="kw">from</span> sklearn.tree <span class="kw">import</span> DecisionTreeClassifier, export_text
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+tree = DecisionTreeClassifier(
+    criterion=<span class="st">'gini'</span>,       <span class="cm"># or 'entropy'</span>
+    max_depth=<span class="num">4</span>,            <span class="cm"># limit depth to control variance</span>
+    min_samples_split=<span class="num">10</span>,   <span class="cm"># minimum samples needed to split a node</span>
+    min_samples_leaf=<span class="num">5</span>,     <span class="cm"># minimum samples in any leaf</span>
+    random_state=<span class="num">42</span>
+)
+tree.fit(X_train, y_train)
+
+<span class="cm"># See the actual decision rules</span>
+<span class="fn">print</span>(export_text(tree, feature_names=feature_names))<span class="lang-tag">python</span></code></pre>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- RANDOM FORESTS -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <section class="chapter" id="ch-rf">
+      <div class="chapter-label">Phase 2</div>
+      <h2>Random Forests — Killing Variance with Bagging</h2>
+
+      <h3>The Statistical Motivation</h3>
+      <p>If you have \(N\) independent random variables each with variance \(\sigma^2\), the variance of their average drops to \(\sigma^2/N\). Build 500 trees and average them — variance collapses toward zero. But independence is key — if all trees are identical, averaging does nothing.</p>
+
+      <h3>How Trees Are Made Independent</h3>
+      <ul>
+        <li><strong>Bootstrap Aggregating (Bagging):</strong> Each tree trains on a random sample <em>with replacement</em> of the full dataset. Approximately 63% of rows appear in each bootstrap sample; the rest are "out-of-bag" (OOB) samples, giving a free validation set.</li>
+        <li><strong>Feature Randomness:</strong> At each split, only a random subset of \(\sqrt{n_\text{features}}\) features is considered. If one feature dominates (e.g., "Credit Score" for loan defaults), this forces every tree to explore weaker, diverse features — ensuring genuine independence.</li>
+      </ul>
+
+      <div class="callout insight">
+        <div class="callout-title">🔑 Out-of-Bag (OOB) Error</div>
+        <p>Each tree's OOB samples (~37% of data it never saw) can be used as a free internal validation set. The OOB error is a reliable estimator of test error — you don't need to set aside a separate validation set at all. Set <code>oob_score=True</code> in sklearn.</p>
+      </div>
+
+      <h3>Why Trees Over Neural Networks for Tabular Data?</h3>
+      <table class="data-table">
+        <thead><tr><th>Property</th><th>Tree Ensembles</th><th>Neural Networks</th></tr></thead>
+        <tbody>
+          <tr><td>Feature scaling</td><td>✅ Immune — no distance calculations</td><td>❌ Must normalize/standardize</td></tr>
+          <tr><td>Missing data</td><td>✅ XGBoost/CatBoost handle natively</td><td>❌ Must impute</td></tr>
+          <tr><td>Categorical features</td><td>✅ CatBoost handles raw strings</td><td>❌ Must encode</td></tr>
+          <tr><td>Non-linearity</td><td>✅ Built-in via splitting</td><td>✅ Built-in via activations</td></tr>
+          <tr><td>Interpretability</td><td>✅ SHAP values, feature importance</td><td>❌ Black box</td></tr>
+          <tr><td>Training speed (tabular)</td><td>✅ Fast</td><td>❌ Slower, needs GPU</td></tr>
+          <tr><td>Regulatory compliance</td><td>✅ Explainable to auditors</td><td>❌ Hard to justify decisions</td></tr>
+        </tbody>
+      </table>
+
+      <pre><code><span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> RandomForestClassifier
+
+rf = RandomForestClassifier(
+    n_estimators=<span class="num">500</span>,         <span class="cm"># more trees → lower variance (diminishing returns)</span>
+    max_features=<span class="st">'sqrt'</span>,       <span class="cm"># sqrt(n_features) per split — the key to independence</span>
+    max_depth=<span class="num">None</span>,            <span class="cm"># None = fully grown (low bias); tune to reduce variance</span>
+    min_samples_split=<span class="num">2</span>,
+    oob_score=<span class="kw">True</span>,            <span class="cm"># free validation error estimate</span>
+    n_jobs=<span class="num">-1</span>,                 <span class="cm"># use all CPU cores</span>
+    random_state=<span class="num">42</span>
+)
+rf.fit(X_train, y_train)
+<span class="fn">print</span>(<span class="st">f"OOB Score: {rf.oob_score_:.4f}"</span>)
+
+<span class="cm"># Feature importance</span>
+importance = rf.feature_importances_  <span class="cm"># Mean decrease in Gini impurity</span><span class="lang-tag">python</span></code></pre>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- GRADIENT BOOSTING + XGBOOST -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <section class="chapter" id="ch-gbm">
+      <div class="chapter-label">Phase 3</div>
+      <h2>Gradient Boosting & XGBoost — Killing Bias Sequentially</h2>
+
+      <p>Random Forests fix variance by averaging. Boosting takes the opposite approach: build shallow, weak learners sequentially, each one fixing the mistakes of all previous ones. This reduces bias.</p>
+
+      <h3>The Gradient Boosting Algorithm</h3>
+      <ol class="step-list">
+        <li><div class="step-num">1</div><div>Initialize with a constant prediction: \(F_0(x) = \arg\min_\gamma \sum_i L(y_i, \gamma)\) (e.g., the mean for MSE)</div></li>
+        <li><div class="step-num">2</div><div>Compute the negative gradient (pseudo-residuals): \(r_i = -\frac{\partial L(y_i, F(x_i))}{\partial F(x_i)}\)</div></li>
+        <li><div class="step-num">3</div><div>Fit a shallow regression tree \(f_t\) to the residuals \(r_i\)</div></li>
+        <li><div class="step-num">4</div><div>Update: \(F_t(x) = F_{t-1}(x) + \alpha \cdot f_t(x)\) where \(\alpha\) is the learning rate</div></li>
+        <li><div class="step-num">5</div><div>Repeat for \(T\) trees. Final prediction: \(F(x) = \sum_{t=0}^T \alpha f_t(x)\)</div></li>
+      </ol>
+
+      <div class="callout insight">
+        <div class="callout-title">🔑 For MSE loss: Residuals = Literal Errors</div>
+        <p>For MSE, \(L = \frac{1}{2}(y - F)^2\), so \(r_i = -(-(y_i - F(x_i))) = y_i - F(x_i)\). The negative gradient is literally the error. This is why we say "the next tree predicts the errors of the previous trees." For other losses (Log-Loss, Huber), the residuals are the negative gradient of that specific loss function — hence the name <em>gradient</em> boosting.</p>
+      </div>
+    </section>
+
+    <section class="chapter" id="ch-xgb">
+      <div class="chapter-label">XGBoost Deep Dive</div>
+      <h2>XGBoost — Why It Wins: 2nd-Order Optimization</h2>
+
+      <p><strong>The Golf Analogy:</strong> Standard Gradient Boosting looks at the slope and hits the ball in that general direction (1st derivative). XGBoost is the pro golfer who also calculates the curvature of the green (2nd derivative) to sink the putt in one precise shot.</p>
+
+      <h3>The 2nd-Order Taylor Expansion</h3>
+      <p>We have \(t-1\) trees with combined prediction \(F_{t-1}(x_i)\). We want to find the new tree \(f_t\) that minimizes the overall loss. Instead of approximating linearly (GBM), XGBoost approximates the loss with a quadratic (parabola):</p>
+
+      <div class="math-block">
+        <span class="label">2nd-Order Taylor Expansion of Loss</span>
+        \[ L(y_i, F_{t-1} + f_t) \approx L(y_i, F_{t-1}) + g_i f_t + \frac{1}{2}h_i f_t^2 \]
+      </div>
+
+      <p>Where \(g_i = \frac{\partial L}{\partial F_{t-1}}\) is the <strong>gradient</strong> and \(h_i = \frac{\partial^2 L}{\partial F_{t-1}^2}\) is the <strong>Hessian</strong> (curvature).</p>
+
+      <h3>Deriving the Optimal Leaf Weight</h3>
+      <p>The first term \(L(y_i, F_{t-1})\) is a constant w.r.t. the new tree. Adding XGBoost's L2 regularization penalty \(\frac{1}{2}\lambda w^2\) on leaf weights, the objective per leaf becomes:</p>
+      <div class="math-block">
+        \[ \tilde{L}(w) = \left(\sum_{i \in \text{leaf}} g_i\right)w + \frac{1}{2}\left(\sum_{i \in \text{leaf}} h_i + \lambda\right)w^2 \]
+      </div>
+      <p>This is a simple quadratic in \(w\). Set \(d\tilde{L}/dw = 0\) (Newton's method, exact in one step):</p>
+      <div class="math-block">
+        <span class="label">XGBoost Optimal Leaf Weight — The Most Important Formula</span>
+        \[ w^* = -\frac{\sum_{i \in \text{leaf}} g_i}{\sum_{i \in \text{leaf}} h_i + \lambda} \]
+      </div>
+
+      <div class="callout gold">
+        <div class="callout-title">⭐ Why the Hessian in the Denominator is Brilliant</div>
+        <p>The Hessian \(h_i\) represents the <em>curvature</em> of the loss. If the curvature is steep (large \(h_i\)): the denominator is large → small step. If the loss landscape is flat (small \(h_i\)): the denominator is small → large confident step. XGBoost <strong>automatically adapts its step size</strong> based on the local geometry of the loss, unlike standard GBM which needs manual learning rate tuning.</p>
+      </div>
+
+      <h3>XGBoost Tree Score (Gain)</h3>
+      <p>XGBoost also derives the gain from splitting a node into left (L) and right (R) children:</p>
+      <div class="math-block">
+        <span class="label">XGBoost Split Gain</span>
+        \[ \text{Gain} = \frac{1}{2}\left[\frac{G_L^2}{H_L + \lambda} + \frac{G_R^2}{H_R + \lambda} - \frac{(G_L+G_R)^2}{H_L+H_R+\lambda}\right] - \gamma \]
+      </div>
+      <p>Where \(G = \sum g_i\), \(H = \sum h_i\), and \(\gamma\) is a minimum gain threshold (another regularizer — if a split doesn't improve by at least \(\gamma\), the tree prunes itself).</p>
+
+      <table class="data-table">
+        <thead><tr><th></th><th>Standard GBM</th><th>XGBoost</th></tr></thead>
+        <tbody>
+          <tr><td>Optimization order</td><td>1st order (gradient only)</td><td>2nd order (gradient + Hessian)</td></tr>
+          <tr><td>Step towards minimum</td><td>Along slope — cautious, many trees needed</td><td>Jump to parabola bottom — fewer trees needed</td></tr>
+          <tr><td>Regularization</td><td>External (shrinkage only)</td><td>Built-in L1 + L2 in leaf formula</td></tr>
+          <tr><td>Tree pruning</td><td>Pre-pruning (max_depth)</td><td>Post-pruning via \(\gamma\) gain threshold</td></tr>
+          <tr><td>Missing data</td><td>Requires imputation</td><td>Learns optimal default direction per split</td></tr>
+        </tbody>
+      </table>
+
+      <pre><code><span class="kw">import</span> xgboost <span class="kw">as</span> xgb
+
+model = xgb.XGBClassifier(
+    n_estimators=<span class="num">500</span>,
+    max_depth=<span class="num">6</span>,             <span class="cm"># tree depth</span>
+    learning_rate=<span class="num">0.05</span>,       <span class="cm"># shrinkage (α)</span>
+    subsample=<span class="num">0.8</span>,            <span class="cm"># row sampling per tree (bagging-like)</span>
+    colsample_bytree=<span class="num">0.8</span>,     <span class="cm"># feature sampling per tree</span>
+    min_child_weight=<span class="num">1</span>,       <span class="cm"># min sum of hessians in a leaf (controls overfitting)</span>
+    gamma=<span class="num">0.1</span>,               <span class="cm"># min gain to make a split (γ in formula above)</span>
+    reg_alpha=<span class="num">0.1</span>,            <span class="cm"># L1 penalty on leaf weights</span>
+    reg_lambda=<span class="num">1.0</span>,           <span class="cm"># λ — L2 penalty (the one in our formula!)</span>
+    eval_metric=<span class="st">'auc'</span>,
+    early_stopping_rounds=<span class="num">20</span>  <span class="cm"># stop if val metric doesn't improve for 20 rounds</span>
+)
+model.fit(X_train, y_train,
+          eval_set=[(X_val, y_val)], verbose=<span class="num">50</span>)<span class="lang-tag">python</span></code></pre>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- LIGHTGBM + CATBOOST -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <section class="chapter" id="ch-lgbm">
+      <div class="chapter-label">Phase 4</div>
+      <h2>LightGBM — The Speed Demon (Microsoft, 2017)</h2>
+
+      <p><strong>The Problem XGBoost Had:</strong> XGBoost grows trees "level-wise" — it evaluates every possible split on every feature across all nodes before moving to the next depth level. As financial datasets grew to millions of rows with thousands of features, XGBoost's exact greedy algorithm triggered Out-Of-Memory errors and took hours to train.</p>
+
+      <h3>LightGBM's Two Architectural Innovations</h3>
+
+      <h4>1. Histogram-Based Split Finding</h4>
+      <p>Instead of evaluating every distinct value of a continuous feature (e.g., "Income = $54,321.47"), LightGBM bins all values into discrete buckets (e.g., "$50k–$60k" → bin 5). Only the best split within each bin is evaluated. This reduces the number of split candidates from millions of unique values to just ~256 bins, slashing memory and computation.</p>
+
+      <h4>2. Leaf-Wise (Best-First) Tree Growth</h4>
+      <p>Instead of growing the tree level-by-level (uniform depth), LightGBM scans all current leaves, finds the single leaf with the highest potential gain, and splits only that one — regardless of tree depth. This creates highly asymmetric trees that reduce loss much faster per tree than XGBoost's symmetric growth.</p>
+
+      <!-- Tree growth comparison viz -->
+      <div class="viz-container">
+        <div class="viz-title">🌿 Interactive: Level-Wise (XGBoost) vs Leaf-Wise (LightGBM) Growth</div>
+        <canvas id="growthCanvas" height="240"></canvas>
+        <div class="viz-controls">
+          <button onclick="setGrowth('level')" id="btnLevel" class="active">Level-Wise (XGBoost)</button>
+          <button onclick="setGrowth('leaf')" id="btnLeaf">Leaf-Wise (LightGBM)</button>
+          <button onclick="nextGrowthStep()">Next Split ▶</button>
+          <button onclick="resetGrowth()">↺ Reset</button>
+        </div>
+        <p style="margin-top:0.6rem; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-muted)">
+          Level-wise builds every node at depth d before going to d+1. Leaf-wise hunts the single highest-gain leaf next.
+        </p>
+      </div>
+
+      <div class="callout warning">
+        <div class="callout-title">⚠️ LightGBM's Achilles Heel: Overfitting Small Data</div>
+        <p>Leaf-wise growth can create ultra-deep, lopsided trees on small datasets — each subtree becomes highly specialized to a tiny region. For small datasets (&lt;10,000 rows), limit depth with <code>num_leaves</code> and use higher <code>min_data_in_leaf</code>. For large datasets (millions of rows), LightGBM is usually the first choice.</p>
+      </div>
+
+      <pre><code><span class="kw">import</span> lightgbm <span class="kw">as</span> lgb
+
+model = lgb.LGBMClassifier(
+    n_estimators=<span class="num">1000</span>,
+    num_leaves=<span class="num">31</span>,            <span class="cm"># max leaves per tree (controls overfitting)</span>
+    max_depth=<span class="num">-1</span>,             <span class="cm"># -1 = no limit; use num_leaves instead</span>
+    learning_rate=<span class="num">0.05</span>,
+    subsample=<span class="num">0.8</span>,
+    colsample_bytree=<span class="num">0.8</span>,
+    min_child_samples=<span class="num">20</span>,     <span class="cm"># min samples in a leaf — key regularizer</span>
+    reg_alpha=<span class="num">0.1</span>,
+    reg_lambda=<span class="num">0.1</span>,
+    verbose=<span class="num">-1</span>
+)
+model.fit(X_train, y_train,
+          eval_set=[(X_val, y_val)],
+          callbacks=[lgb.early_stopping(<span class="num">20</span>), lgb.log_evaluation(<span class="num">50</span>)])<span class="lang-tag">python</span></code></pre>
+    </section>
+
+    <section class="chapter" id="ch-catboost">
+      <div class="chapter-label">Phase 4 Continued</div>
+      <h2>CatBoost — The Categorical Master (Yandex, 2017)</h2>
+
+      <p><strong>The Two Problems CatBoost Solved:</strong> (1) Financial data is packed with high-cardinality categoricals (Stock Tickers, Zip Codes, User IDs). XGBoost/LightGBM require you to One-Hot Encode these, exploding a column of 10,000 unique zip codes into 10,000 binary columns. (2) LightGBM's lopsided leaf-wise growth overfits small-to-medium datasets.</p>
+
+      <h3>Innovation 1: Native Categorical Handling</h3>
+      <p>CatBoost uses <strong>Target-Based Statistics (Ordered Encoding)</strong>. For each category value (e.g., ZIP code "94103"), it computes the running average target value for that category using only the rows that appeared before the current row (to prevent target leakage). This creates a single meaningful float feature per categorical column — no explosion of dimensions.</p>
+
+      <h3>Innovation 2: Symmetric (Oblivious) Trees — Built-in Regularization</h3>
+      <p>Here is where most people get confused. CatBoost forces the <strong>exact same split rule</strong> to be applied across all nodes at a given depth level. If depth 3 splits on "Age &gt; 35", <em>every single node</em> at depth 3 must split on "Age &gt; 35".</p>
+
+      <h4>Why Does Symmetry = Regularization?</h4>
+      <p>Consider an overfitted standard tree that creates a tiny isolated box around one noisy outlier:</p>
+      <ul>
+        <li>The standard tree just adds one extra custom branch deep on one side to isolate that outlier. Cost: only affects that branch.</li>
+        <li>In CatBoost, any new split at depth \(d\) must be applied globally across <em>all</em> \(2^{d-1}\) nodes. The noisy, highly specific split that captures one outlier simultaneously slices through healthy normal data on the other side of the tree, massively increasing the total loss.</li>
+        <li>The algorithm evaluates the global gain and refuses — the outlier is automatically ignored.</li>
+      </ul>
+
+      <div class="math-block">
+        <span class="label">Degrees of Freedom Comparison</span>
+        \[ \text{Standard tree, depth } d:\; 2^d - 1 \text{ independent split decisions} \]
+        \[ \text{Symmetric tree, depth } d:\; d \text{ split decisions (one per level)} \]
+      </div>
+      <p>By forcing symmetry, CatBoost slashes the model's capacity to memorize noise by orders of magnitude.</p>
+
+      <div class="callout insight">
+        <div class="callout-title">🔑 Prediction Speed Bonus</div>
+        <p>Because symmetric trees have uniform structure (the same feature tested at each depth), the entire tree can be stored as a simple binary array and traversed with bitwise operations. CatBoost predictions are insanely fast — critical for high-frequency trading where milliseconds matter.</p>
+      </div>
+
+      <div class="callout interview">
+        <div class="callout-title">🎯 Interview: "How is symmetry regularization? Aren't we just making the model dumber?"</div>
+        <p><strong>Exact Answer:</strong> "Yes — deliberately. In statistics, 'Degrees of Freedom' measures how many independent parameters a model can learn. A standard depth-3 tree has 7 independent split decisions and can draw arbitrarily complex jagged boundaries. A symmetric depth-3 tree has only 3 decisions, drastically limiting complexity. Regularization is mathematically defined as injecting bias to reduce variance. By forcing global splits, any split that's useful only for a tiny local region will have a negative global loss impact and won't be chosen — this is the regularization mechanism."</p>
+      </div>
+
+      <pre><code><span class="kw">from</span> catboost <span class="kw">import</span> CatBoostClassifier, Pool
+
+<span class="cm"># CatBoost handles categoricals natively — just tell it which columns</span>
+cat_features = [<span class="st">'zip_code'</span>, <span class="st">'sector'</span>, <span class="st">'product_type'</span>]
+
+model = CatBoostClassifier(
+    iterations=<span class="num">1000</span>,
+    depth=<span class="num">6</span>,                  <span class="cm"># symmetric tree depth</span>
+    learning_rate=<span class="num">0.03</span>,
+    l2_leaf_reg=<span class="num">3.0</span>,          <span class="cm"># L2 regularization on leaves</span>
+    bagging_temperature=<span class="num">1.0</span>,   <span class="cm"># controls stochastic row sampling</span>
+    eval_metric=<span class="st">'AUC'</span>,
+    early_stopping_rounds=<span class="num">50</span>,
+    verbose=<span class="num">100</span>
+)
+
+train_pool = Pool(X_train, y_train, cat_features=cat_features)
+val_pool   = Pool(X_val, y_val, cat_features=cat_features)
+
+model.fit(train_pool, eval_set=val_pool)<span class="lang-tag">python</span></code></pre>
+
+      <h3>The Holy Trinity: When to Use Which</h3>
+      <table class="data-table">
+        <thead><tr><th>Algorithm</th><th>Use When</th><th>Key Strength</th><th>Key Weakness</th></tr></thead>
+        <tbody>
+          <tr><td><strong>XGBoost</strong></td><td>General-purpose tabular; industry baseline</td><td>Mathematically rigorous, well-tuned defaults</td><td>Slow on very large datasets; memory intensive</td></tr>
+          <tr><td><strong>LightGBM</strong></td><td>Millions of rows; RAM is a bottleneck; speed critical</td><td>10–30× faster than XGBoost; low memory</td><td>Overfits small datasets; needs careful <code>num_leaves</code> tuning</td></tr>
+          <tr><td><strong>CatBoost</strong></td><td>Heavy categorical features; prediction latency critical; small-medium data</td><td>Native categoricals; fast inference; robust regularization</td><td>Slower training than LightGBM on pure numeric data</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- CH 48: SVM FULL OPTIMIZATION -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <section class="chapter" id="ch48">
+      <div class="chapter-label">Chapter 48</div>
+      <h2>Support Vector Machines — The Full Optimization Math</h2>
+
+      <p>We change labels from \(\{0,1\}\) to \(y \in \{-1, +1\}\) — this symmetry makes SVM math elegant. Our hypothesis: \(h_{w,b}(x) = g(w^T x + b)\), where \(g(z) = +1\) if \(z \geq 0\), else \(-1\).</p>
+
+      <h3>Functional vs. Geometric Margin</h3>
+
+      <h4>Functional Margin</h4>
+      <div class="math-block">
+        \[ \hat{\gamma}^{(i)} = y^{(i)}(w^T x^{(i)} + b) \]
+      </div>
+      <p>If \(y=+1\), we want \(w^T x + b \gg 0\); if \(y=-1\), we want \(w^T x + b \ll 0\). Their product is large positive when we're confidently correct. <strong>Problem:</strong> We can inflate the functional margin just by scaling \(w\) by 100 — the boundary doesn't move. This number isn't physically meaningful.</p>
+
+      <h4>Geometric Margin (The Physical Distance)</h4>
+      <div class="math-block">
+        \[ \gamma^{(i)} = \frac{y^{(i)}(w^T x^{(i)} + b)}{\|w\|} \]
+      </div>
+      <p>Dividing by \(\|w\|\) normalizes away the scaling artifact. This is the actual Euclidean distance from point \(x^{(i)}\) to the decision hyperplane.</p>
+
+      <h3>The Primal Optimization Problem</h3>
+      <p>We force the functional margin of the support vectors (the closest points) to exactly 1. Then the geometric margin = \(1/\|w\|\). Maximizing \(1/\|w\|\) = minimizing \(\|w\|^2\):</p>
+
+      <div class="math-block">
+        <span class="label">SVM Primal Form — Hard Margin</span>
+        \[ \min_{w,b} \frac{1}{2}\|w\|^2 \]
+        \[ \text{s.t.} \quad y^{(i)}(w^T x^{(i)} + b) \geq 1 \quad \forall i \]
+      </div>
+      <p>This is a <strong>convex quadratic program</strong> — guaranteed single global optimum, no local minima.</p>
+
+      <h3>Soft-Margin SVM (Handling Noise)</h3>
+      <p>Real data has noise — a single misclassified point makes the hard-margin problem infeasible. We introduce <strong>slack variables</strong> \(\xi_i \geq 0\) that allow violations, penalized by \(C\):</p>
+
+      <div class="math-block">
+        <span class="label">SVM Soft-Margin Primal</span>
+        \[ \min_{w,b,\xi} \frac{1}{2}\|w\|^2 + C\sum_{i=1}^m \xi_i \]
+        \[ \text{s.t.} \quad y^{(i)}(w^T x^{(i)} + b) \geq 1 - \xi_i \quad \text{and} \quad \xi_i \geq 0 \quad \forall i \]
+      </div>
+
+      <div class="callout interview">
+        <div class="callout-title">🎯 CDC Classic: Explain the C hyperparameter</div>
+        <p><strong>Large C</strong> → you heavily penalize any margin violation → the model draws a very narrow, complex margin twisting to separate training data perfectly → Low Bias, High Variance → Overfitting.</p>
+        <p><strong>Small C</strong> → you don't care much about violations → the model draws a wide, generous margin ignoring noisy outliers → High Bias, Low Variance → Underfitting.</p>
+        <p>C is the SVM's Bias-Variance knob, analogous to \(1/\lambda\) in Ridge Regression.</p>
+      </div>
+
+      <h3>Hinge Loss — The Deep Learning Bridge</h3>
+      <p>The soft-margin SVM is equivalent to minimizing the <strong>Hinge Loss</strong>:</p>
+      <div class="math-block">
+        \[ J(w) = \frac{1}{2}\|w\|^2 + C\sum_{i=1}^m \max\!\left(0, 1 - y^{(i)}(w^T x^{(i)} + b)\right) \]
+      </div>
+      <p>If a point is safely outside the margin: the \(\max\) term = 0, no contribution to loss. If a point violates the margin: loss scales linearly with penetration depth. This unconstrained form can be minimized with standard Gradient Descent in PyTorch.</p>
+
+      <!-- SVM C viz -->
+      <div class="viz-container">
+        <div class="viz-title">⚡ Interactive: SVM — Effect of C Parameter on Margin Width</div>
+        <canvas id="svmCCanvas" height="280"></canvas>
+        <div class="viz-controls">
+          <label>C value: <input type="range" id="cParamSlider" min="0.1" max="10" step="0.1" value="1.0"> <span id="cParamVal">1.0</span></label>
+        </div>
+        <p style="margin-top:0.6rem; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-muted)">
+          Large C = narrow margin (overfitting). Small C = wide margin (underfitting). Orange boundary = decision boundary.
+        </p>
+      </div>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- CH 49: LAGRANGIAN DUALITY — FULL DERIVATION -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <section class="chapter" id="ch49">
+      <div class="chapter-label">Chapter 49</div>
+      <h2>Lagrangian Duality — The Full Algebraic Derivation</h2>
+
+      <p>We have the primal SVM. Why convert it to a "Dual" form? Because in the primal, we must explicitly compute \(w\) — a vector with one dimension per feature. If we project data into infinite dimensions (to handle non-linear data), \(w\) becomes infinite-dimensional and uncomputable. Duality provides a mathematical escape hatch.</p>
+
+      <h3>Step 1: Construct the Lagrangian</h3>
+      <p>We introduce Lagrange Multipliers \(\alpha_i \geq 0\) — one per constraint. We fold the constraints into the objective:</p>
+      <div class="math-block">
+        \[ \mathcal{L}(w, b, \alpha) = \frac{1}{2}\|w\|^2 - \sum_{i=1}^m \alpha_i \left[y^{(i)}(w^T x^{(i)} + b) - 1\right] \]
+      </div>
+
+      <h3>Step 2: Minimize w.r.t. Primal Variables</h3>
+      <p>Take derivatives and set to zero to find optimality conditions:</p>
+
+      <div class="proof-box">
+        <div class="proof-title">Derivative w.r.t. b</div>
+        <p>\(\frac{\partial \mathcal{L}}{\partial b} = -\sum_{i=1}^m \alpha_i y^{(i)} = 0 \implies \boxed{\sum_{i=1}^m \alpha_i y^{(i)} = 0}\) &nbsp;&nbsp;&nbsp;... (Property 1)</p>
+      </div>
+
+      <div class="proof-box">
+        <div class="proof-title">Derivative w.r.t. w</div>
+        <p>\(\frac{\partial \mathcal{L}}{\partial w} = w - \sum_{i=1}^m \alpha_i y^{(i)} x^{(i)} = 0 \implies \boxed{w = \sum_{i=1}^m \alpha_i y^{(i)} x^{(i)}}\) &nbsp;&nbsp;&nbsp;... (Property 2)</p>
+        <p style="margin-top:0.8rem; color:var(--accent3)"><strong>God-Tier Insight:</strong> The optimal \(w\) is a linear combination of the training data points themselves! The model is entirely defined by the data.</p>
+      </div>
+
+      <h3>Step 3: Full Algebraic Expansion — Where W(α) Comes From</h3>
+      <p>We plug Properties 1 and 2 back into the Lagrangian. Split it into four parts:</p>
+
+      <div class="math-block">
+        \[ \mathcal{L} = \underbrace{\frac{1}{2}\|w\|^2}_{\text{Part A}} - \underbrace{\sum_i \alpha_i y^{(i)} w^T x^{(i)}}_{\text{Part B}} - \underbrace{b\sum_i \alpha_i y^{(i)}}_{\text{Part C}} + \underbrace{\sum_i \alpha_i}_{\text{Part D}} \]
+      </div>
+
+      <div class="proof-box">
+        <div class="proof-title">Part C vanishes</div>
+        <p>By Property 1: \(\sum_i \alpha_i y^{(i)} = 0\). So Part C = \(b \cdot 0 = 0\). ✓</p>
+      </div>
+
+      <div class="proof-box">
+        <div class="proof-title">Part A: Expand using Property 2</div>
+        <p>\(\|w\|^2 = w^T w = \left(\sum_i \alpha_i y^{(i)} x^{(i)}\right)^T \!\left(\sum_j \alpha_j y^{(j)} x^{(j)}\right)\)</p>
+        <p style="margin-top:0.5rem">Distributing (each term of the first sum multiplies every term of the second):</p>
+        <p style="margin-top:0.5rem">\(\|w\|^2 = \sum_i \sum_j \alpha_i \alpha_j y^{(i)} y^{(j)} (x^{(i)})^T x^{(j)}\)</p>
+        <p style="margin-top:0.5rem">So: \(\text{Part A} = \frac{1}{2}\sum_i \sum_j \alpha_i \alpha_j y^{(i)} y^{(j)} (x^{(i)})^T x^{(j)}\)</p>
+      </div>
+
+      <div class="proof-box">
+        <div class="proof-title">Part B: Collapse using Property 2</div>
+        <p>\(\text{Part B} = w^T \sum_i \alpha_i y^{(i)} x^{(i)}\)</p>
+        <p>But by Property 2, \(\sum_i \alpha_i y^{(i)} x^{(i)} = w\). So Part B = \(w^T w = \|w\|^2\)</p>
+        <p style="margin-top:0.5rem">Expanding exactly like Part A:</p>
+        <p>\(\text{Part B} = \sum_i \sum_j \alpha_i \alpha_j y^{(i)} y^{(j)} (x^{(i)})^T x^{(j)}\)</p>
+      </div>
+
+      <div class="proof-box">
+        <div class="proof-title">Combining A − B − C + D</div>
+        <p>\(\mathcal{L} = \frac{1}{2}\sum_{ij}(\cdots) - \sum_{ij}(\cdots) - 0 + \sum_i \alpha_i\)</p>
+        <p style="margin-top:0.5rem">\(\mathcal{L} = -\frac{1}{2}\sum_{ij}(\cdots) + \sum_i \alpha_i\)</p>
+      </div>
+
+      <div class="math-block">
+        <span class="label">The Dual Formulation W(α) — Final Result</span>
+        \[ \max_\alpha W(\alpha) = \sum_{i=1}^m \alpha_i - \frac{1}{2}\sum_{i=1}^m\sum_{j=1}^m \alpha_i \alpha_j y^{(i)} y^{(j)} (x^{(i)})^T x^{(j)} \]
+        \[ \text{s.t.} \quad \alpha_i \geq 0, \quad \sum_{i=1}^m \alpha_i y^{(i)} = 0 \]
+      </div>
+
+      <h3>Step 4: KKT Conditions → Support Vectors</h3>
+      <p>The Karush-Kuhn-Tucker "Complementary Slackness" condition requires at the optimal solution:</p>
+      <div class="math-block">
+        \[ \alpha_i \left[y^{(i)}(w^T x^{(i)} + b) - 1\right] = 0 \quad \forall i \]
+      </div>
+      <p>Either \(\alpha_i = 0\) (the point is safely away from the margin — it contributes nothing to \(w\)), or \(y^{(i)}(w^T x^{(i)} + b) = 1\) (the point sits exactly on the margin boundary — it is a <strong>Support Vector</strong>). The result: 99% of \(\alpha_i\) values are exactly 0. The model is extremely sparse — only support vectors matter.</p>
+
+      <h3>Why Duality Unlocks the Kernel Trick</h3>
+      <p>Look at the Dual: data points appear <em>only</em> as dot products \((x^{(i)})^T x^{(j)}\). We optimized away the explicit weight vector \(w\). Now, if we want to project data into a higher-dimensional space \(\phi(x)\), we just replace the dot product with a Kernel:</p>
+      <div class="math-block">
+        \[ (x^{(i)})^T x^{(j)} \;\longrightarrow\; K(x^{(i)}, x^{(j)}) = \phi(x^{(i)})^T \phi(x^{(j)}) \]
+      </div>
+      <p>We never compute \(\phi(x)\) explicitly. We just compute the scalar similarity score \(K(x,z)\) in the original space.</p>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- KERNEL ORIGIN STORY -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <section class="chapter" id="ch-kernel-origin">
+      <div class="chapter-label">Kernel Deep Dive</div>
+      <h2>The Kernel Formula: Origin Story (Reverse Engineering)</h2>
+
+      <p>The formula \(K(x,z) = (x^T z)^2\) was NOT invented by guessing. Mathematicians started with the brute-force high-dimensional calculation, got an ugly expanded result, stared at it, and noticed it factored perfectly into something simple. Here is the exact derivation:</p>
+
+      <h3>Step 1: We Need Squared Terms for Non-Linear Boundaries</h3>
+      <p>Linear SVM draws a straight line. To draw circles/ellipses, we need squared feature combinations. Define a 2D→3D mapping for \(x = (x_1, x_2)\):</p>
+      <div class="math-block">
+        \[ \phi(x) = \begin{pmatrix} x_1^2 \\ x_2^2 \\ \sqrt{2}\,x_1 x_2 \end{pmatrix}, \qquad \phi(z) = \begin{pmatrix} z_1^2 \\ z_2^2 \\ \sqrt{2}\,z_1 z_2 \end{pmatrix} \]
+      </div>
+
+      <h3>Step 2: Compute the 3D Dot Product (The Hard Way)</h3>
+      <div class="proof-box">
+        <div class="proof-title">Hard Way: Explicit 3D Projection</div>
+        <p>\(\phi(x)^T \phi(z) = x_1^2 z_1^2 + x_2^2 z_2^2 + \sqrt{2}x_1 x_2 \cdot \sqrt{2}z_1 z_2\)</p>
+        <p style="margin-top:0.5rem">\(= x_1^2 z_1^2 + x_2^2 z_2^2 + 2x_1 x_2 z_1 z_2\)</p>
+        <p style="margin-top:0.5rem; color:var(--text-muted)">Operations: compute 3-element φ(x), compute 3-element φ(z), dot product = 3 mults + 2 adds = <strong>11 total operations</strong></p>
+      </div>
+
+      <h3>Step 3: The "Holy Shit" Factorization</h3>
+      <p>A mathematician stares at the result \(x_1^2z_1^2 + x_2^2z_2^2 + 2x_1x_2z_1z_2\) and recognizes the binomial square pattern \((A+B)^2 = A^2 + B^2 + 2AB\) with \(A = x_1z_1, B = x_2z_2\):</p>
+
+      <div class="proof-box">
+        <div class="proof-title">Smart Way: The Kernel Shortcut</div>
+        <p>\(K(x,z) = (x^T z)^2 = (x_1 z_1 + x_2 z_2)^2\)</p>
+        <p style="margin-top:0.5rem">Expanding: \(= x_1^2z_1^2 + x_2^2z_2^2 + 2x_1x_2z_1z_2\)</p>
+        <p style="margin-top:0.5rem; color:var(--accent3)"><strong>IDENTICAL to the 3D result!</strong></p>
+        <p style="margin-top:0.5rem; color:var(--text-muted)">Operations: 2D dot product (2 mults + 1 add), then square (1 mult) = <strong>4 total operations</strong></p>
+      </div>
+
+      <div class="callout gold">
+        <div class="callout-title">⭐ The Kernel Origin Story in One Sentence</div>
+        <p>The kernel formula was discovered by doing the expensive 3D calculation first, staring at the result, factoring it algebraically into a simpler expression involving the original 2D dot product, and realizing that simpler expression could replace the entire expensive calculation. The formula wasn't guessed — it was <em>factored out</em> from the brute-force answer.</p>
+      </div>
+
+      <h3>The General Polynomial Kernel — Scaling to n Dimensions</h3>
+      <p>For \(n\)-dimensional input and degree-2 mapping, the double-sum expansion proves it:</p>
+      <div class="math-block">
+        \[ K(x,z) = (x^T z)^2 = \left(\sum_{i=1}^n x_i z_i\right)^2 = \sum_{i=1}^n\sum_{j=1}^n (x_i x_j)(z_i z_j) = \phi(x)^T\phi(z) \]
+      </div>
+      <p>The double sum generates every pair \((x_i x_j)\) — all \(n^2\) cross-feature combinations. This is the explicit higher-dimensional representation, computed at \(O(n)\) cost instead of \(O(n^2)\).</p>
+    </section>
+
+    <section class="chapter" id="ch-kernel-complexity">
+      <div class="chapter-label">Kernel Complexity</div>
+      <h2>Kernel Computational Complexity — The Big-O Proof</h2>
+
+      <table class="data-table">
+        <thead><tr><th>Method</th><th>Steps</th><th>Per-Step Cost</th><th>Total</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Explicit Projection (Hard Way)</strong></td>
+            <td>Compute φ(x) with n² features, compute φ(z), dot product</td>
+            <td>\(O(n^2)\) + \(O(n^2)\) + \(O(n^2)\)</td>
+            <td>\(\mathbf{O(n^2)}\)</td>
+          </tr>
+          <tr>
+            <td><strong>Kernel Trick (Smart Way)</strong></td>
+            <td>Compute n-dimensional dot product x·z, then square</td>
+            <td>\(O(n)\) + \(O(1)\)</td>
+            <td>\(\mathbf{O(n)}\)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout interview">
+        <div class="callout-title">🎯 CDC Whiteboard: Contextualize with Real Numbers</div>
+        <p>For a 100×100 pixel image, \(n = 10{,}000\). Explicit degree-2 projection requires \(O(n^2) = 10^8\) operations and storing a 100M-element vector in RAM — impossible. The Kernel Trick computes a single scalar in \(O(n) = 10{,}000\) operations. For degree \(d\), explicit projection costs \(O(n^d)\), while the Kernel \((x^Tz)^d\) stays locked at \(O(n)\) regardless of \(d\).</p>
+      </div>
+    </section>
+
+    <section class="chapter" id="ch-mercer">
+      <div class="chapter-label">Mercer's Theorem</div>
+      <h2>Mercer's Theorem — Mathematical Validity of Kernels</h2>
+
+      <p><strong>Q: How do we know if a new formula K(x,z) actually corresponds to a valid higher-dimensional dot product?</strong></p>
+      <p>We don't guess. <strong>Mercer's Theorem</strong> states: a function \(K(x,z)\) is a valid kernel if and only if it is:</p>
+      <ul>
+        <li><strong>Symmetric:</strong> \(K(x,z) = K(z,x)\)</li>
+        <li><strong>Positive Semi-Definite:</strong> The Gram matrix \(K_{ij} = K(x^{(i)}, x^{(j)})\) has all non-negative eigenvalues</li>
+      </ul>
+      <p>If these two conditions hold, the math strictly guarantees some higher-dimensional space \(\phi\) exists where \(K(x,z) = \phi(x)^T\phi(z)\). We don't need to know what that space looks like. We don't even need to know its dimension (it could be infinite).</p>
+
+      <h3>How the Computer Chooses the Right Kernel</h3>
+      <p>The SVM doesn't geometrically figure out which kernel to use. It's a hyperparameter — you try different ones via <strong>cross-validation</strong>:</p>
+      <ol>
+        <li>Try Kernel = Linear, Poly(d=2), Poly(d=3), RBF(γ=0.1), RBF(γ=1.0), RBF(γ=10.0)</li>
+        <li>For each, run 5-fold cross-validation and record validation error</li>
+        <li>Pick the kernel/γ with the lowest CV error</li>
+      </ol>
+      <p>In practice: if you don't know the data structure, try RBF first. Its \(\sigma\) (or \(\gamma = 1/2\sigma^2\)) controls the "reach" of influence. Small \(\gamma\): points far apart can still influence each other (smooth boundary). Large \(\gamma\): only very close points influence each other (jagged, complex boundary → overfitting).</p>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- CH 50: ADABOOST -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <section class="chapter" id="ch50">
+      <div class="chapter-label">Chapter 50</div>
+      <h2>AdaBoost — The Original Boosting Algorithm</h2>
+
+      <p>Gradient Boosting learns from mistakes by predicting residuals (modifying the target variable). AdaBoost takes a completely different approach: it physically modifies the training data by changing the weight of each data point. Misclassified points become "heavier" — the next weak learner is forced to pay extra attention to them.</p>
+
+      <h3>The AdaBoost Algorithm — Step by Step</h3>
+
+      <ol class="step-list">
+        <li><div class="step-num">1</div><div><strong>Initialize uniform weights:</strong> \(w_i = \frac{1}{m}\) for all \(i = 1, \ldots, m\). Every point has equal importance.</div></li>
+        <li><div class="step-num">2</div><div><strong>For each round \(t = 1, \ldots, T\):</strong> Train a weak classifier (usually a depth-1 stump) \(h_t(x)\) on the weighted dataset (points with larger \(w_i\) are sampled more).</div></li>
+        <li><div class="step-num">3</div><div><strong>Compute weighted error rate:</strong>
+          \[\epsilon_t = \sum_{i: h_t(x^{(i)}) \neq y^{(i)}} w_i\]
+          (Sum of weights of all misclassified points)</div></li>
+        <li><div class="step-num">4</div><div><strong>Compute the stump's "Amount of Say" \(\alpha_t\):</strong>
+          <div class="math-block">
+            \[ \alpha_t = \frac{1}{2}\ln\!\left(\frac{1-\epsilon_t}{\epsilon_t}\right) \]
+          </div>
+          If \(\epsilon_t\) is small (low error), \(\alpha_t\) is large (stump gets a loud vote). If \(\epsilon_t = 0.5\) (random guessing), \(\alpha_t = 0\) (stump is ignored).</div></li>
+        <li><div class="step-num">5</div><div><strong>Update data weights:</strong>
+          <div class="math-block">
+            \[ w_i \leftarrow w_i \cdot \begin{cases} e^{-\alpha_t} & \text{if correctly classified (weight shrinks)} \\ e^{+\alpha_t} & \text{if misclassified (weight grows exponentially)} \end{cases} \]
+          </div>
+          Then normalize so all weights sum to 1.</div></li>
+        <li><div class="step-num">6</div><div><strong>Final prediction:</strong> Weighted majority vote of all stumps:
+          \[H(x) = \text{sign}\!\left(\sum_{t=1}^T \alpha_t h_t(x)\right)\]</div></li>
+      </ol>
+
+      <!-- AdaBoost viz -->
+      <div class="viz-container">
+        <div class="viz-title">🔴 Interactive: AdaBoost — Watch Misclassified Points Grow in Weight</div>
+        <canvas id="adaCanvas" height="300"></canvas>
+        <div class="viz-controls">
+          <button onclick="adaStep()" id="adaBtn">Round 1: Train Stump ▶</button>
+          <button onclick="resetAda()">↺ Reset</button>
+        </div>
+        <p style="margin-top:0.6rem; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-muted)">
+          Point size = weight. After each round, misclassified points get larger (heavier). Watch the stump boundary shift.
+        </p>
+        <p id="adaStatus" style="margin-top:0.4rem; font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--accent)"></p>
+      </div>
+
+      <div class="callout interview">
+        <div class="callout-title">🎯 CDC Classic: AdaBoost vs Gradient Boosting</div>
+        <p><strong>Q: Both algorithms combine weak trees to make a strong model. What is the fundamental difference?</strong></p>
+        <p><strong>Exact Answer:</strong> "Gradient Boosting identifies shortcomings by modifying the <em>Target Variable</em> — it trains subsequent trees to predict the residual errors in the output space. AdaBoost identifies shortcomings by modifying the <em>Data Weights</em> — it trains subsequent trees to predict the original target, but the loss function is dominated by the data points that were previously misclassified. GBM works in function space; AdaBoost works in sample-weight space."</p>
+      </div>
+
+      <h3>AdaBoost Loss Function: Exponential Loss</h3>
+      <p>AdaBoost implicitly minimizes the <strong>Exponential Loss</strong>:</p>
+      <div class="math-block">
+        \[ J = \sum_{i=1}^m e^{-y^{(i)} F(x^{(i)})} \]
+      </div>
+      <p>Where \(F(x) = \sum_t \alpha_t h_t(x)\). This exponential function grows extremely fast for confident wrong predictions — AdaBoost is known to be <strong>very sensitive to noisy outliers</strong> (which get exponentially large weights and dominate training). Gradient Boosting with Huber loss is more robust to outliers for this reason.</p>
+
+      <pre><code><span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> AdaBoostClassifier
+<span class="kw">from</span> sklearn.tree <span class="kw">import</span> DecisionTreeClassifier
+
+<span class="cm"># AdaBoost with stumps (depth=1)</span>
+ada = AdaBoostClassifier(
+    estimator=DecisionTreeClassifier(max_depth=<span class="num">1</span>),  <span class="cm"># the weak learner</span>
+    n_estimators=<span class="num">200</span>,
+    learning_rate=<span class="num">1.0</span>,   <span class="cm"># shrinks each α_t contribution</span>
+    algorithm=<span class="st">'SAMME.R'</span>  <span class="cm"># 'SAMME.R' uses probability estimates</span>
+)
+ada.fit(X_train, y_train)
+
+<span class="cm"># Stage-wise accuracy (how accuracy improves with each stump)</span>
+staged_scores = list(ada.staged_score(X_test, y_test))
+<span class="fn">print</span>(<span class="st">f"Final accuracy: {staged_scores[-1]:.4f}"</span>)<span class="lang-tag">python</span></code></pre>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- CH 51: EVALUATION METRICS -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <section class="chapter" id="ch51">
+      <div class="chapter-label">Chapter 51</div>
+      <h2>Evaluation Metrics for Imbalanced Data</h2>
+
+      <p>You train a fraud detection model. 99% of transactions are safe, 1% are fraud. A model that predicts "safe" for every single transaction achieves <strong>99% accuracy</strong>. This model is completely useless — it catches zero fraud. Accuracy is a lie on imbalanced data.</p>
+
+      <h3>The Confusion Matrix</h3>
+
+      <div class="viz-container">
+        <div class="viz-title">🟦 Interactive: Confusion Matrix — Adjust Predictions</div>
+        <canvas id="cmCanvas" height="280"></canvas>
+        <div class="viz-controls">
+          <label>Threshold: <input type="range" id="threshSlider" min="0.1" max="0.9" step="0.05" value="0.5"> <span id="threshVal">0.50</span></label>
+        </div>
+        <p style="margin-top:0.6rem; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-muted)">
+          Precision: <span id="precVal" style="color:var(--accent2)">—</span> &nbsp;|&nbsp; Recall: <span id="recVal" style="color:var(--accent3)">—</span> &nbsp;|&nbsp; F1: <span id="f1Val" style="color:var(--accent)">—</span>
+        </p>
+      </div>
+
+      <table class="data-table">
+        <thead><tr><th>Metric</th><th>Formula</th><th>Meaning</th><th>Optimize When</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Precision</strong></td>
+            <td>\(\frac{TP}{TP + FP}\)</td>
+            <td>"Of all the things I called Positive, what fraction actually were?" — Controls False Alarm rate</td>
+            <td>Cost of False Alarms is high (e.g., email spam filter — don't block real emails)</td>
+          </tr>
+          <tr>
+            <td><strong>Recall (Sensitivity)</strong></td>
+            <td>\(\frac{TP}{TP + FN}\)</td>
+            <td>"Of all the actual Positives, what fraction did I catch?" — Controls Miss rate</td>
+            <td>Cost of Missing a Positive is high (e.g., cancer screening — don't miss a case)</td>
+          </tr>
+          <tr>
+            <td><strong>F1-Score</strong></td>
+            <td>\(\frac{2 \cdot P \cdot R}{P + R}\)</td>
+            <td>Harmonic mean of Precision and Recall. Penalizes extreme imbalances between the two.</td>
+            <td>You need balance; neither FP nor FN cost dominates</td>
+          </tr>
+          <tr>
+            <td><strong>AUC-ROC</strong></td>
+            <td>Area under TPR vs FPR curve</td>
+            <td>Probability that model ranks a random positive above a random negative. Threshold-independent.</td>
+            <td>Comparing models; class-imbalance robustness; ranking matters</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>ROC Curve — Threshold-Independent Evaluation</h3>
+      <p>A model outputs probabilities. You choose a <em>threshold</em> to convert to labels. Different thresholds give different Precision/Recall tradeoffs. The ROC curve plots <strong>True Positive Rate (Recall)</strong> vs <strong>False Positive Rate</strong> at every possible threshold:</p>
+      <div class="math-block">
+        \[ \text{TPR} = \frac{TP}{TP+FN} \qquad \text{FPR} = \frac{FP}{FP+TN} \]
+      </div>
+
+      <!-- ROC viz -->
+      <div class="viz-container">
+        <div class="viz-title">📈 Interactive: ROC Curve — AUC Visualization</div>
+        <canvas id="rocCanvas" height="280"></canvas>
+        <div class="viz-controls">
+          <button onclick="setROCModel('random')" id="rocRnd">Random Model</button>
+          <button onclick="setROCModel('ok')" id="rocOk">OK Model (AUC≈0.75)</button>
+          <button onclick="setROCModel('good')" id="rocGood" class="active">Good Model (AUC≈0.90)</button>
+        </div>
+        <p style="margin-top:0.6rem; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-muted)">
+          AUC = 1.0: Perfect. AUC = 0.5: No better than random (diagonal line). Higher AUC = better discrimination.
+        </p>
+      </div>
+
+      <div class="callout interview">
+        <div class="callout-title">🎯 CDC Behavioral: Precision vs Recall — When to Choose?</div>
+        <p><strong>Fraud Detection:</strong> Prioritize Recall — a fraudulent transaction slipping through is catastrophic. Accept more false alarms (flagging legitimate transactions).</p>
+        <p><strong>Email Spam Filter:</strong> Prioritize Precision — blocking a legitimate email is very costly. Accept more spam in the inbox (lower recall).</p>
+        <p><strong>Cancer Screening:</strong> Prioritize Recall — never miss a cancer case. You can always do follow-up tests to confirm.</p>
+        <p><strong>General Rule:</strong> If the cost of False Negatives &gt; cost of False Positives → prioritize Recall. If the cost of False Positives &gt; cost of False Negatives → prioritize Precision.</p>
+      </div>
+
+      <h3>Handling Class Imbalance</h3>
+      <table class="data-table">
+        <thead><tr><th>Technique</th><th>How</th><th>When</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Class Weights</strong></td><td>Pass <code>class_weight='balanced'</code> to sklearn; minority class gets higher weight in loss</td><td>First thing to try, always</td></tr>
+          <tr><td><strong>SMOTE</strong></td><td>Synthetic Minority Oversampling — generates new minority examples by interpolating between existing ones</td><td>When you can oversample safely; tabular data</td></tr>
+          <tr><td><strong>Random Undersampling</strong></td><td>Remove majority class examples</td><td>When you have millions of majority examples</td></tr>
+          <tr><td><strong>Threshold Tuning</strong></td><td>Adjust classification threshold (e.g., 0.3 instead of 0.5) based on Precision-Recall curve</td><td>After training — find threshold on PR curve</td></tr>
+          <tr><td><strong>Ensemble Methods</strong></td><td>BalancedRandomForest, EasyEnsemble from imbalanced-learn</td><td>Severe imbalance (&gt;100:1 ratio)</td></tr>
+        </tbody>
+      </table>
+
+      <pre><code><span class="kw">from</span> sklearn.metrics <span class="kw">import</span> (classification_report, confusion_matrix,
+                               roc_auc_score, f1_score, precision_recall_curve)
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># Never use accuracy on imbalanced data!</span>
+y_proba = model.predict_proba(X_test)[:, <span class="num">1</span>]
+
+<span class="fn">print</span>(<span class="st">"AUC-ROC:"</span>, roc_auc_score(y_test, y_proba))
+<span class="fn">print</span>(<span class="st">"\nClassification Report:"</span>)
+<span class="fn">print</span>(classification_report(y_test, model.predict(X_test)))
+
+<span class="cm"># Find optimal threshold from Precision-Recall curve</span>
+prec, rec, thresholds = precision_recall_curve(y_test, y_proba)
+f1_scores = <span class="num">2</span> * prec * rec / (prec + rec + <span class="num">1e-8</span>)
+optimal_threshold = thresholds[np.argmax(f1_scores)]
+<span class="fn">print</span>(<span class="st">f"Optimal threshold: {optimal_threshold:.3f}"</span>)
+
+<span class="cm"># Apply optimal threshold</span>
+y_pred_optimal = (y_proba >= optimal_threshold).astype(int)
+<span class="fn">print</span>(<span class="st">f"F1 at optimal threshold: {f1_score(y_test, y_pred_optimal):.4f}"</span>)
+
+<span class="cm"># Handle imbalance with class weights</span>
+xgb_balanced = xgb.XGBClassifier(
+    scale_pos_weight=<span class="num">99</span>  <span class="cm"># = n_negative / n_positive for binary classification</span>
+)
+
+<span class="cm"># Or use SMOTE</span>
+<span class="kw">from</span> imblearn.over_sampling <span class="kw">import</span> SMOTE
+X_resampled, y_resampled = SMOTE(random_state=<span class="num">42</span>).fit_resample(X_train, y_train)<span class="lang-tag">python</span></code></pre>
+
+      <!-- Full interview rapid fire -->
+      <h3>Complete Rapid-Fire Interview Reference</h3>
+
+      <div class="qa-block">
+        <div class="qa-q">XGBoost vs LightGBM vs CatBoost — how do you choose?</div>
+        <div class="qa-a">Start with XGBoost as baseline. Switch to LightGBM if dataset has millions of rows or RAM is a bottleneck — it's 10–30× faster with histogram binning and leaf-wise growth. Switch to CatBoost if you have heavy categorical features and don't want to encode them manually, or if prediction latency is critical (symmetric trees enable ultra-fast inference). For kaggle competitions: stack all three.</div>
+      </div>
+
+      <div class="qa-block">
+        <div class="qa-q">What happens to SVM when you remove a non-support-vector?</div>
+        <div class="qa-a">Nothing changes. By the KKT conditions, non-support-vectors have α_i = 0, meaning they contribute zero to the weight vector w = Σα_i y^(i) x^(i). The decision boundary is entirely defined by the support vectors alone. This is actually an advantage of SVMs — the model is very sparse and doesn't need to store the full training set.</div>
+      </div>
+
+      <div class="qa-block">
+        <div class="qa-q">Why is AdaBoost sensitive to outliers while Gradient Boosting is more robust?</div>
+        <div class="qa-a">AdaBoost uses Exponential Loss, which grows without bound as the margin increases negatively. A single hard-to-classify noisy outlier gets exponentially increasing weight each round, eventually dominating the entire training process. Gradient Boosting can use Huber Loss, which behaves like MSE for small errors but transitions to MAE (absolute loss, bounded gradient) for large errors — outliers stop having a catastrophically large gradient contribution beyond a threshold delta.</div>
+      </div>
+
+      <div class="qa-block">
+        <div class="qa-q">Explain Information Gain in decision trees from an information-theory perspective</div>
+        <div class="qa-a">Entropy H(S) measures the expected number of bits needed to encode the class label of a random example from set S. Information Gain is the reduction in entropy after splitting: IG = H(parent) − weighted_avg H(children). By maximizing IG at each split, we're choosing the question that most compresses our uncertainty about the class labels. It's equivalent to selecting the split that maximizes the KL divergence between the uniform distribution and the post-split class distribution.</div>
+      </div>
+    </section>
+
+  </div><!-- /content-wrapper -->
+</main>
+
+<footer class="site-footer">
+  <a href="index.html">◈ CDC ML PREP</a> &nbsp;·&nbsp; Classical ML Part 2 &nbsp;·&nbsp; Bias-Variance · Trees · SVMs · AdaBoost
+</footer>
+
+<script>
+// Progress bar
+window.addEventListener('scroll', () => {
+  const h = document.documentElement;
+  document.getElementById('progressBar').style.width = (h.scrollTop / (h.scrollHeight - h.clientHeight) * 100) + '%';
+});
+
+// ─── BIAS VARIANCE VIZ ───
+const bvCanvas = document.getElementById('bvCanvas');
+const bvCtx = bvCanvas.getContext('2d');
+function drawBV() {
+  const W = bvCanvas.width = bvCanvas.offsetWidth; const H = 260; bvCanvas.height = H;
+  bvCtx.clearRect(0,0,W,H);
+  const c = parseInt(document.getElementById('complexSlider').value);
+  document.getElementById('complexVal').textContent = c;
+  const pad = {l:50,r:20,t:20,b:40};
+  const cw = W-pad.l-pad.r, ch = H-pad.t-pad.b;
+  const sx = v => pad.l + v/10*cw;
+  const sy = v => pad.t + (1-v/1.2)*ch;
+
+  // Grid lines
+  bvCtx.strokeStyle='#21262d'; bvCtx.lineWidth=1;
+  [0.2,0.4,0.6,0.8,1.0].forEach(v=>{
+    bvCtx.beginPath(); bvCtx.moveTo(pad.l,sy(v)); bvCtx.lineTo(W-pad.r,sy(v)); bvCtx.stroke();
+    bvCtx.fillStyle='#484f58'; bvCtx.font='9px IBM Plex Mono'; bvCtx.fillText(v.toFixed(1),pad.l-28,sy(v)+4);
+  });
+
+  // Compute curve values
+  const pts = Array.from({length:100},(_,i)=>{
+    const x=(i+1)/10;
+    const trainErr = Math.max(0.02, 0.5*Math.exp(-0.5*x) + 0.02);
+    const bias = Math.max(0.03, 0.7*Math.exp(-0.4*x));
+    const variance = 0.02 + 0.015*x*x;
+    const testErr = bias + variance + 0.05;
+    return {x, trainErr, testErr, bias, variance};
+  });
+
+  // Draw train error curve
+  bvCtx.strokeStyle='#56d364'; bvCtx.lineWidth=2;
+  bvCtx.beginPath();
+  pts.forEach((p,i)=>i===0?bvCtx.moveTo(sx(p.x),sy(p.trainErr)):bvCtx.lineTo(sx(p.x),sy(p.trainErr)));
+  bvCtx.stroke();
+
+  // Draw test error curve
+  bvCtx.strokeStyle='#f85149'; bvCtx.lineWidth=2;
+  bvCtx.beginPath();
+  pts.forEach((p,i)=>i===0?bvCtx.moveTo(sx(p.x),sy(p.testErr)):bvCtx.lineTo(sx(p.x),sy(p.testErr)));
+  bvCtx.stroke();
+
+  // Draw current complexity marker
+  const cp = pts[Math.min(c*10-1,99)];
+  [cp.trainErr, cp.testErr].forEach((v,i)=>{
+    bvCtx.beginPath(); bvCtx.arc(sx(cp.x),sy(v),6,0,Math.PI*2);
+    bvCtx.fillStyle=i===0?'#56d364':'#f85149'; bvCtx.fill();
+    bvCtx.strokeStyle='#fff'; bvCtx.lineWidth=1.5; bvCtx.stroke();
+  });
+
+  // Labels
+  bvCtx.font='11px IBM Plex Mono';
+  bvCtx.fillStyle='#56d364'; bvCtx.fillText('Train Error',W-120,pad.t+20);
+  bvCtx.fillStyle='#f85149'; bvCtx.fillText('Test Error',W-110,pad.t+38);
+  bvCtx.fillStyle='#8b949e'; bvCtx.fillText('← Underfitting | Overfitting →', pad.l, H-8);
+}
+document.getElementById('complexSlider').addEventListener('input',drawBV);
+window.addEventListener('resize',drawBV);
+setTimeout(drawBV,100);
+
+// ─── K-FOLD CV VIZ ───
+const cvCanvas = document.getElementById('cvCanvas');
+const cvCtx = cvCanvas.getContext('2d');
+let currentFold = 0;
+function drawCV() {
+  const W = cvCanvas.width = cvCanvas.offsetWidth; const H = 200; cvCanvas.height = H;
+  cvCtx.clearRect(0,0,W,H);
+  const K = parseInt(document.getElementById('kfoldSlider').value);
+  document.getElementById('kfoldVal').textContent = K;
+  const pad = 30; const fw = (W-2*pad)/K; const fh = 50; const fy = H/2-fh/2;
+
+  cvCtx.font='11px IBM Plex Mono';
+  for(let k=0;k<K;k++){
+    const x = pad + k*fw;
+    const isVal = k === (currentFold % K);
+    cvCtx.fillStyle = isVal ? 'rgba(232,197,71,0.3)' : 'rgba(121,192,255,0.15)';
+    cvCtx.fillRect(x+2,fy,fw-4,fh);
+    cvCtx.strokeStyle = isVal ? '#e8c547' : '#79c0ff';
+    cvCtx.lineWidth = isVal ? 2.5 : 1;
+    cvCtx.strokeRect(x+2,fy,fw-4,fh);
+    cvCtx.fillStyle = isVal ? '#e8c547' : '#79c0ff';
+    cvCtx.textAlign='center';
+    cvCtx.fillText(`Fold ${k+1}`, x+fw/2, fy+fh/2+4);
+    if(isVal){ cvCtx.fillStyle='#e8c547'; cvCtx.fillText('VAL',x+fw/2,fy+fh+16); }
+    else{ cvCtx.fillStyle='#484f58'; cvCtx.fillText('train',x+fw/2,fy+fh+16); }
+  }
+  cvCtx.textAlign='left';
+  cvCtx.fillStyle='#8b949e';
+  cvCtx.fillText(`Round ${(currentFold%K)+1} of ${K}`,pad,fy-10);
+}
+function nextFold(){currentFold++; drawCV();}
+function resetCV(){currentFold=0; drawCV();}
+document.getElementById('kfoldSlider').addEventListener('input',()=>{currentFold=0;drawCV();});
+window.addEventListener('resize',drawCV);
+setTimeout(drawCV,200);
+
+// ─── LAMBDA SWEEP VIZ ───
+const lambdaCanvas = document.getElementById('lambdaCanvas');
+const lambdaCtx = lambdaCanvas.getContext('2d');
+function drawLambda(){
+  const W = lambdaCanvas.width = lambdaCanvas.offsetWidth; const H = 240; lambdaCanvas.height = H;
+  lambdaCtx.clearRect(0,0,W,H);
+  const v = parseInt(document.getElementById('lambdaSweepSlider').value);
+  const lam = Math.exp((v/100)*6-1);
+  document.getElementById('lambdaSweepVal').textContent = lam.toFixed(3);
+  const pad={l:45,r:20,t:20,b:40}; const cw=W-pad.l-pad.r; const ch=H-pad.t-pad.b;
+  const sx=v=>pad.l+v/100*cw;
+  const sy=v=>pad.t+(1-v/1.0)*ch;
+  // Axes
+  lambdaCtx.strokeStyle='#484f58'; lambdaCtx.lineWidth=1;
+  lambdaCtx.beginPath(); lambdaCtx.moveTo(pad.l,pad.t); lambdaCtx.lineTo(pad.l,H-pad.b); lambdaCtx.lineTo(W-pad.r,H-pad.b); lambdaCtx.stroke();
+
+  const pts=[];
+  for(let i=0;i<=100;i++){
+    const x=i/100;
+    const bias2 = 0.6*Math.exp(-2.5*x*x/1 + 2.5*x) * 0.7;  // decreasing then flat
+    const vari  = 0.05 + 0.55*Math.exp(-3*x);
+    const tot   = bias2 + vari + 0.05;
+    pts.push({x:i, bias2, vari, tot});
+  }
+
+  // Variance
+  lambdaCtx.strokeStyle='#79c0ff'; lambdaCtx.lineWidth=2;
+  lambdaCtx.beginPath();
+  pts.forEach((p,i)=>i===0?lambdaCtx.moveTo(sx(p.x),sy(Math.min(p.vari,0.99))):lambdaCtx.lineTo(sx(p.x),sy(Math.min(p.vari,0.99))));
+  lambdaCtx.stroke();
+  // Bias^2
+  lambdaCtx.strokeStyle='#e8c547'; lambdaCtx.lineWidth=2;
+  lambdaCtx.beginPath();
+  pts.forEach((p,i)=>i===0?lambdaCtx.moveTo(sx(p.x),sy(Math.min(p.bias2,0.99))):lambdaCtx.lineTo(sx(p.x),sy(Math.min(p.bias2,0.99))));
+  lambdaCtx.stroke();
+  // Total
+  lambdaCtx.strokeStyle='#e6edf3'; lambdaCtx.lineWidth=2.5;
+  lambdaCtx.beginPath();
+  pts.forEach((p,i)=>i===0?lambdaCtx.moveTo(sx(p.x),sy(Math.min(p.tot,0.99))):lambdaCtx.lineTo(sx(p.x),sy(Math.min(p.tot,0.99))));
+  lambdaCtx.stroke();
+
+  // Current lambda marker
+  const ci = Math.min(v,99);
+  const cp = pts[ci];
+  [[cp.vari,'#79c0ff'],[cp.bias2,'#e8c547'],[cp.tot,'#e6edf3']].forEach(([val,col])=>{
+    lambdaCtx.beginPath(); lambdaCtx.arc(sx(cp.x),sy(Math.min(val,0.99)),5,0,Math.PI*2);
+    lambdaCtx.fillStyle=col; lambdaCtx.fill();
+  });
+
+  // Labels
+  lambdaCtx.font='10px IBM Plex Mono';
+  lambdaCtx.fillStyle='#e8c547'; lambdaCtx.fillText('Bias²',W-80,pad.t+12);
+  lambdaCtx.fillStyle='#79c0ff'; lambdaCtx.fillText('Variance',W-80,pad.t+26);
+  lambdaCtx.fillStyle='#e6edf3'; lambdaCtx.fillText('Total Error',W-80,pad.t+40);
+  lambdaCtx.fillStyle='#8b949e'; lambdaCtx.fillText('λ →', W-pad.r-20, H-pad.b+14);
+}
+document.getElementById('lambdaSweepSlider').addEventListener('input',drawLambda);
+window.addEventListener('resize',drawLambda);
+setTimeout(drawLambda,300);
+
+// ─── DECISION TREE VIZ ───
+const treeCanvas = document.getElementById('treeCanvas');
+const treeCtx = treeCanvas.getContext('2d');
+let treeFeature = 0;
+const treeData = Array.from({length:40},()=>({x:Math.random()*9+0.5,y:Math.random()*9+0.5,c:Math.random()<0.5?0:1}));
+function entropy(pts){if(!pts.length)return 0;const p=pts.filter(p=>p.c===1).length/pts.length;if(p===0||p===1)return 0;return -p*Math.log2(p)-(1-p)*Math.log2(1-p);}
+function drawTree(){
+  const W=treeCanvas.width=treeCanvas.offsetWidth; const H=280; treeCanvas.height=H;
+  treeCtx.clearRect(0,0,W,H);
+  const sp=parseFloat(document.getElementById('splitSlider').value);
+  document.getElementById('splitVal').textContent=sp.toFixed(1);
+  const pad=25; const sx=x=>pad+x*(W-2*pad)/10; const sy=y=>H-pad-y*(H-2*pad)/10;
+
+  // Split line
+  treeCtx.strokeStyle='#e8c547'; treeCtx.lineWidth=2.5;
+  if(treeFeature===0){treeCtx.beginPath();treeCtx.moveTo(sx(sp),pad);treeCtx.lineTo(sx(sp),H-pad);treeCtx.stroke();}
+  else{treeCtx.beginPath();treeCtx.moveTo(pad,sy(sp));treeCtx.lineTo(W-pad,sy(sp));treeCtx.stroke();}
+
+  // Points
+  treeData.forEach(p=>{
+    treeCtx.beginPath(); treeCtx.arc(sx(p.x),sy(p.y),5,0,Math.PI*2);
+    treeCtx.fillStyle=p.c===1?'rgba(121,192,255,0.85)':'rgba(248,81,73,0.85)'; treeCtx.fill();
+    treeCtx.strokeStyle='#0d1117'; treeCtx.lineWidth=1; treeCtx.stroke();
+  });
+
+  // Information Gain calc
+  const left = treeFeature===0 ? treeData.filter(p=>p.x<sp) : treeData.filter(p=>p.y<sp);
+  const right = treeFeature===0 ? treeData.filter(p=>p.x>=sp) : treeData.filter(p=>p.y>=sp);
+  const m=treeData.length;
+  const ig = entropy(treeData) - (left.length/m)*entropy(left) - (right.length/m)*entropy(right);
+  document.getElementById('igDisplay').textContent=ig.toFixed(4);
+}
+function toggleFeature(){treeFeature=1-treeFeature;document.getElementById('featBtn').textContent='Feature: '+(treeFeature?'X₂':'X₁');drawTree();}
+document.getElementById('splitSlider').addEventListener('input',drawTree);
+window.addEventListener('resize',drawTree);
+setTimeout(drawTree,400);
+
+// ─── GROWTH VIZ ───
+const growthCanvas = document.getElementById('growthCanvas');
+const gCtx = growthCanvas.getContext('2d');
+let growthMode='level', growthStep=0;
+function setGrowth(m){growthMode=m;growthStep=0;document.getElementById('btnLevel').classList.toggle('active',m==='level');document.getElementById('btnLeaf').classList.toggle('active',m==='leaf');drawGrowth();}
+function nextGrowthStep(){if(growthStep<6)growthStep++;drawGrowth();}
+function resetGrowth(){growthStep=0;drawGrowth();}
+function drawGrowth(){
+  const W=growthCanvas.width=growthCanvas.offsetWidth; const H=240; growthCanvas.height=H;
+  gCtx.clearRect(0,0,W,H);
+  const pad=20; const nw=W-2*pad; const nh=H-2*pad;
+  gCtx.font='10px IBM Plex Mono';
+
+  if(growthMode==='level'){
+    // Level-wise: all nodes at each level filled simultaneously
+    const levelColors=['#e8c547','#79c0ff','#56d364','#f85149','#d2a8ff'];
+    const levels=Math.min(growthStep,4);
+    for(let d=0;d<=levels;d++){
+      const count=Math.pow(2,d); const fw=nw/count; const fh=Math.min(40,nh/(levels+1));
+      const fy=pad+d*(nh/(levels+1));
+      for(let n=0;n<count;n++){
+        const fx=pad+n*fw;
+        gCtx.fillStyle=`rgba(${d===levels?'232,197,71':'121,192,255'},0.15)`;
+        gCtx.fillRect(fx+2,fy,fw-4,fh-4);
+        gCtx.strokeStyle=d===levels?'#e8c547':'#79c0ff';
+        gCtx.lineWidth=d===levels?2:1;
+        gCtx.strokeRect(fx+2,fy,fw-4,fh-4);
+        gCtx.fillStyle=d===levels?'#e8c547':'#79c0ff';
+        gCtx.textAlign='center';
+        gCtx.fillText(`d${d}n${n+1}`,fx+fw/2,fy+fh/2);
+      }
+    }
+    gCtx.fillStyle='#8b949e'; gCtx.textAlign='left';
+    gCtx.fillText(`Level-Wise: All ${Math.pow(2,levels)} nodes at depth ${levels} split simultaneously`,pad,H-6);
+  } else {
+    // Leaf-wise: one leaf at a time, choosing best gain
+    const leafSeq=[[0,0],[1,0],[0,1],[2,1],[1,2],[0,3]];
+    gCtx.fillStyle='#8b949e'; gCtx.textAlign='left';
+    gCtx.fillText(`Leaf-Wise: Best single leaf split at each round`,pad,H-6);
+    const shown=leafSeq.slice(0,Math.min(growthStep,6));
+    shown.forEach(([col,row],i)=>{
+      const fw=nw/Math.max(3,i+1); const fh=40; const fy=pad+row*55;
+      const fx=pad+col*fw;
+      gCtx.fillStyle=i===shown.length-1?'rgba(232,197,71,0.2)':'rgba(86,211,100,0.12)';
+      gCtx.fillRect(Math.min(fx,W-pad-50)+2,Math.min(fy,H-60),70,fh-4);
+      gCtx.strokeStyle=i===shown.length-1?'#e8c547':'#56d364';
+      gCtx.lineWidth=i===shown.length-1?2.5:1;
+      gCtx.strokeRect(Math.min(fx,W-pad-50)+2,Math.min(fy,H-60),70,fh-4);
+      gCtx.fillStyle=i===shown.length-1?'#e8c547':'#56d364';
+      gCtx.textAlign='center';
+      gCtx.fillText(`leaf${i+1}`,Math.min(fx,W-pad-50)+37,Math.min(fy,H-60)+fh/2);
+    });
+  }
+  gCtx.textAlign='left';
+}
+window.addEventListener('resize',drawGrowth);
+setTimeout(drawGrowth,500);
+
+// ─── SVM C VIZ ───
+const svmCCanvas = document.getElementById('svmCCanvas');
+const svmCCtx = svmCCanvas.getContext('2d');
+const svmData2 = {
+  pos:[[2,6.5],[2.5,7.5],[3,5.8],[4,7],[2,8.5],[3.5,7],[4.5,5.5]],
+  neg:[[6.5,2.5],[7,3.5],[7.5,2],[8,3],[6,2],[8.5,4],[7,1.5]],
+  noise:[[4.5,6],[5.5,5.5]]  // outliers
+};
+function drawSVMC(){
+  const W=svmCCanvas.width=svmCCanvas.offsetWidth; const H=280; svmCCtx.height=H; svmCCanvas.height=H;
+  svmCCtx.clearRect(0,0,W,H);
+  const C=parseFloat(document.getElementById('cParamSlider').value);
+  document.getElementById('cParamVal').textContent=C.toFixed(1);
+  const pad=20; const sx=x=>pad+x*(W-2*pad)/10; const sy=y=>H-pad-y*(H-2*pad)/10;
+  // Margin width inversely proportional to C
+  const marginW = Math.max(0.3, 2.5/Math.sqrt(C));
+
+  // Decision boundary: roughly y = -x + 9.5
+  const dbY=x=> -x+9.5;
+  // Upper/lower margin gutters
+  svmCCtx.strokeStyle='rgba(232,197,71,0.5)'; svmCCtx.lineWidth=1.5; svmCCtx.setLineDash([5,5]);
+  svmCCtx.beginPath(); svmCCtx.moveTo(sx(0),sy(dbY(0)+marginW)); svmCCtx.lineTo(sx(9.5),sy(dbY(9.5)+marginW)); svmCCtx.stroke();
+  svmCCtx.beginPath(); svmCCtx.moveTo(sx(0),sy(dbY(0)-marginW)); svmCCtx.lineTo(sx(9.5),sy(dbY(9.5)-marginW)); svmCCtx.stroke();
+  svmCCtx.setLineDash([]);
+  // Fill margin
+  svmCCtx.save(); svmCCtx.beginPath();
+  svmCCtx.moveTo(sx(0),sy(dbY(0)+marginW)); svmCCtx.lineTo(sx(9.5),sy(dbY(9.5)+marginW));
+  svmCCtx.lineTo(sx(9.5),sy(dbY(9.5)-marginW)); svmCCtx.lineTo(sx(0),sy(dbY(0)-marginW));
+  svmCCtx.closePath(); svmCCtx.fillStyle='rgba(232,197,71,0.05)'; svmCCtx.fill(); svmCCtx.restore();
+  // Decision boundary
+  svmCCtx.strokeStyle='#e8c547'; svmCCtx.lineWidth=2.5;
+  svmCCtx.beginPath(); svmCCtx.moveTo(sx(0),sy(dbY(0))); svmCCtx.lineTo(sx(9.5),sy(dbY(9.5))); svmCCtx.stroke();
+
+  // Data points
+  svmData2.pos.forEach(([x,y])=>{svmCCtx.beginPath();svmCCtx.arc(sx(x),sy(y),5,0,Math.PI*2);svmCCtx.fillStyle='rgba(121,192,255,0.85)';svmCCtx.fill();});
+  svmData2.neg.forEach(([x,y])=>{svmCCtx.beginPath();svmCCtx.arc(sx(x),sy(y),5,0,Math.PI*2);svmCCtx.fillStyle='rgba(248,81,73,0.85)';svmCCtx.fill();});
+  // Noise/outliers
+  svmData2.noise.forEach(([x,y])=>{
+    svmCCtx.beginPath(); svmCCtx.arc(sx(x),sy(y),5,0,Math.PI*2);
+    svmCCtx.fillStyle='rgba(210,168,255,0.85)'; svmCCtx.fill();
+    svmCCtx.strokeStyle='#d2a8ff'; svmCCtx.lineWidth=1.5; svmCCtx.stroke();
+  });
+
+  // Margin label
+  svmCCtx.fillStyle='#8b949e'; svmCCtx.font='10px IBM Plex Mono';
+  svmCCtx.fillText(`C=${C.toFixed(1)}: margin width ≈ ${marginW.toFixed(2)} | ${C<2?'Wide margin (underfitting)':C>5?'Narrow margin (overfitting)':'Balanced'}`,pad,H-8);
+}
+document.getElementById('cParamSlider').addEventListener('input',drawSVMC);
+window.addEventListener('resize',drawSVMC);
+setTimeout(drawSVMC,600);
+
+// ─── ADABOOST VIZ ───
+const adaCanvas = document.getElementById('adaCanvas');
+const adaCtx = adaCanvas.getContext('2d');
+let adaRound=0;
+const adaPoints = [
+  {x:2,y:7,c:1},{x:2.5,y:8,c:1},{x:3,y:6.5,c:1},{x:3.5,y:7.5,c:1},{x:2,y:8.5,c:1},
+  {x:7,y:3,c:-1},{x:7.5,y:2.5,c:-1},{x:8,y:3.5,c:-1},{x:8.5,y:2,c:-1},{x:7,y:2,c:-1},
+  {x:4.5,y:5.5,c:1},{x:5.5,y:4.5,c:-1}  // hard points
+];
+adaPoints.forEach(p=>p.w=1/adaPoints.length);
+const adaStumps=[{axis:'x',val:5.5,dir:1},{axis:'y',val:5.5,dir:1},{axis:'x',val:4,dir:1}];
+
+function drawAda(){
+  const W=adaCanvas.width=adaCanvas.offsetWidth; const H=300; adaCanvas.height=H;
+  adaCtx.clearRect(0,0,W,H);
+  const pad=20; const sx=x=>pad+x*(W-2*pad)/10; const sy=y=>H-pad-y*(H-2*pad)/10;
+
+  if(adaRound>0){
+    const st=adaStumps[Math.min(adaRound-1,2)];
+    adaCtx.strokeStyle='rgba(232,197,71,0.7)'; adaCtx.lineWidth=2; adaCtx.setLineDash([6,4]);
+    if(st.axis==='x'){adaCtx.beginPath();adaCtx.moveTo(sx(st.val),pad);adaCtx.lineTo(sx(st.val),H-pad);adaCtx.stroke();}
+    else{adaCtx.beginPath();adaCtx.moveTo(pad,sy(st.val));adaCtx.lineTo(W-pad,sy(st.val));adaCtx.stroke();}
+    adaCtx.setLineDash([]);
+  }
+
+  adaPoints.forEach(p=>{
+    const r=Math.max(4,Math.min(20,p.w*adaPoints.length*8));
+    adaCtx.beginPath(); adaCtx.arc(sx(p.x),sy(p.y),r,0,Math.PI*2);
+    adaCtx.fillStyle=p.c===1?`rgba(121,192,255,0.8)`:`rgba(248,81,73,0.8)`; adaCtx.fill();
+    adaCtx.strokeStyle='#0d1117'; adaCtx.lineWidth=1; adaCtx.stroke();
+    adaCtx.fillStyle='#fff'; adaCtx.font='8px IBM Plex Mono'; adaCtx.textAlign='center';
+    adaCtx.fillText(p.w.toFixed(2),sx(p.x),sy(p.y)+3); adaCtx.textAlign='left';
+  });
+
+  adaCtx.fillStyle='#8b949e'; adaCtx.font='10px IBM Plex Mono';
+  adaCtx.fillText(`Round ${adaRound}/3 | Point size = weight | White = w value`,pad,H-8);
+}
+
+function adaStep(){
+  if(adaRound>=3){document.getElementById('adaStatus').textContent='3 rounds complete — see final weighted vote';return;}
+  const st=adaStumps[adaRound];
+  adaPoints.forEach(p=>{
+    const pred=st.axis==='x'?(p.x>=st.val?1:-1):(p.y>=st.val?1:-1);
+    const correct=pred===p.c;
+    p.w*=correct?0.7:1.5;
+  });
+  const total=adaPoints.reduce((a,b)=>a+b.w,0);
+  adaPoints.forEach(p=>p.w/=total);
+  adaRound++;
+  document.getElementById('adaBtn').textContent=adaRound<3?`Round ${adaRound+1}: Update & Retrain ▶`:'Show Final Vote ▶';
+  document.getElementById('adaStatus').textContent=`Round ${adaRound} complete — misclassified points grew heavier`;
+  drawAda();
+}
+
+function resetAda(){
+  adaRound=0; adaPoints.forEach(p=>p.w=1/adaPoints.length);
+  document.getElementById('adaBtn').textContent='Round 1: Train Stump ▶';
+  document.getElementById('adaStatus').textContent='';
+  drawAda();
+}
+window.addEventListener('resize',drawAda);
+setTimeout(drawAda,700);
+
+// ─── CONFUSION MATRIX + METRICS ───
+const cmCanvas = document.getElementById('cmCanvas');
+const cmCtx = cmCanvas.getContext('2d');
+function drawCM(){
+  const W=cmCanvas.width=cmCanvas.offsetWidth; const H=280; cmCanvas.height=H;
+  cmCtx.clearRect(0,0,W,H);
+  const thr=parseFloat(document.getElementById('threshSlider').value);
+  document.getElementById('threshVal').textContent=thr.toFixed(2);
+
+  // Simulate: 100 positives, 900 negatives
+  const tp=Math.round(100*(1-Math.max(0,thr-0.3)*2));
+  const fn=100-tp;
+  const fp=Math.round(900*(1-thr)*0.3);
+  const tn=900-fp;
+
+  const prec=tp/(tp+fp+1e-6); const rec=tp/(tp+fn+1e-6);
+  const f1=2*prec*rec/(prec+rec+1e-6);
+  document.getElementById('precVal').textContent=prec.toFixed(3);
+  document.getElementById('recVal').textContent=rec.toFixed(3);
+  document.getElementById('f1Val').textContent=f1.toFixed(3);
+
+  const cs=Math.min((W-80)/2, (H-80)/2, 80);
+  const ox=(W-2*cs)/2; const oy=40;
+  const cells=[[tp,'TP','rgba(86,211,100,0.25)','#56d364'],[fp,'FP','rgba(248,81,73,0.15)','#f85149'],
+                [fn,'FN','rgba(248,81,73,0.15)','#f85149'],[tn,'TN','rgba(86,211,100,0.15)','#56d364']];
+  cells.forEach(([val,label,bg,col],i)=>{
+    const cx=ox+(i%2)*cs; const cy=oy+Math.floor(i/2)*cs;
+    cmCtx.fillStyle=bg; cmCtx.fillRect(cx,cy,cs,cs);
+    cmCtx.strokeStyle=col; cmCtx.lineWidth=2; cmCtx.strokeRect(cx,cy,cs,cs);
+    cmCtx.fillStyle=col; cmCtx.font='bold 14px IBM Plex Mono'; cmCtx.textAlign='center';
+    cmCtx.fillText(label,cx+cs/2,cy+cs/2-8);
+    cmCtx.fillStyle='#e6edf3'; cmCtx.font='16px IBM Plex Mono';
+    cmCtx.fillText(val,cx+cs/2,cy+cs/2+14);
+  });
+  // Headers
+  cmCtx.fillStyle='#8b949e'; cmCtx.font='10px IBM Plex Mono';
+  cmCtx.textAlign='center';
+  cmCtx.fillText('Pred +',ox+cs/2,oy-10); cmCtx.fillText('Pred −',ox+cs+cs/2,oy-10);
+  cmCtx.save(); cmCtx.translate(ox-15,oy+cs/2); cmCtx.rotate(-Math.PI/2);
+  cmCtx.fillText('Actual +',0,0); cmCtx.restore();
+  cmCtx.save(); cmCtx.translate(ox-15,oy+cs+cs/2); cmCtx.rotate(-Math.PI/2);
+  cmCtx.fillText('Actual −',0,0); cmCtx.restore();
+  cmCtx.textAlign='left';
+}
+document.getElementById('threshSlider').addEventListener('input',drawCM);
+window.addEventListener('resize',drawCM);
+setTimeout(drawCM,800);
+
+// ─── ROC CURVE ───
+const rocCanvas = document.getElementById('rocCanvas');
+const rocCtx = rocCanvas.getContext('2d');
+let rocModel='good';
+function setROCModel(m){
+  rocModel=m;
+  ['rocRnd','rocOk','rocGood'].forEach(id=>document.getElementById(id).classList.remove('active'));
+  document.getElementById('roc'+m.charAt(0).toUpperCase()+m.slice(1)).classList.add('active');
+  drawROC();
+}
+function drawROC(){
+  const W=rocCanvas.width=rocCanvas.offsetWidth; const H=280; rocCanvas.height=H;
+  rocCtx.clearRect(0,0,W,H);
+  const pad={l:50,r:20,t:20,b:40}; const cw=W-pad.l-pad.r; const ch=H-pad.t-pad.b;
+  const sx=v=>pad.l+v*cw; const sy=v=>pad.t+(1-v)*ch;
+
+  // Grid
+  rocCtx.strokeStyle='#21262d'; rocCtx.lineWidth=1;
+  [0.2,0.4,0.6,0.8,1.0].forEach(v=>{
+    rocCtx.beginPath();rocCtx.moveTo(pad.l,sy(v));rocCtx.lineTo(W-pad.r,sy(v));rocCtx.stroke();
+    rocCtx.beginPath();rocCtx.moveTo(sx(v),pad.t);rocCtx.lineTo(sx(v),H-pad.b);rocCtx.stroke();
+    rocCtx.fillStyle='#484f58';rocCtx.font='9px IBM Plex Mono';
+    rocCtx.fillText(v.toFixed(1),pad.l-22,sy(v)+4);
+    rocCtx.fillText(v.toFixed(1),sx(v)-6,H-pad.b+12);
+  });
+
+  // Random line
+  rocCtx.strokeStyle='#484f58'; rocCtx.lineWidth=1.5; rocCtx.setLineDash([5,5]);
+  rocCtx.beginPath(); rocCtx.moveTo(sx(0),sy(0)); rocCtx.lineTo(sx(1),sy(1)); rocCtx.stroke();
+  rocCtx.setLineDash([]);
+
+  // Model curve
+  let pts=[], auc=0;
+  if(rocModel==='random'){pts=[[0,0],[0.2,0.2],[0.5,0.5],[0.8,0.8],[1,1]];auc=0.5;}
+  else if(rocModel==='ok'){pts=[[0,0],[0.1,0.4],[0.2,0.6],[0.4,0.75],[0.6,0.87],[0.8,0.93],[1,1]];auc=0.75;}
+  else{pts=[[0,0],[0.05,0.5],[0.1,0.75],[0.2,0.88],[0.4,0.93],[0.6,0.96],[0.8,0.98],[1,1]];auc=0.91;}
+
+  // Fill under curve
+  rocCtx.fillStyle='rgba(86,211,100,0.06)';
+  rocCtx.beginPath(); rocCtx.moveTo(sx(0),sy(0));
+  pts.forEach(([x,y])=>rocCtx.lineTo(sx(x),sy(y)));
+  rocCtx.lineTo(sx(1),sy(0)); rocCtx.closePath(); rocCtx.fill();
+
+  rocCtx.strokeStyle='#56d364'; rocCtx.lineWidth=2.5;
+  rocCtx.beginPath();
+  pts.forEach(([x,y],i)=>i===0?rocCtx.moveTo(sx(x),sy(y)):rocCtx.lineTo(sx(x),sy(y)));
+  rocCtx.stroke();
+
+  pts.forEach(([x,y])=>{rocCtx.beginPath();rocCtx.arc(sx(x),sy(y),4,0,Math.PI*2);rocCtx.fillStyle='#56d364';rocCtx.fill();});
+
+  // Labels
+  rocCtx.fillStyle='#56d364'; rocCtx.font='12px IBM Plex Mono';
+  rocCtx.fillText(`AUC = ${auc}`,sx(0.5),sy(0.15));
+  rocCtx.fillStyle='#8b949e'; rocCtx.font='10px IBM Plex Mono';
+  rocCtx.fillText('FPR →',W-pad.r-30,H-pad.b+14);
+  rocCtx.save(); rocCtx.translate(12,H/2); rocCtx.rotate(-Math.PI/2);
+  rocCtx.fillText('TPR (Recall)',0,0); rocCtx.restore();
+}
+window.addEventListener('resize',drawROC);
+setTimeout(drawROC,900);
+</script>
+
+<script>
+MathJax = {
+  tex: { inlineMath: [['\\(','\\)'],['$','$']], displayMath: [['\\[','\\]'],['$$','$$']] },
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+};
+</script>
+</body>
+</html>
