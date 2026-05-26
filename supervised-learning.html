@@ -1,0 +1,2338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Supervised Learning — CDC ML Prep</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&family=Newsreader:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0a0c10;
+    --bg2: #0f1117;
+    --bg3: #161b22;
+    --border: #21262d;
+    --accent: #f0a500;
+    --accent2: #58a6ff;
+    --accent3: #7ee787;
+    --accent4: #ff7b72;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --text-dim: #484f58;
+    --card: #161b22;
+    --code-bg: #0d1117;
+    --highlight: rgba(240,165,0,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Newsreader', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.8;
+    overflow-x: hidden;
+  }
+
+  /* ─── HEADER ─── */
+  .site-header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,12,16,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 56px;
+  }
+  .site-header .logo {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px; color: var(--accent);
+    text-decoration: none; letter-spacing: 0.08em;
+  }
+  .header-nav { display: flex; gap: 1.5rem; }
+  .header-nav a {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px; color: var(--text-muted);
+    text-decoration: none; letter-spacing: 0.04em;
+    transition: color 0.2s;
+  }
+  .header-nav a:hover { color: var(--accent2); }
+
+  /* ─── HERO ─── */
+  .hero {
+    padding: 5rem 2rem 3rem;
+    max-width: 900px; margin: 0 auto;
+    position: relative;
+  }
+  .hero-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--accent);
+    letter-spacing: 0.15em; text-transform: uppercase;
+    border: 1px solid rgba(240,165,0,0.3);
+    display: inline-block; padding: 3px 10px;
+    border-radius: 3px; margin-bottom: 1.5rem;
+  }
+  .hero h1 {
+    font-family: 'Newsreader', serif;
+    font-size: clamp(2.4rem, 5vw, 3.8rem);
+    font-weight: 300;
+    line-height: 1.15;
+    color: var(--text);
+    margin-bottom: 1.2rem;
+  }
+  .hero h1 em { font-style: italic; color: var(--accent); }
+  .hero-desc {
+    font-size: 1.15rem; color: var(--text-muted);
+    max-width: 640px; line-height: 1.75;
+  }
+  .hero-meta {
+    margin-top: 2.5rem;
+    display: flex; gap: 2rem; flex-wrap: wrap;
+  }
+  .hero-meta-item {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--text-dim);
+  }
+  .hero-meta-item span { color: var(--accent3); }
+
+  /* ─── TOC ─── */
+  .toc-container {
+    max-width: 900px; margin: 0 auto 3rem;
+    padding: 0 2rem;
+  }
+  .toc {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    padding: 1.5rem 2rem;
+  }
+  .toc-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--accent);
+    letter-spacing: 0.12em; text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  .toc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 0.4rem 2rem;
+  }
+  .toc a {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13.5px; color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .toc a::before {
+    content: '→';
+    color: var(--accent2); font-size: 11px;
+  }
+  .toc a:hover { color: var(--accent2); }
+
+  /* ─── MAIN CONTENT ─── */
+  .content-wrapper {
+    max-width: 900px; margin: 0 auto;
+    padding: 0 2rem 6rem;
+  }
+
+  /* ─── SECTIONS ─── */
+  .chapter {
+    margin-bottom: 5rem;
+    scroll-margin-top: 70px;
+  }
+  .chapter-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; color: var(--accent);
+    letter-spacing: 0.18em; text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    display: flex; align-items: center; gap: 0.6rem;
+  }
+  .chapter-label::after {
+    content: '';
+    flex: 1; height: 1px;
+    background: linear-gradient(to right, var(--border), transparent);
+  }
+  .chapter h2 {
+    font-family: 'Newsreader', serif;
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 400;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+    line-height: 1.25;
+  }
+  .chapter h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.1rem; font-weight: 500;
+    color: var(--accent2);
+    margin: 2rem 0 0.8rem;
+    letter-spacing: -0.01em;
+  }
+  .chapter h4 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.95rem; font-weight: 500;
+    color: var(--accent3);
+    margin: 1.5rem 0 0.5rem;
+    letter-spacing: 0.02em;
+  }
+  .chapter p {
+    margin-bottom: 1.1rem;
+    color: var(--text);
+  }
+  .chapter ul, .chapter ol {
+    margin: 0.8rem 0 1.2rem 1.5rem;
+  }
+  .chapter li {
+    margin-bottom: 0.5rem;
+    color: var(--text);
+  }
+
+  /* ─── MATH BLOCKS ─── */
+  .math-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent2);
+    border-radius: 6px;
+    padding: 1.2rem 1.5rem;
+    margin: 1.5rem 0;
+    overflow-x: auto;
+    text-align: center;
+    font-size: 1.05rem;
+  }
+  .math-block .label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; color: var(--text-dim);
+    text-align: left; display: block;
+    margin-bottom: 0.5rem; letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* ─── CODE BLOCKS ─── */
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.2rem 1.5rem;
+    overflow-x: auto;
+    margin: 1.5rem 0;
+    position: relative;
+  }
+  pre .lang-tag {
+    position: absolute; top: 8px; right: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; color: var(--text-dim);
+    letter-spacing: 0.08em;
+  }
+  code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: var(--text);
+  }
+  p code, li code {
+    background: var(--bg3);
+    padding: 1px 5px; border-radius: 3px;
+    font-size: 0.82rem; color: var(--accent3);
+  }
+
+  /* syntax highlighting */
+  .kw { color: #ff7b72; }
+  .fn { color: #d2a8ff; }
+  .st { color: #a5d6ff; }
+  .cm { color: #8b949e; font-style: italic; }
+  .num { color: #79c0ff; }
+  .cl { color: #ffa657; }
+
+  /* ─── CALLOUT CARDS ─── */
+  .callout {
+    border-radius: 6px;
+    padding: 1.2rem 1.5rem;
+    margin: 1.8rem 0;
+    border-left: 4px solid;
+  }
+  .callout-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing: 0.1em;
+    text-transform: uppercase; margin-bottom: 0.5rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .callout.interview {
+    background: rgba(88,166,255,0.06);
+    border-color: var(--accent2);
+  }
+  .callout.interview .callout-title { color: var(--accent2); }
+  .callout.warning {
+    background: rgba(255,123,114,0.06);
+    border-color: var(--accent4);
+  }
+  .callout.warning .callout-title { color: var(--accent4); }
+  .callout.insight {
+    background: rgba(126,231,135,0.06);
+    border-color: var(--accent3);
+  }
+  .callout.insight .callout-title { color: var(--accent3); }
+  .callout.gold {
+    background: rgba(240,165,0,0.07);
+    border-color: var(--accent);
+  }
+  .callout.gold .callout-title { color: var(--accent); }
+
+  /* ─── Q&A BLOCKS ─── */
+  .qa-block {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 2rem 0;
+  }
+  .qa-q {
+    background: var(--bg3);
+    padding: 1rem 1.4rem;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.95rem; font-weight: 500;
+    color: var(--accent2);
+    display: flex; align-items: flex-start; gap: 0.8rem;
+    cursor: pointer;
+  }
+  .qa-q::before {
+    content: 'Q';
+    background: var(--accent2);
+    color: var(--bg);
+    font-size: 11px; font-weight: 700;
+    padding: 1px 6px; border-radius: 3px;
+    flex-shrink: 0; margin-top: 2px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .qa-a {
+    background: var(--bg2);
+    padding: 1rem 1.4rem;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: flex-start; gap: 0.8rem;
+    font-size: 0.95rem; color: var(--text);
+  }
+  .qa-a::before {
+    content: 'A';
+    background: var(--accent3);
+    color: var(--bg);
+    font-size: 11px; font-weight: 700;
+    padding: 1px 6px; border-radius: 3px;
+    flex-shrink: 0; margin-top: 2px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  /* ─── NOTATION TABLE ─── */
+  .notation-table {
+    width: 100%; border-collapse: collapse;
+    margin: 1.5rem 0; font-size: 0.92rem;
+  }
+  .notation-table th {
+    background: var(--bg3);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; letter-spacing: 0.1em;
+    color: var(--accent); text-transform: uppercase;
+    padding: 0.7rem 1rem; text-align: left;
+    border-bottom: 2px solid var(--border);
+  }
+  .notation-table td {
+    padding: 0.65rem 1rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .notation-table tr:hover td { background: var(--highlight); }
+  .notation-table td:first-child {
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--accent2); font-size: 0.88rem;
+  }
+
+  /* ─── COMPARISON TABLE ─── */
+  .compare-table {
+    width: 100%; border-collapse: collapse;
+    margin: 1.5rem 0; font-size: 0.9rem;
+  }
+  .compare-table th {
+    background: var(--bg3);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.85rem; font-weight: 500;
+    color: var(--text); padding: 0.8rem 1rem;
+    border-bottom: 2px solid var(--accent);
+    border-right: 1px solid var(--border);
+  }
+  .compare-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .compare-table tr:hover td { background: var(--highlight); }
+
+  /* ─── CANVAS VIZ ─── */
+  .viz-container {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+  }
+  .viz-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--accent);
+    letter-spacing: 0.1em; text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  .viz-controls {
+    display: flex; gap: 1rem; flex-wrap: wrap;
+    align-items: center; margin-top: 1rem;
+  }
+  .viz-controls label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px; color: var(--text-muted);
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .viz-controls input[type=range] {
+    accent-color: var(--accent);
+    width: 120px;
+  }
+  .viz-controls button {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; padding: 5px 12px;
+    border-radius: 4px; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .viz-controls button:hover {
+    border-color: var(--accent2);
+    color: var(--accent2);
+  }
+  canvas {
+    display: block; border-radius: 4px;
+    width: 100%; max-width: 100%;
+  }
+
+  /* ─── DIVIDER ─── */
+  .chapter-divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--border), transparent);
+    margin: 4rem 0;
+  }
+
+  /* ─── BADGE ─── */
+  .badge {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; padding: 2px 8px;
+    border-radius: 3px; letter-spacing: 0.05em;
+    text-transform: uppercase; font-weight: 600;
+    margin: 0 3px;
+  }
+  .badge-blue { background: rgba(88,166,255,0.15); color: var(--accent2); }
+  .badge-green { background: rgba(126,231,135,0.15); color: var(--accent3); }
+  .badge-orange { background: rgba(240,165,0,0.15); color: var(--accent); }
+  .badge-red { background: rgba(255,123,114,0.15); color: var(--accent4); }
+
+  /* ─── HIGHLIGHT BOX ─── */
+  .highlight-box {
+    background: var(--highlight);
+    border: 1px solid rgba(240,165,0,0.2);
+    border-radius: 6px;
+    padding: 1rem 1.4rem;
+    margin: 1.5rem 0;
+  }
+
+  /* ─── STEP LIST ─── */
+  .step-list { list-style: none; margin: 1rem 0 1.5rem; padding: 0; }
+  .step-list li {
+    display: flex; gap: 1rem;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .step-list li:last-child { border-bottom: none; }
+  .step-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; font-weight: 600;
+    background: var(--accent);
+    color: var(--bg);
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 2px;
+  }
+
+  /* ─── SCROLL PROGRESS ─── */
+  .progress-bar {
+    position: fixed; top: 56px; left: 0;
+    height: 2px; background: var(--accent);
+    width: 0%; z-index: 99; transition: width 0.1s;
+  }
+
+  /* ─── FOOTER ─── */
+  .site-footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem;
+    text-align: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--text-dim);
+    letter-spacing: 0.08em;
+  }
+  .site-footer a { color: var(--accent2); text-decoration: none; }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 640px) {
+    .hero { padding: 3rem 1.2rem 2rem; }
+    .content-wrapper { padding: 0 1.2rem 4rem; }
+    .toc-grid { grid-template-columns: 1fr; }
+    .header-nav { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<header class="site-header">
+  <a href="index.html" class="logo">◈ CDC ML PREP</a>
+  <nav class="header-nav">
+    <a href="index.html">Home</a>
+    <a href="#toc">Contents</a>
+    <a href="#chapter-gda">Generative</a>
+    <a href="#chapter-regularization">Regularization</a>
+    <a href="#chapter-svm">SVMs</a>
+  </nav>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-tag">Pillar 1 · Classical ML</div>
+    <h1>Supervised <em>Learning</em><br>Master Notes</h1>
+    <p class="hero-desc">Complete mathematical treatment of supervised learning algorithms — from linear regression to SVMs, kernels, and tree ensembles. Every derivation, every proof, every interview trap.</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">Source: <span>CS229 Stanford</span></div>
+      <div class="hero-meta-item">Chapters: <span>39+</span></div>
+      <div class="hero-meta-item">Target: <span>CDC Day 1 ML Interviews</span></div>
+    </div>
+  </section>
+
+  <!-- TOC -->
+  <div class="toc-container" id="toc">
+    <div class="toc">
+      <div class="toc-title">📋 Table of Contents</div>
+      <div class="toc-grid">
+        <a href="#ch1">Ch 1 · Anatomy of Supervised Learning</a>
+        <a href="#ch2">Ch 2 · Linear Regression</a>
+        <a href="#ch3">Ch 3 · Gradient Descent</a>
+        <a href="#ch4">Ch 4 · Normal Equation</a>
+        <a href="#ch5">Ch 5 · Probabilistic Interpretation</a>
+        <a href="#ch6">Ch 6 · Regularization (L1 & L2)</a>
+        <a href="#ch7">Ch 7 · Logistic Regression</a>
+        <a href="#ch8">Ch 8 · Geometry of Sparsity</a>
+        <a href="#ch9">Ch 9 · MAP Estimation</a>
+        <a href="#ch13">Ch 13 · GLMs & Softmax</a>
+        <a href="#ch15">Ch 15 · GLM Proofs</a>
+        <a href="#ch16">Ch 16 · Cross-Entropy Loss</a>
+        <a href="#ch17">Ch 17 · KL Divergence</a>
+        <a href="#ch18">Ch 18-22 · Forward/Reverse KL</a>
+        <a href="#chapter-gda">Ch 23-26 · GDA & Naive Bayes</a>
+        <a href="#chapter-svm">Ch 30-33 · SVMs & Kernels</a>
+        <a href="#chapter-trees">Ch 34-38 · Trees & XGBoost</a>
+        <a href="#chapter-knn">Ch 39-44 · KNN</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-wrapper">
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- CHAPTER 1 -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <section class="chapter" id="ch1">
+      <div class="chapter-label">Chapter 1</div>
+      <h2>The Anatomy of Supervised Learning</h2>
+
+      <p>Before building any model, we need a common vocabulary. Every ML engineer and researcher communicates using the same notation. Memorize this — an interviewer will use these symbols without definition.</p>
+
+      <table class="notation-table">
+        <thead>
+          <tr>
+            <th>Symbol</th>
+            <th>Name</th>
+            <th>Meaning</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>\(x^{(i)}\)</td><td>Input / Features</td><td>The feature vector of the i-th training example (e.g., size of house, no. of bedrooms)</td></tr>
+          <tr><td>\(y^{(i)}\)</td><td>Output / Label</td><td>The target value we want to predict for the i-th example</td></tr>
+          <tr><td>\((x^{(i)}, y^{(i)})\)</td><td>Training Example</td><td>A single paired data point</td></tr>
+          <tr><td>\(m\)</td><td>Dataset Size</td><td>Total number of training examples</td></tr>
+          <tr><td>\(n\)</td><td>Feature Dimension</td><td>Number of features in each example</td></tr>
+          <tr><td>\(\mathcal{H}\)</td><td>Hypothesis Space</td><td>The set of all possible models we're searching through</td></tr>
+          <tr><td>\(h\)</td><td>Hypothesis</td><td>Our learned model function: maps input \(x\) to predicted output \(\hat{y}\)</td></tr>
+          <tr><td>\(\theta\)</td><td>Parameters / Weights</td><td>The learned numbers that define our model</td></tr>
+        </tbody>
+      </table>
+
+      <h3>The Goal</h3>
+      <p>Given a training set \(\{(x^{(1)}, y^{(1)}), \ldots, (x^{(m)}, y^{(m)})\}\), learn a function \(h : \mathcal{X} \to \mathcal{Y}\) such that \(h(x)\) is a "good" predictor for the corresponding value of \(y\).</p>
+
+      <div class="callout insight">
+        <div class="callout-title">🔑 Regression vs Classification</div>
+        <p>If \(y\) is <strong>continuous</strong> (e.g., house price = $450,000) → <strong>Regression problem</strong><br>
+        If \(y\) is <strong>discrete</strong> (e.g., spam/not-spam, cat/dog/bird) → <strong>Classification problem</strong></p>
+      </div>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- CHAPTER 2 -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <section class="chapter" id="ch2">
+      <div class="chapter-label">Chapter 2</div>
+      <h2>Linear Regression</h2>
+
+      <p><strong>Why it came up:</strong> We need the simplest possible way to draw a line (or hyperplane in higher dimensions) through data points to predict a continuous value. If you want to predict house price from square footage and bedrooms, a linear model is your first instinct.</p>
+
+      <h3>The Hypothesis</h3>
+      <p>We define our prediction as a weighted sum of the input features plus a bias term:</p>
+
+      <div class="math-block">
+        <span class="label">Linear Hypothesis</span>
+        \[ h_\theta(x) = \theta_0 + \theta_1 x_1 + \theta_2 x_2 + \cdots + \theta_n x_n \]
+      </div>
+
+      <p>Here, \(\theta_i\) are the <em>parameters (weights)</em>. \(\theta_0\) is the <em>bias term</em> (the y-intercept). To write this cleanly, we add a dummy feature \(x_0 = 1\), allowing:</p>
+
+      <div class="math-block">
+        <span class="label">Vector form</span>
+        \[ h_\theta(x) = \sum_{i=0}^{n} \theta_i x_i = \theta^T x \]
+      </div>
+
+      <h3>The Cost Function (Ordinary Least Squares)</h3>
+      <p>How do we measure how "good" our parameters \(\theta\) are? We define the <strong>Cost Function \(J(\theta)\)</strong> as the average squared error between our predictions and the truth:</p>
+
+      <div class="math-block">
+        <span class="label">Mean Squared Error — the OLS Cost Function</span>
+        \[ J(\theta) = \frac{1}{2} \sum_{i=1}^{m} \left(h_\theta(x^{(i)}) - y^{(i)}\right)^2 \]
+      </div>
+
+      <div class="qa-block">
+        <div class="qa-q">Why the \(\frac{1}{2}\) in front?</div>
+        <div class="qa-a">It's purely for mathematical convenience. When we differentiate the squared term, a factor of 2 comes down from the exponent. The \(\frac{1}{2}\) cancels it out, leaving cleaner update rules. It has zero effect on where the minimum lies — we're just scaling the function uniformly.</div>
+      </div>
+
+      <div class="qa-block">
+        <div class="qa-q">Why do we square the errors? Why not use absolute difference \(|h_\theta(x) - y|\)?</div>
+        <div class="qa-a">Two reasons: (1) Squaring makes the function differentiable everywhere — absolute value has a kink at zero where the derivative is undefined. (2) Probabilistically, squaring is the correct choice under Gaussian noise assumptions (proved in Chapter 5). Also, squaring penalizes large errors much more heavily than small ones, which is usually desirable.</div>
+      </div>
+
+      <!-- INTERACTIVE VIZ 1: Linear Regression -->
+      <div class="viz-container">
+        <div class="viz-title">📊 Interactive: Linear Regression — Adjust the Line</div>
+        <canvas id="lrCanvas" height="280"></canvas>
+        <div class="viz-controls">
+          <label>Slope (θ₁): <input type="range" id="slopeSlider" min="-3" max="8" step="0.1" value="2.5"> <span id="slopeVal">2.5</span></label>
+          <label>Intercept (θ₀): <input type="range" id="interceptSlider" min="-50" max="100" step="1" value="20"> <span id="interceptVal">20</span></label>
+          <button onclick="resetLR()">Reset</button>
+        </div>
+        <div style="margin-top:0.8rem; font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--text-muted)">
+          Cost J(θ): <span id="costDisplay" style="color:var(--accent)">—</span>
+        </div>
+      </div>
+
+      <h3>Code: Linear Regression from Scratch</h3>
+      <pre><code><span class="cl">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># Data: housing size (sqft) → price ($1000s)</span>
+X = np.array([<span class="num">1000</span>, <span class="num">1500</span>, <span class="num">2000</span>, <span class="num">2500</span>, <span class="num">3000</span>])
+y = np.array([<span class="num">200</span>, <span class="num">280</span>, <span class="num">350</span>, <span class="num">430</span>, <span class="num">500</span>])
+
+<span class="cm"># Add bias column (x_0 = 1)</span>
+X_b = np.c_[np.ones(len(X)), X]       <span class="cm"># shape: (5, 2)</span>
+theta = np.zeros(<span class="num">2</span>)                   <span class="cm"># [theta_0, theta_1]</span>
+
+<span class="kw">def</span> <span class="fn">cost</span>(X_b, y, theta):
+    m = len(y)
+    predictions = X_b @ theta          <span class="cm"># matrix multiply</span>
+    errors = predictions - y
+    <span class="kw">return</span> (<span class="num">1</span> / (<span class="num">2</span> * m)) * np.dot(errors, errors)
+
+<span class="kw">def</span> <span class="fn">gradient</span>(X_b, y, theta):
+    m = len(y)
+    predictions = X_b @ theta
+    errors = predictions - y
+    <span class="kw">return</span> (<span class="num">1</span> / m) * X_b.T @ errors     <span class="cm"># shape: (2,)</span>
+
+<span class="cm"># Gradient Descent</span>
+alpha = <span class="num">1e-7</span>
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">10000</span>):
+    theta -= alpha * gradient(X_b, y, theta)
+
+<span class="fn">print</span>(<span class="st">f"θ₀={theta[0]:.2f}, θ₁={theta[1]:.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"Predict 2200 sqft: ${theta[0] + theta[1]*2200:.0f}k"</span>)<span class="lang-tag">python</span></code></pre>
+
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- CHAPTER 3 -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <section class="chapter" id="ch3">
+      <div class="chapter-label">Chapter 3</div>
+      <h2>Gradient Descent — Walking Down the Hill</h2>
+
+      <p>We have a cost function \(J(\theta)\) shaped like a bowl. We want to find the \(\theta\) at the bottom. Gradient Descent is an iterative algorithm that does this blindly but effectively — imagine being blindfolded on a hilly terrain, feeling the slope with your feet, and always stepping in the downhill direction.</p>
+
+      <h3>The Update Rule</h3>
+      <div class="math-block">
+        <span class="label">Gradient Descent Update (for each parameter j)</span>
+        \[ \theta_j := \theta_j - \alpha \frac{\partial}{\partial \theta_j} J(\theta) \]
+      </div>
+
+      <p>The symbol \(:=\) means "update". The <strong>learning rate \(\alpha\)</strong> controls step size. All \(\theta_j\) are updated <em>simultaneously</em> at each step.</p>
+
+      <h3>Full Derivation of the Update Rule</h3>
+      <p>Let's derive the partial derivative for a single training example \((x, y)\):</p>
+
+      <ol class="step-list">
+        <li>
+          <div class="step-num">1</div>
+          <div>Start with the cost: \(\frac{\partial}{\partial \theta_j} J(\theta) = \frac{\partial}{\partial \theta_j} \frac{1}{2}(h_\theta(x) - y)^2\)</div>
+        </li>
+        <li>
+          <div class="step-num">2</div>
+          <div>Apply chain rule: \(= 2 \cdot \frac{1}{2}(h_\theta(x) - y) \cdot \frac{\partial}{\partial \theta_j}(h_\theta(x) - y)\)</div>
+        </li>
+        <li>
+          <div class="step-num">3</div>
+          <div>The derivative of the hypothesis: \(\frac{\partial}{\partial \theta_j}\left(\sum_i \theta_i x_i - y\right) = x_j\)</div>
+        </li>
+        <li>
+          <div class="step-num">4</div>
+          <div>Result: \(\frac{\partial}{\partial \theta_j} J(\theta) = (h_\theta(x) - y) \cdot x_j\)</div>
+        </li>
+      </ol>
+
+      <p>Extending to all \(m\) training examples (Batch Gradient Descent):</p>
+
+      <div class="math-block">
+        <span class="label">Batch Gradient Descent Update Rule</span>
+        \[ \theta_j := \theta_j - \alpha \sum_{i=1}^{m} \left(h_\theta(x^{(i)}) - y^{(i)}\right) x_j^{(i)} \]
+      </div>
+
+      <h3>The Learning Rate \(\alpha\) — Physical and Mathematical Intuition</h3>
+
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>α Value</th>
+            <th>What Happens Physically</th>
+            <th>What Happens Mathematically</th>
+            <th>Outcome</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="badge badge-red">Too Small</span><br>e.g., 0.00001</td>
+            <td>Tiny baby steps down the hill</td>
+            <td>\(\alpha \nabla J(\theta)\) is microscopic. \(\theta\) barely moves each iteration.</td>
+            <td>Training takes forever. May get permanently trapped in shallow local minima in non-convex landscapes.</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-green">Just Right</span><br>e.g., 0.01</td>
+            <td>Confident steps early, slowing near the bottom</td>
+            <td>Step size is large when gradient is steep, naturally shrinks as gradient approaches 0 near minimum.</td>
+            <td>Converges smoothly to the global minimum.</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-orange">Too Large</span><br>e.g., 1.5</td>
+            <td>Leap from one side of the valley to the other, landing higher each time</td>
+            <td>Update term \(\alpha \nabla J\) overshoots the minimum. Each step increases the error.</td>
+            <td>Divergence. Loss approaches \(\infty\). You get <code>NaN</code> errors in code.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- INTERACTIVE VIZ 2: Gradient Descent -->
+      <div class="viz-container">
+        <div class="viz-title">🎯 Interactive: Gradient Descent — Watch it Converge or Diverge</div>
+        <canvas id="gdCanvas" height="260"></canvas>
+        <div class="viz-controls">
+          <label>Learning Rate α: <input type="range" id="alphaSlider" min="0.01" max="2.5" step="0.01" value="0.3"> <span id="alphaVal">0.30</span></label>
+          <button onclick="runGD()">▶ Run</button>
+          <button onclick="resetGD()">↺ Reset</button>
+        </div>
+        <div style="margin-top:0.8rem; font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--text-muted)">
+          Iteration: <span id="gdIter" style="color:var(--accent2)">0</span> &nbsp;|&nbsp; θ: <span id="gdTheta" style="color:var(--accent)">0.00</span> &nbsp;|&nbsp; Cost: <span id="gdCost" style="color:var(--accent3)">—</span>
+        </div>
+      </div>
+
+      <h3>Variants of Gradient Descent</h3>
+      <table class="compare-table">
+        <thead>
+          <tr><th>Variant</th><th>Uses per Step</th><th>Speed</th><th>Stability</th><th>When to Use</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Batch GD</strong></td>
+            <td>All \(m\) examples</td>
+            <td>Slow (per update)</td>
+            <td>Very stable, smooth</td>
+            <td>Small datasets, convex problems</td>
+          </tr>
+          <tr>
+            <td><strong>Stochastic GD (SGD)</strong></td>
+            <td>1 example</td>
+            <td>Very fast</td>
+            <td>Noisy, oscillates</td>
+            <td>Large datasets, online learning</td>
+          </tr>
+          <tr>
+            <td><strong>Mini-Batch GD</strong></td>
+            <td>32/64/128 examples</td>
+            <td>Fast</td>
+            <td>Moderate noise</td>
+            <td>Deep learning (the standard)</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- CHAPTER 4 -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <section class="chapter" id="ch4">
+      <div class="chapter-label">Chapter 4</div>
+      <h2>The Normal Equation — The Analytical Solution</h2>
+
+      <p>For linear regression specifically, because \(J(\theta)\) is a convex quadratic function (a perfect bowl), we don't have to iterate. We can use matrix calculus to jump directly to the exact minimum in one step by setting the gradient to zero.</p>
+
+      <h3>Matrix Notation Setup</h3>
+      <p>Represent the entire dataset as matrices:</p>
+      <ul>
+        <li>\(\mathbf{X}\) is the <strong>Design Matrix</strong> — shape \(m \times (n+1)\). Each row is one training example \((x^{(i)})^T\).</li>
+        <li>\(\vec{y}\) is the <strong>Target Vector</strong> — shape \(m \times 1\). Column of all labels.</li>
+        <li>\(\theta\) is the <strong>Parameter Vector</strong> — shape \((n+1) \times 1\).</li>
+      </ul>
+
+      <p>The cost function in matrix form:</p>
+      <div class="math-block">
+        <span class="label">Matrix form of J(θ)</span>
+        \[ J(\theta) = \frac{1}{2}(\mathbf{X}\theta - \vec{y})^T(\mathbf{X}\theta - \vec{y}) \]
+      </div>
+
+      <h3>Full Derivation: Where the Normal Equation Comes From</h3>
+
+      <ol class="step-list">
+        <li>
+          <div class="step-num">1</div>
+          <div><strong>Expand using transpose rule</strong> \((AB)^T = B^T A^T\):
+          \[J(\theta) = \frac{1}{2}(\theta^T \mathbf{X}^T\mathbf{X}\theta - \theta^T \mathbf{X}^T \vec{y} - \vec{y}^T \mathbf{X}\theta + \vec{y}^T \vec{y})\]</div>
+        </li>
+        <li>
+          <div class="step-num">2</div>
+          <div><strong>Simplify the middle terms</strong>: \(\theta^T \mathbf{X}^T \vec{y}\) and \(\vec{y}^T \mathbf{X}\theta\) are both scalars (single numbers). The transpose of a scalar equals itself. Therefore \(\vec{y}^T \mathbf{X}\theta = (\theta^T \mathbf{X}^T \vec{y})^T = \theta^T \mathbf{X}^T \vec{y}\). They're equal! Combine them:
+          \[J(\theta) = \frac{1}{2}\left(\theta^T \mathbf{X}^T\mathbf{X}\theta - 2\theta^T \mathbf{X}^T \vec{y} + \vec{y}^T \vec{y}\right)\]</div>
+        </li>
+        <li>
+          <div class="step-num">3</div>
+          <div><strong>Take gradient using two matrix calculus identities</strong>:<br>
+          Identity 1: \(\nabla_\theta(\theta^T A \theta) = 2A\theta\) (when \(A\) is symmetric, which \(\mathbf{X}^T\mathbf{X}\) is)<br>
+          Identity 2: \(\nabla_\theta(b^T \theta) = b\)<br><br>
+          Applying both:
+          \[\nabla_\theta J(\theta) = \frac{1}{2}(2\mathbf{X}^T\mathbf{X}\theta - 2\mathbf{X}^T \vec{y}) = \mathbf{X}^T\mathbf{X}\theta - \mathbf{X}^T\vec{y}\]</div>
+        </li>
+        <li>
+          <div class="step-num">4</div>
+          <div><strong>Set to zero and solve</strong>:
+          \[\mathbf{X}^T\mathbf{X}\theta = \mathbf{X}^T\vec{y}\]
+          Multiply both sides by \((\mathbf{X}^T\mathbf{X})^{-1}\):
+          \[\boxed{\theta = (\mathbf{X}^T\mathbf{X})^{-1}\mathbf{X}^T\vec{y}}\]</div>
+        </li>
+      </ol>
+
+      <div class="callout interview">
+        <div class="callout-title">🎯 Classic Interview Question</div>
+        <p><strong>Q: If the Normal Equation gives the exact answer instantly, why do we ever use Gradient Descent?</strong></p>
+        <p><strong>A:</strong> "The Normal Equation requires computing the inverse of \(\mathbf{X}^T\mathbf{X}\), which is an \(n \times n\) matrix. Matrix inversion has time complexity \(O(n^3)\). If we have 100,000 features (common in NLP bag-of-words), that's \((10^5)^3 = 10^{15}\) operations — completely infeasible. Gradient Descent scales linearly with features at \(O(k \cdot n \cdot m)\), making it the only viable choice for high-dimensional data."</p>
+      </div>
+
+      <div class="highlight-box">
+        <strong>The Golden Rule:</strong>
+        <ul>
+          <li>If \(n &lt; 10{,}000\) features → use the Normal Equation. Zero hyperparameter tuning, exact answer.</li>
+          <li>If \(n\) is large → use Gradient Descent.</li>
+          <li>For Logistic Regression → <em>always</em> use Gradient Descent (no closed-form solution exists).</li>
+        </ul>
+      </div>
+
+      <pre><code><span class="cm"># Normal Equation in NumPy</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+X_b = np.c_[np.ones(m), X]   <span class="cm"># add bias column</span>
+
+<span class="cm"># One-shot solution: θ = (XᵀX)⁻¹ Xᵀy</span>
+theta_optimal = np.linalg.inv(X_b.T @ X_b) @ X_b.T @ y
+
+<span class="cm"># More numerically stable (uses least squares solver):</span>
+theta_optimal = np.linalg.lstsq(X_b, y, rcond=None)[<span class="num">0</span>]<span class="lang-tag">python</span></code></pre>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- CHAPTER 5 -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <section class="chapter" id="ch5">
+      <div class="chapter-label">Chapter 5</div>
+      <h2>The Probabilistic Interpretation — Why Squared Errors?</h2>
+
+      <p>This is where you separate yourself from average candidates. Anyone can memorize Least Squares. But <em>why</em> do we square the errors? The answer comes from <strong>Maximum Likelihood Estimation (MLE)</strong>.</p>
+
+      <h3>The Setup: Gaussian Noise Assumption</h3>
+      <p>We assume the true relationship is linear, but our observations are corrupted by random noise \(\epsilon^{(i)}\):</p>
+      <div class="math-block">
+        \[ y^{(i)} = \theta^T x^{(i)} + \epsilon^{(i)} \]
+      </div>
+      <p>We assume noise is IID (independently and identically distributed) Gaussian with mean 0 and variance \(\sigma^2\):</p>
+      <div class="math-block">
+        \[ \epsilon^{(i)} \sim \mathcal{N}(0, \sigma^2) \]
+      </div>
+      <p>Therefore, the probability of observing \(y^{(i)}\) given \(x^{(i)}\) is:</p>
+      <div class="math-block">
+        <span class="label">Gaussian Likelihood</span>
+        \[ p(y^{(i)} \mid x^{(i)}; \theta) = \frac{1}{\sqrt{2\pi}\sigma} \exp\!\left(-\frac{(y^{(i)} - \theta^T x^{(i)})^2}{2\sigma^2}\right) \]
+      </div>
+
+      <h3>Maximum Likelihood Estimation</h3>
+      <p>We want to find \(\theta\) that maximizes the probability of observing our entire dataset. This is the <strong>Likelihood Function</strong>:</p>
+      <div class="math-block">
+        \[ L(\theta) = \prod_{i=1}^{m} p(y^{(i)} \mid x^{(i)}; \theta) \]
+      </div>
+      <p>Products are hard. We take the <strong>log-likelihood</strong> (log converts products to sums, and is monotonically increasing so maximizing \(\ell(\theta)\) is the same as maximizing \(L(\theta)\)):</p>
+      <div class="math-block">
+        <span class="label">Log-Likelihood</span>
+        \[ \ell(\theta) = m\log\frac{1}{\sqrt{2\pi}\sigma} - \frac{1}{2\sigma^2}\sum_{i=1}^{m}(y^{(i)} - \theta^T x^{(i)})^2 \]
+      </div>
+
+      <p>To maximize \(\ell(\theta)\), we must <em>minimize</em> the subtracted term:</p>
+      <div class="math-block">
+        <span class="label">This is exactly the MSE cost function!</span>
+        \[ \frac{1}{2}\sum_{i=1}^{m}(y^{(i)} - \theta^T x^{(i)})^2 \equiv J(\theta) \]
+      </div>
+
+      <div class="callout gold">
+        <div class="callout-title">💡 The "God Tier" Takeaway</div>
+        <p><strong>Minimizing squared error is mathematically equivalent to Maximum Likelihood Estimation under Gaussian noise.</strong> The choice of \(\frac{1}{2}\sum(\hat{y} - y)^2\) isn't arbitrary — it's the statistically principled thing to do when you believe the data's randomness comes from a Gaussian distribution.</p>
+      </div>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- CHAPTER 6 -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <section class="chapter" id="ch6">
+      <div class="chapter-label">Chapter 6</div>
+      <h2>Regularization — Fixing Overfitting</h2>
+
+      <p><strong>The Problem:</strong> If your model has too many features (or polynomial features like \(x_1^2, x_1^3\)), it will twist and bend to pass through every training point perfectly — training error of 0, but catastrophic failure on new data. This is <strong>Overfitting (High Variance)</strong>.</p>
+      <p>Overfitted models have extremely large \(\theta\) values. Small changes in input cause massive output swings. The fix: <em>penalize large weights</em>.</p>
+
+      <h3>L2 Regularization (Ridge Regression)</h3>
+      <p>Add a penalty equal to the sum of squared weights:</p>
+      <div class="math-block">
+        <span class="label">Ridge Regression Cost</span>
+        \[ J(\theta) = \frac{1}{2m}\left[\sum_{i=1}^{m}(h_\theta(x^{(i)}) - y^{(i)})^2 + \lambda\sum_{j=1}^{n}\theta_j^2\right] \]
+      </div>
+
+      <div class="callout warning">
+        <div class="callout-title">⚠️ Critical Detail</div>
+        <p>The penalty sum starts at <strong>j=1, not j=0</strong>. We <em>never regularize the bias term \(\theta_0\)</em>. Penalizing the bias just shifts the model vertically — it doesn't prevent the model from curving wildly, which is what we actually care about.</p>
+      </div>
+
+      <p><strong>\(\lambda\) (Lambda)</strong> — the regularization hyperparameter:</p>
+      <ul>
+        <li>\(\lambda = 0\) → Standard linear regression (prone to overfitting)</li>
+        <li>\(\lambda \to \infty\) → All weights crushed to 0, model predicts the mean (underfitting)</li>
+        <li>Tune \(\lambda\) via cross-validation</li>
+      </ul>
+
+      <h4>Ridge: Modified Normal Equation</h4>
+      <p>Ridge also fixes a mathematical flaw: \(\mathbf{X}^T\mathbf{X}\) can be <strong>singular (non-invertible)</strong> if:</p>
+      <ul>
+        <li>You have more features than training examples (\(n > m\)) — the rank of \(\mathbf{X}^T\mathbf{X}\) is at most \(m\), so it can't be full rank</li>
+        <li>Features are perfectly correlated (multicollinearity) — duplicate columns make the determinant zero</li>
+      </ul>
+
+      <p>Deriving the Ridge Normal Equation: write the regularization term as \(\lambda \theta^T L \theta\) where \(L\) is a modified identity matrix with a 0 in the top-left (to skip \(\theta_0\)):</p>
+
+      <div class="math-block">
+        \[ L = \begin{pmatrix} 0 & 0 & \cdots & 0 \\ 0 & 1 & \cdots & 0 \\ \vdots & & \ddots & \vdots \\ 0 & 0 & \cdots & 1 \end{pmatrix} \]
+      </div>
+
+      <p>Taking the gradient and setting to zero yields:</p>
+      <div class="math-block">
+        <span class="label">Ridge Normal Equation</span>
+        \[ \theta = (\mathbf{X}^T\mathbf{X} + \lambda L)^{-1} \mathbf{X}^T \vec{y} \]
+      </div>
+
+      <div class="callout insight">
+        <div class="callout-title">🔑 Why adding λL fixes singularity</div>
+        <p>If \(\mathbf{X}^T\mathbf{X}\) is singular, it has eigenvalues equal to 0. Adding \(\lambda L\) adds \(\lambda\) to each diagonal eigenvalue, shifting them from 0 to \(\lambda > 0\). A symmetric matrix with all positive eigenvalues is <strong>positive definite</strong>, which is <em>guaranteed to be invertible</em>. Ridge Regression literally forces the math to work.</p>
+      </div>
+
+      <h3>L1 Regularization (Lasso Regression)</h3>
+      <p>Instead of squaring the weights, take their absolute value:</p>
+      <div class="math-block">
+        <span class="label">Lasso Regression Cost</span>
+        \[ J(\theta) = \frac{1}{2m}\sum_{i=1}^{m}(h_\theta(x^{(i)}) - y^{(i)})^2 + \lambda\sum_{j=1}^{n}|\theta_j| \]
+      </div>
+
+      <p>The crucial difference: <strong>Lasso is a Feature Selector</strong>. It forces weights of useless features to become <em>exactly 0</em>, producing sparse models.</p>
+
+      <h3>The Geometry of L1 vs L2 — Why L1 Zeroes Things Out</h3>
+
+      <p>Reframe regularization as <strong>constrained optimization</strong>. Minimizing \(J(\theta) + \lambda \cdot \text{Penalty}\) is mathematically equivalent to minimizing just \(J(\theta)\) subject to a budget constraint \(t\):</p>
+      <ul>
+        <li><strong>L2 constraint</strong>: \(\theta_1^2 + \theta_2^2 \leq t\) — This is a <em>circle</em> centered at the origin</li>
+        <li><strong>L1 constraint</strong>: \(|\theta_1| + |\theta_2| \leq t\) — This is a <em>diamond</em> (rotated square)</li>
+      </ul>
+
+      <!-- INTERACTIVE VIZ 3: L1 vs L2 Geometry -->
+      <div class="viz-container">
+        <div class="viz-title">💎 Interactive: L1 vs L2 Constraint Geometry</div>
+        <canvas id="regCanvas" height="320"></canvas>
+        <div class="viz-controls">
+          <button onclick="setReg('l2')" id="btnL2" style="border-color:var(--accent2); color:var(--accent2)">L2 Ridge (Circle)</button>
+          <button onclick="setReg('l1')" id="btnL1">L1 Lasso (Diamond)</button>
+          <label>λ budget: <input type="range" id="lambdaSlider" min="0.3" max="2.5" step="0.05" value="1.2"> <span id="lambdaVal">1.2</span></label>
+        </div>
+        <p style="margin-top:0.8rem; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-muted)">
+          The ellipses are loss contours (equal loss curves) around the unregularized minimum ✦. The optimal regularized solution is where the smallest ellipse first <em>touches</em> the constraint boundary.
+        </p>
+      </div>
+
+      <h4>Why does L1 produce exact zeros?</h4>
+      <p>The L1 diamond has <strong>sharp corners pointing along the coordinate axes</strong>. When the loss ellipses expand outward from the unconstrained minimum, they are overwhelmingly likely to first touch a <em>corner</em> of the diamond before touching a flat edge. At a corner, one coordinate is exactly 0 — that feature's weight is mathematically eliminated.</p>
+      <p>L2's circle has no corners — the ellipse gently kisses a random point on the smooth edge, leaving all weights non-zero but small.</p>
+
+      <div class="callout gold">
+        <div class="callout-title">⭐ Probabilistic "God Tier" Answer</div>
+        <p>Regularization isn't just engineering — it's Bayesian statistics:</p>
+        <ul>
+          <li><strong>L2 Ridge = Gaussian Prior</strong> on weights: \(P(\theta_j) \propto \exp(-\theta_j^2 / 2\tau^2)\). Assumes weights are normally distributed around zero.</li>
+          <li><strong>L1 Lasso = Laplace Prior</strong> on weights: \(P(\theta_j) \propto \exp(-|\theta_j|/b)\). The Laplace distribution has a sharp spike at zero — that's why L1 drives weights to exactly zero.</li>
+        </ul>
+        <p>Adding regularization = MAP (Maximum A Posteriori) estimation instead of MLE. The loss function = negative log-likelihood + negative log-prior.</p>
+      </div>
+
+      <pre><code><span class="cm"># L2 Ridge Regression with sklearn</span>
+<span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> Ridge, Lasso
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+
+<span class="cm"># Always scale features before regularization!</span>
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X_train)
+
+ridge = Ridge(alpha=<span class="num">1.0</span>)   <span class="cm"># alpha = λ in our notation</span>
+lasso = Lasso(alpha=<span class="num">0.1</span>)
+
+ridge.fit(X_scaled, y_train)
+lasso.fit(X_scaled, y_train)
+
+<span class="cm"># L1 will zero out weak features</span>
+<span class="fn">print</span>(<span class="st">"L2 weights:"</span>, ridge.coef_)   <span class="cm"># all small but nonzero</span>
+<span class="fn">print</span>(<span class="st">"L1 weights:"</span>, lasso.coef_)   <span class="cm"># many exact zeros!</span><span class="lang-tag">python</span></code></pre>
+
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- CHAPTER 7 -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <section class="chapter" id="ch7">
+      <div class="chapter-label">Chapter 7</div>
+      <h2>Logistic Regression — Classification</h2>
+
+      <p>Now \(y\) is discrete. For binary classification: \(y \in \{0, 1\}\). We're predicting categories, not numbers.</p>
+
+      <h3>Why Linear Regression Fails for Classification</h3>
+      <ul>
+        <li>The output \(\theta^T x\) can be any number from \(-\infty\) to \(+\infty\). A "spamminess score" of -450 or +12,000 is meaningless.</li>
+        <li>A single massive outlier data point will drag the decision boundary away from all normal data.</li>
+        <li>MSE on a binary target creates a <em>non-convex</em> loss with many local minima — gradient descent will get stuck.</li>
+      </ul>
+
+      <h3>The Sigmoid (Logistic) Function</h3>
+      <p>We need a function that squashes any real number to \((0, 1)\):</p>
+      <div class="math-block">
+        <span class="label">Sigmoid Function</span>
+        \[ g(z) = \frac{1}{1 + e^{-z}} \]
+      </div>
+
+      <!-- INTERACTIVE VIZ 4: Sigmoid -->
+      <div class="viz-container">
+        <div class="viz-title">📈 Interactive: The Sigmoid Function</div>
+        <canvas id="sigmoidCanvas" height="220"></canvas>
+        <div class="viz-controls">
+          <label>Stretch (temperature): <input type="range" id="tempSlider" min="0.2" max="5" step="0.1" value="1.0"> <span id="tempVal">1.0</span></label>
+        </div>
+        <p style="margin-top:0.6rem; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-muted)">
+          As z→+∞, σ(z)→1. As z→−∞, σ(z)→0. At z=0, σ(0)=0.5. The output is always a valid probability.
+        </p>
+      </div>
+
+      <h3>The Logistic Hypothesis</h3>
+      <p>Wrap our linear equation inside the sigmoid:</p>
+      <div class="math-block">
+        \[ h_\theta(x) = g(\theta^T x) = \frac{1}{1 + e^{-\theta^T x}} \]
+      </div>
+      <p><strong>Interpretation:</strong> \(h_\theta(x) = P(y=1 \mid x; \theta)\). If the output is 0.7, the model is 70% confident the example is class 1.</p>
+
+      <h3>Decision Boundary</h3>
+      <p>We predict \(y = 1\) if \(h_\theta(x) \geq 0.5\), else \(y = 0\).</p>
+      <p>Since \(g(z) \geq 0.5\) exactly when \(z \geq 0\), we predict \(y=1\) when \(\theta^T x \geq 0\).</p>
+      <p>The <strong>decision boundary</strong> is the surface \(\theta^T x = 0\) — the hyperplane separating the two classes in feature space.</p>
+
+      <h3>The Log Loss (Cross-Entropy) Cost Function</h3>
+
+      <div class="callout warning">
+        <div class="callout-title">⚠️ Interview Trap: Why not use MSE for Logistic Regression?</div>
+        <p>Plugging the sigmoid into MSE creates a <strong>non-convex function</strong> — full of local minima. Gradient descent will get stuck. We need a strictly convex loss function.</p>
+      </div>
+
+      <p>We use the Log Loss, which penalizes confident wrong answers infinitely:</p>
+      <div class="math-block">
+        <span class="label">Per-example Log Loss</span>
+        \[ \text{Cost}(h_\theta(x), y) = \begin{cases} -\log(h_\theta(x)) & \text{if } y = 1 \\ -\log(1 - h_\theta(x)) & \text{if } y = 0 \end{cases} \]
+      </div>
+      <p>This compresses into one elegant formula:</p>
+      <div class="math-block">
+        <span class="label">Binary Cross-Entropy Loss</span>
+        \[ J(\theta) = -\frac{1}{m}\sum_{i=1}^{m}\left[y^{(i)}\log(h_\theta(x^{(i)})) + (1-y^{(i)})\log(1-h_\theta(x^{(i)}))\right] \]
+      </div>
+
+      <h4>Why Log Loss Makes Sense Intuitively</h4>
+      <ul>
+        <li>If \(y=1\) and model predicts 1.0: cost = \(-\log(1) = 0\) ✓ Perfect</li>
+        <li>If \(y=1\) but model predicts 0.001: cost = \(-\log(0.001) \approx 6.9\) — massive penalty for being confidently wrong</li>
+        <li>The \(-\log(x)\) curve shoots to infinity as \(x \to 0\) — ruthless exponential punishment for overconfident mistakes</li>
+      </ul>
+
+      <div class="callout insight">
+        <div class="callout-title">🔑 Probabilistic Derivation</div>
+        <p>Log Loss is not arbitrary. Applying MLE to a <strong>Bernoulli distribution</strong> (the correct distribution for binary outcomes) derives this exact formula. It's statistically the principled choice.</p>
+      </div>
+
+      <h3>Gradient Descent for Logistic Regression</h3>
+      <p>After applying chain rule through the log and sigmoid (the complex terms cancel magnificently):</p>
+      <div class="math-block">
+        <span class="label">Gradient of Log Loss</span>
+        \[ \frac{\partial}{\partial \theta_j} J(\theta) = \frac{1}{m}\sum_{i=1}^{m}(h_\theta(x^{(i)}) - y^{(i)})x_j^{(i)} \]
+      </div>
+
+      <div class="callout gold">
+        <div class="callout-title">⭐ The Update Rule is the Same!</div>
+        <p>This is <em>identical in form</em> to linear regression's update rule. The algorithm looks the same in code. The <strong>only difference</strong> is the definition of \(h_\theta(x)\): linear uses \(\theta^T x\), logistic uses \(\frac{1}{1+e^{-\theta^T x}}\).</p>
+      </div>
+
+      <pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">sigmoid</span>(z):
+    <span class="kw">return</span> <span class="num">1</span> / (<span class="num">1</span> + np.exp(-z))
+
+<span class="kw">def</span> <span class="fn">logistic_cost</span>(X, y, theta):
+    m = len(y)
+    h = sigmoid(X @ theta)
+    <span class="cm"># Clip to avoid log(0)</span>
+    h = np.clip(h, <span class="num">1e-10</span>, <span class="num">1</span>-<span class="num">1e-10</span>)
+    <span class="kw">return</span> -(<span class="num">1</span>/m) * (y @ np.log(h) + (<span class="num">1</span>-y) @ np.log(<span class="num">1</span>-h))
+
+<span class="kw">def</span> <span class="fn">logistic_gradient</span>(X, y, theta):
+    m = len(y)
+    h = sigmoid(X @ theta)
+    <span class="kw">return</span> (<span class="num">1</span>/m) * X.T @ (h - y)
+
+<span class="cm"># Gradient descent loop</span>
+theta = np.zeros(X.shape[<span class="num">1</span>])
+alpha, iters = <span class="num">0.1</span>, <span class="num">1000</span>
+<span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(iters):
+    theta -= alpha * logistic_gradient(X_b, y, theta)
+
+<span class="cm"># Prediction: apply sigmoid, threshold at 0.5</span>
+probs = sigmoid(X_test @ theta)
+preds = (probs >= <span class="num">0.5</span>).astype(int)<span class="lang-tag">python</span></code></pre>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- CHAPTER 13 -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <section class="chapter" id="ch13">
+      <div class="chapter-label">Chapters 13–14</div>
+      <h2>Generalized Linear Models (GLMs) & Softmax</h2>
+
+      <p>Linear Regression and Logistic Regression aren't just two unrelated algorithms. They are <em>two specific instances</em> of one unified mathematical framework called <strong>Generalized Linear Models (GLMs)</strong>.</p>
+
+      <h3>The Exponential Family</h3>
+      <p>A distribution belongs to the Exponential Family if it can be written as:</p>
+      <div class="math-block">
+        <span class="label">Exponential Family Form</span>
+        \[ p(y; \eta) = b(y)\exp(\eta^T T(y) - a(\eta)) \]
+      </div>
+      <ul>
+        <li>\(\eta\) — Natural parameter (what we learn)</li>
+        <li>\(T(y)\) — Sufficient statistic (usually \(T(y) = y\))</li>
+        <li>\(a(\eta)\) — Log partition function (normalization constant)</li>
+        <li>\(b(y)\) — Base measure</li>
+      </ul>
+
+      <h3>The Three GLM Assumptions</h3>
+      <ol>
+        <li>\(y \mid x; \theta \sim \text{ExponentialFamily}(\eta)\)</li>
+        <li>Goal: predict \(E[y \mid x]\), so \(h_\theta(x) = E[y \mid x]\)</li>
+        <li>The natural parameter is linear: \(\eta = \theta^T x\)</li>
+      </ol>
+
+      <h3>Softmax Regression (Multi-Class Classification)</h3>
+      <p>For \(k\) classes (\(y \in \{1, \ldots, k\}\)), we use the <strong>Multinomial distribution</strong>. Each class gets its own weight vector \(\theta_j\). The Softmax function converts raw scores to probabilities:</p>
+      <div class="math-block">
+        <span class="label">Softmax Function</span>
+        \[ P(y=j \mid x; \theta) = \frac{e^{\theta_j^T x}}{\sum_{l=1}^{k} e^{\theta_l^T x}} \]
+      </div>
+
+      <p><strong>Why exponentials?</strong></p>
+      <ul>
+        <li>Ensures all probabilities are strictly positive (since \(e^z > 0\) always)</li>
+        <li>The denominator normalizes so probabilities sum to 1</li>
+        <li>Disproportionately rewards the largest score — acts like a "soft" argmax</li>
+      </ul>
+
+      <div class="callout interview">
+        <div class="callout-title">🎯 Interview: Relation to Binary Logistic</div>
+        <p>For \(k=2\), Softmax reduces exactly to Logistic Regression. They're the same algorithm — Softmax is the generalization.</p>
+      </div>
+
+      <pre><code><span class="kw">def</span> <span class="fn">softmax</span>(z):
+    <span class="cm"># z: (m, k) matrix of raw scores</span>
+    exp_z = np.exp(z - z.max(axis=<span class="num">1</span>, keepdims=<span class="kw">True</span>))  <span class="cm"># numerical stability</span>
+    <span class="kw">return</span> exp_z / exp_z.sum(axis=<span class="num">1</span>, keepdims=<span class="kw">True</span>)
+
+<span class="cm"># Cross-entropy loss for multi-class</span>
+<span class="kw">def</span> <span class="fn">cross_entropy_loss</span>(probs, y_onehot):
+    <span class="cm"># probs: (m, k), y_onehot: (m, k)</span>
+    m = len(y_onehot)
+    <span class="kw">return</span> -np.sum(y_onehot * np.log(probs + <span class="num">1e-10</span>)) / m<span class="lang-tag">python</span></code></pre>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- CHAPTER 15: GLM PROOFS -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <section class="chapter" id="ch15">
+      <div class="chapter-label">Chapter 15</div>
+      <h2>GLM Proofs — Deriving Algorithms from Distributions</h2>
+      <p>The "God Tier" skill: proving that plugging a distribution into the GLM framework automatically derives the algorithm. All three proofs use the same trick: \(x = \exp(\log x)\).</p>
+
+      <h3>Proof 1: Gaussian → Linear Regression</h3>
+      <p>Gaussian PDF: \(p(y; \mu) = \frac{1}{\sqrt{2\pi}}\exp\!\left(-\frac{1}{2}(y - \mu)^2\right)\)</p>
+      <p>Expand and separate: \(p(y;\mu) = \underbrace{\frac{1}{\sqrt{2\pi}}e^{-y^2/2}}_{b(y)} \cdot \exp\!\left(\mu y - \frac{\mu^2}{2}\right)\)</p>
+      <p>Extraction: \(\eta = \mu\), so \(h_\theta(x) = E[y] = \mu = \eta = \theta^T x\). ✓ Linear Regression.</p>
+
+      <h3>Proof 2: Bernoulli → Logistic Regression</h3>
+      <p>Bernoulli PMF: \(p(y;\phi) = \phi^y(1-\phi)^{1-y}\)</p>
+      <p>Apply \(\exp(\log(\cdot))\) and expand:</p>
+      <div class="math-block">
+        \[ p(y;\phi) = \exp\!\left(y\log\frac{\phi}{1-\phi} + \log(1-\phi)\right) \]
+      </div>
+      <p>Extraction: \(\eta = \log\!\left(\frac{\phi}{1-\phi}\right)\) (the <em>log-odds / logit</em>).</p>
+      <p>Invert to get \(\phi\):</p>
+      <div class="math-block">
+        \[ e^\eta = \frac{\phi}{1-\phi} \implies \phi = \frac{e^\eta}{1+e^\eta} = \frac{1}{1+e^{-\eta}} \]
+      </div>
+      <p>Since \(\eta = \theta^T x\): \(h_\theta(x) = \frac{1}{1+e^{-\theta^T x}}\). ✓ Sigmoid / Logistic Regression.</p>
+
+      <h3>Proof 3: Poisson → Poisson Regression</h3>
+      <p>For count data (number of events). Poisson PMF: \(p(y;\lambda) = \frac{\lambda^y e^{-\lambda}}{y!}\)</p>
+      <p>Rewrite: \(p(y;\lambda) = \frac{1}{y!}\exp(y\log\lambda - \lambda)\)</p>
+      <p>Extraction: \(\eta = \log\lambda \implies \lambda = e^\eta\).</p>
+      <p>Therefore: \(h_\theta(x) = e^{\theta^T x}\). ✓ Poisson Regression (exponential hypothesis, guarantees positive predictions).</p>
+
+      <div class="callout gold">
+        <div class="callout-title">⭐ The Unifying Pattern</div>
+        <p>In all cases: (1) Write the distribution in exponential family form, (2) Extract \(\eta\), (3) Invert to find the mean, (4) Substitute \(\eta = \theta^T x\). The resulting function is your model's hypothesis.</p>
+      </div>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- CHAPTER 17: KL DIVERGENCE -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <section class="chapter" id="ch17">
+      <div class="chapter-label">Chapters 17–22</div>
+      <h2>KL Divergence — The Engine Behind Modern AI</h2>
+
+      <p>KL Divergence is hiding inside almost every ML algorithm you'll encounter. Cross-entropy loss in classification, the VAE loss, RLHF in ChatGPT, t-SNE visualizations — all are fundamentally minimizing KL Divergence.</p>
+
+      <h3>The Formula</h3>
+      <div class="math-block">
+        <span class="label">KL Divergence from Q to P</span>
+        \[ D_{KL}(P \| Q) = \sum_x P(x) \log\frac{P(x)}{Q(x)} \]
+      </div>
+      <p>\(P\) = True distribution (reality), \(Q\) = Model's predicted distribution (approximation). Measures the "inefficiency" of using \(Q\) when the truth is \(P\).</p>
+
+      <h3>The Asymmetry Trap (Always Asked in Interviews)</h3>
+
+      <div class="callout interview">
+        <div class="callout-title">🎯 "Is KL Divergence a distance metric?"</div>
+        <p><strong>No.</strong> A true distance metric must be symmetric: \(d(A,B) = d(B,A)\). KL Divergence is asymmetric: \(D_{KL}(P\|Q) \neq D_{KL}(Q\|P)\). They have completely different denominators and trigger their penalties in opposite scenarios.</p>
+      </div>
+
+      <h3>The Camel Analogy: Forward vs Reverse KL</h3>
+      <p>Imagine the true data distribution \(P\) looks like a two-humped camel (bimodal). Your model \(Q\) is a simple single bell curve. Where does it put its hump?</p>
+
+      <table class="compare-table">
+        <thead>
+          <tr><th>Type</th><th>Formula</th><th>Behavior</th><th>Nickname</th><th>Used In</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Forward KL</strong> \(D_{KL}(P\|Q)\)</td>
+            <td>\(\sum P\log(P/Q)\)</td>
+            <td>If \(P\) is high, \(Q\) <em>must</em> be high (or penalty → ∞). Q spreads wide to cover all humps. Lands in the valley between them.</td>
+            <td><strong>Mean-Seeking</strong> / Zero-Avoiding</td>
+            <td>Classification (cross-entropy)</td>
+          </tr>
+          <tr>
+            <td><strong>Reverse KL</strong> \(D_{KL}(Q\|P)\)</td>
+            <td>\(\sum Q\log(Q/P)\)</td>
+            <td>If \(Q\) is high, \(P\) <em>must</em> be high. Q shrinks to hide inside one safe hump and ignores the rest.</td>
+            <td><strong>Mode-Seeking</strong> / Zero-Forcing</td>
+            <td>Variational Inference, VAEs, RLHF</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Cross-Entropy is Just Forward KL</h3>
+      <p>Expand KL Divergence:</p>
+      <div class="math-block">
+        \[ D_{KL}(P\|Q) = \underbrace{-\sum P(x)\log P(x)}_{H(P) = \text{const}} - \underbrace{\sum P(x)\log Q(x)}_{-H(P,Q)} \]
+      </div>
+      <p>Since \(H(P)\) is fixed (the true labels don't change during training), <strong>minimizing \(D_{KL}(P\|Q)\) is identical to minimizing Cross-Entropy \(H(P,Q)\)</strong>. That's why we use cross-entropy in code — it's the same objective with the constant dropped.</p>
+
+      <h3>Where KL Divergence Powers Production Systems</h3>
+      <ul>
+        <li><strong>Every Classification Model</strong> (via cross-entropy) — Forward KL under the hood</li>
+        <li><strong>ChatGPT / RLHF (PPO)</strong> — KL penalty between "new polite model" and "original base model" prevents catastrophic forgetting</li>
+        <li><strong>Variational Autoencoders</strong> — Forces latent space to match a standard Normal distribution (Reverse KL / ELBO)</li>
+        <li><strong>t-SNE</strong> — Minimizes KL between high-dimensional neighbor probabilities and 2D neighbor probabilities</li>
+        <li><strong>Decision Tree Information Gain</strong> — Literally KL divergence between class distributions before/after a split</li>
+      </ul>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- GENERATIVE MODELS -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <section class="chapter" id="chapter-gda">
+      <div class="chapter-label">Chapters 23–29</div>
+      <h2>Generative Learning Algorithms</h2>
+
+      <h3>Discriminative vs Generative: The Key Divide</h3>
+      <table class="compare-table">
+        <thead>
+          <tr><th>Approach</th><th>What it learns</th><th>Analogy</th><th>Examples</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Discriminative</strong></td>
+            <td>\(P(y|x)\) — given features, what's the class?</td>
+            <td>Learns to spot the letter "ç" to distinguish French vs English. Doesn't understand either language.</td>
+            <td>Logistic Regression, SVM, Neural Networks</td>
+          </tr>
+          <tr>
+            <td><strong>Generative</strong></td>
+            <td>\(P(x|y)\) and \(P(y)\) — what do the features look like for each class?</td>
+            <td>Actually learns to speak fluent French and fluent English, then picks whichever fits better.</td>
+            <td>GDA, Naive Bayes, GANs, VAEs</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>Prediction via Bayes' Theorem: \(P(y|x) = \frac{P(x|y)P(y)}{P(x)}\)</p>
+
+      <h3>Gaussian Discriminant Analysis (GDA)</h3>
+      <p>For continuous features, we model each class as a multivariate Gaussian. The <strong>Multivariate Gaussian PDF</strong>:</p>
+      <div class="math-block">
+        <span class="label">Multivariate Gaussian</span>
+        \[ P(x; \mu, \Sigma) = \frac{1}{(2\pi)^{n/2}|\Sigma|^{1/2}} \exp\!\left(-\frac{1}{2}(x-\mu)^T\Sigma^{-1}(x-\mu)\right) \]
+      </div>
+      <ul>
+        <li>\(\mu \in \mathbb{R}^n\) — Mean vector (center of the bell curve)</li>
+        <li>\(\Sigma \in \mathbb{R}^{n \times n}\) — Covariance matrix (shape/spread of the bell curve)</li>
+      </ul>
+
+      <h4>GDA Model Assumptions</h4>
+      <ul>
+        <li>\(y \sim \text{Bernoulli}(\phi)\)</li>
+        <li>\(x \mid y=0 \sim \mathcal{N}(\mu_0, \Sigma)\)</li>
+        <li>\(x \mid y=1 \sim \mathcal{N}(\mu_1, \Sigma)\)</li>
+      </ul>
+
+      <div class="callout warning">
+        <div class="callout-title">⚠️ Interview Trap: Shared Covariance Matrix</div>
+        <p>Both classes share the <em>same</em> \(\Sigma\). This forces both Gaussians to have the same shape (just different centers). Mathematically, this guarantees a <strong>linear decision boundary</strong>. If you give each class its own \(\Sigma\), you get <strong>Quadratic Discriminant Analysis (QDA)</strong> with a curved boundary.</p>
+      </div>
+
+      <h4>MLE Parameters (Closed-Form Solutions)</h4>
+      <ul>
+        <li>\(\phi = \frac{1}{m}\sum_{i=1}^m \mathbf{1}\{y^{(i)}=1\}\) — fraction of positive examples</li>
+        <li>\(\mu_0 = \frac{\sum \mathbf{1}\{y^{(i)}=0\} x^{(i)}}{\sum \mathbf{1}\{y^{(i)}=0\}}\) — mean of class 0 examples</li>
+        <li>\(\mu_1 = \frac{\sum \mathbf{1}\{y^{(i)}=1\} x^{(i)}}{\sum \mathbf{1}\{y^{(i)}=1\}}\) — mean of class 1 examples</li>
+        <li>\(\Sigma = \frac{1}{m}\sum_{i=1}^m (x^{(i)} - \mu_{y^{(i)}})(x^{(i)} - \mu_{y^{(i)}})^T\) — pooled covariance</li>
+      </ul>
+
+      <div class="callout interview">
+        <div class="callout-title">🎯 GDA vs Logistic Regression (Classic CS229 Question)</div>
+        <p>If you train a GDA model and compute \(P(y=1|x)\) via Bayes, it <em>mathematically simplifies</em> to the sigmoid: \(\frac{1}{1+e^{-\theta^T x}}\). Both give the same form of decision boundary! So which do you use?</p>
+        <ul>
+          <li><strong>GDA</strong> makes stronger assumptions (Gaussian data). If data truly is Gaussian, GDA is more efficient — needs less data to find the optimal boundary.</li>
+          <li><strong>Logistic Regression</strong> is more robust. Doesn't assume Gaussianity. Works on skewed, Poisson, or messy real-world data.</li>
+          <li>Gaussian \(\Rightarrow\) Logistic. But Logistic \(\not\Rightarrow\) Gaussian. Logistic is more universally applicable.</li>
+        </ul>
+      </div>
+
+      <h3>Naive Bayes (Generative Model for Text)</h3>
+      <p>For discrete features (word counts), we need Naive Bayes. With a 50,000-word vocabulary, modeling all word combinations directly requires \(2^{50000}\) parameters — physically impossible.</p>
+
+      <h4>The Naive Independence Assumption</h4>
+      <p>Assume words are <em>conditionally independent</em> given the class:</p>
+      <div class="math-block">
+        \[ P(x_1, x_2, \ldots, x_n | y) = \prod_{i=1}^{n} P(x_i | y) \]
+      </div>
+      <p>This collapses the intractable joint distribution into simple per-word counts. (It's "naive" because words <em>aren't</em> truly independent — "Nigerian Prince" are highly correlated. But it works remarkably well anyway.)</p>
+
+      <h4>Laplace Smoothing (The Zero Probability Fix)</h4>
+      <p><strong>The fatal flaw:</strong> If a word never appeared in training data, its probability is 0. Any product containing a 0 is 0 — the model crashes with a 0/0 error on any unseen word.</p>
+      <p><strong>Fix:</strong> Add pseudocounts. For a feature with \(k\) possible values:</p>
+      <div class="math-block">
+        <span class="label">Laplace Smoothed Probability</span>
+        \[ P(x_j = v \mid y = 1) = \frac{\text{count}(x_j = v \text{ in class 1}) + 1}{\text{count(class 1 examples)} + k} \]
+      </div>
+      <p>Adding 1 to numerator and \(k\) to denominator guarantees no zero probability, while becoming negligible when data is plentiful.</p>
+
+      <pre><code><span class="kw">from</span> sklearn.naive_bayes <span class="kw">import</span> MultinomialNB, GaussianNB
+<span class="kw">from</span> sklearn.feature_extraction.text <span class="kw">import</span> CountVectorizer
+
+<span class="cm"># Naive Bayes for spam detection</span>
+emails = [<span class="st">"buy cheap pills now"</span>, <span class="st">"meeting at 3pm tomorrow"</span>, ...]
+labels = [<span class="num">1</span>, <span class="num">0</span>, ...]  <span class="cm"># 1=spam, 0=ham</span>
+
+vectorizer = CountVectorizer()
+X = vectorizer.fit_transform(emails)  <span class="cm"># word count matrix</span>
+
+<span class="cm"># MultinomialNB includes Laplace smoothing (alpha=1.0)</span>
+nb = MultinomialNB(alpha=<span class="num">1.0</span>)
+nb.fit(X, labels)
+
+<span class="cm"># GaussianNB for continuous features</span>
+gnb = GaussianNB()
+gnb.fit(X_continuous, y)<span class="lang-tag">python</span></code></pre>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- SVMs -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <section class="chapter" id="chapter-svm">
+      <div class="chapter-label">Chapters 30–33</div>
+      <h2>Support Vector Machines — The Max-Margin Classifier</h2>
+
+      <p>Logistic Regression draws <em>a</em> boundary. SVMs find the <em>best possible</em> boundary — the one with the maximum margin between classes. Out of infinite valid separating hyperplanes, SVMs pick the one that is as far as possible from both sides.</p>
+
+      <h3>Building the "Street"</h3>
+      <p>The decision boundary is the midline of a "street." We define three parallel lines:</p>
+      <div class="math-block">
+        \[ w^T x + b = 0 \quad \text{(decision boundary)} \]
+        \[ w^T x + b = +1 \quad \text{(positive gutter)} \]
+        \[ w^T x + b = -1 \quad \text{(negative gutter)} \]
+      </div>
+      <p>Points on the gutters are called <strong>Support Vectors</strong> — they physically hold the street up. Remove all other points and the boundary doesn't move.</p>
+
+      <h4>Width of the Street</h4>
+      <p>Using vector projection, the street width is \(\frac{2}{\|w\|}\). Maximizing \(\frac{2}{\|w\|}\) is equivalent to minimizing \(\frac{1}{2}\|w\|^2\).</p>
+
+      <h3>The Primal Optimization Problem</h3>
+      <div class="math-block">
+        <span class="label">SVM Primal Form</span>
+        \[ \text{Minimize} \quad \frac{1}{2}\|w\|^2 \]
+        \[ \text{Subject to} \quad y^{(i)}(w^T x^{(i)} + b) \geq 1 \quad \forall i \]
+      </div>
+
+      <h3>The Dual Form — Why We Flip the Math</h3>
+      <p>The primal form has \(n\)-dimensional weight vector \(w\). For high-dimensional data, this is expensive. Using Lagrangian multipliers \(\alpha_i\), we convert to the Dual Form where \(w\) disappears and only dot products of input pairs remain:</p>
+      <div class="math-block">
+        <span class="label">SVM Dual Objective</span>
+        \[ \max_\alpha \sum_{i=1}^m \alpha_i - \frac{1}{2}\sum_{i=1}^m\sum_{j=1}^m y^{(i)}y^{(j)}\alpha_i\alpha_j \langle x^{(i)}, x^{(j)} \rangle \]
+        \[ \text{s.t.} \quad \alpha_i \geq 0, \quad \sum_i \alpha_i y^{(i)} = 0 \]
+      </div>
+
+      <div class="callout gold">
+        <div class="callout-title">⭐ The Critical Insight</div>
+        <p>The entire optimization only depends on <strong>dot products \(\langle x^{(i)}, x^{(j)} \rangle\)</strong> between pairs of training points. It doesn't care about the actual feature values — only the <em>similarity scores</em> between examples. This opens the door to the Kernel Trick.</p>
+      </div>
+
+      <h3>The Kernel Trick — Infinite Dimensions for Free</h3>
+
+      <p><strong>The Problem:</strong> Data isn't always linearly separable (e.g., concentric circles). We could project data into higher dimensions where it becomes separable — but computing dot products in a million-dimensional space would crash any machine.</p>
+
+      <p><strong>The Insight:</strong> The Dual Form only needs the dot product result, not the individual high-dimensional vectors. Can we compute \(\phi(x_i)^T\phi(x_j)\) without ever computing \(\phi(x_i)\)?</p>
+
+      <h4>Algebraic Proof (The Polynomial Kernel)</h4>
+      <p>For 2D vectors \(x = [x_1, x_2]^T\), \(z = [z_1, z_2]^T\), define mapping \(\phi(x) = [x_1^2, \sqrt{2}x_1x_2, x_2^2]^T\).</p>
+
+      <p><strong>Hard way</strong> (explicit projection): \(\phi(x)^T\phi(z) = x_1^2z_1^2 + 2x_1z_1x_2z_2 + x_2^2z_2^2\)</p>
+      <p><strong>Kernel shortcut:</strong> \(K(x,z) = (x^Tz)^2 = (x_1z_1 + x_2z_2)^2 = x_1^2z_1^2 + 2x_1z_1x_2z_2 + x_2^2z_2^2\)</p>
+      <p><strong>They're identical.</strong> Four operations instead of eleven. The saving scales enormously with dimension.</p>
+
+      <h3>The Two Most Important Kernels</h3>
+      <table class="compare-table">
+        <thead>
+          <tr><th>Kernel</th><th>Formula</th><th>Equivalent Projection</th><th>When to Use</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Polynomial</strong></td>
+            <td>\(K(x,z) = (x^Tz + c)^d\)</td>
+            <td>All polynomial features up to degree \(d\)</td>
+            <td>Text classification, data with polynomial relationships</td>
+          </tr>
+          <tr>
+            <td><strong>RBF / Gaussian</strong></td>
+            <td>\(K(x,z) = \exp\!\left(-\frac{\|x-z\|^2}{2\sigma^2}\right)\)</td>
+            <td><strong>Infinite-dimensional</strong> feature space (via Taylor series of \(e^x\))</td>
+            <td>Non-linear boundaries, most common default choice</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout insight">
+        <div class="callout-title">🔑 RBF as a Proximity Sensor</div>
+        <p>The RBF kernel measures closeness: if \(x\) and \(z\) are identical, distance is 0, \(\exp(0) = 1\) (maximum similarity). If they're far apart, the exponential approaches 0 (no similarity). Via Taylor expansion of \(e^x\), this computes the dot product of infinite-dimensional vectors.</p>
+      </div>
+
+      <!-- SVM Viz -->
+      <div class="viz-container">
+        <div class="viz-title">🔵 Interactive: SVM Margin Visualization</div>
+        <canvas id="svmCanvas" height="300"></canvas>
+        <div class="viz-controls">
+          <button onclick="setSVMData('linear')" id="btnLinear" style="border-color:var(--accent2); color:var(--accent2)">Linear Data</button>
+          <button onclick="setSVMData('concentric')" id="btnConcentric">Concentric Circles</button>
+          <label>C (slack): <input type="range" id="cSlider" min="0.1" max="5" step="0.1" value="1.0"> <span id="cVal">1.0</span></label>
+        </div>
+        <p style="margin-top:0.6rem; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-muted)">
+          The highlighted points on the margin boundaries are the <strong>support vectors</strong> — the only points that matter for defining the hyperplane.
+        </p>
+      </div>
+
+      <pre><code><span class="kw">from</span> sklearn.svm <span class="kw">import</span> SVC
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># Linear SVM (hard margin, linearly separable)</span>
+svm_linear = SVC(kernel=<span class="st">'linear'</span>, C=<span class="num">1.0</span>)
+svm_linear.fit(X_train, y_train)
+
+<span class="cm"># RBF Kernel SVM (non-linear, most common)</span>
+svm_rbf = SVC(kernel=<span class="st">'rbf'</span>, C=<span class="num">1.0</span>, gamma=<span class="st">'scale'</span>)
+svm_rbf.fit(X_train, y_train)
+
+<span class="cm"># Access support vectors</span>
+<span class="fn">print</span>(<span class="st">"# Support vectors:"</span>, len(svm_rbf.support_vectors_))
+<span class="fn">print</span>(<span class="st">"Support vector indices:"</span>, svm_rbf.support_[:5])
+
+<span class="cm"># C parameter: the slack penalty</span>
+<span class="cm"># C small → wider margin, more misclassifications allowed (high bias)</span>
+<span class="cm"># C large → narrow margin, fewer misclassifications (high variance)</span><span class="lang-tag">python</span></code></pre>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- TREES -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <section class="chapter" id="chapter-trees">
+      <div class="chapter-label">Chapters 34–38</div>
+      <h2>Tree-Based Models & Ensemble Methods</h2>
+
+      <p>If SVMs are the kings of mathematical elegance, tree ensembles are the kings of real-world production. For tabular data (CSV files, database tables), gradient boosting consistently wins. Suggesting SVMs or deep learning before tree ensembles for tabular data is a red flag in an interview.</p>
+
+      <h3>Decision Trees</h3>
+      <p>Instead of a continuous boundary, decision trees ask a sequence of yes/no questions, carving the feature space into rectangular boxes. At each node, they greedily pick the split that makes the child boxes most <em>pure</em> (one-class).</p>
+
+      <h4>Measuring Impurity: Entropy vs Gini</h4>
+      <div class="math-block">
+        <span class="label">Entropy (Information-Theoretic)</span>
+        \[ H(S) = -\sum_{i=1}^k p_i \log_2 p_i \]
+      </div>
+      <div class="math-block">
+        <span class="label">Gini Impurity (Default in scikit-learn)</span>
+        \[ \text{Gini}(S) = 1 - \sum_{i=1}^k p_i^2 \]
+      </div>
+      <p>Both range from 0 (pure) to maximum when classes are equally mixed. Gini avoids log computation — faster in practice.</p>
+
+      <h4>Information Gain</h4>
+      <div class="math-block">
+        \[ \text{IG} = H(\text{parent}) - \frac{|L|}{|S|}H(\text{left child}) - \frac{|R|}{|S|}H(\text{right child}) \]
+      </div>
+      <p>Pick the split that maximizes Information Gain at each node.</p>
+
+      <div class="callout warning">
+        <div class="callout-title">⚠️ The Fatal Flaw of Single Trees</div>
+        <p>A fully grown tree will create a tiny box around each individual training point. Training error = 0%, but test error is catastrophic. Changing one data point can cascade and completely restructure the entire tree (<strong>high variance / overfitting</strong>). Fix: use an ensemble.</p>
+      </div>
+
+      <h3>Random Forests (Bagging)</h3>
+      <p><strong>Statistical motivation:</strong> If you average \(N\) independent random variables each with variance \(\sigma^2\), the variance of their average is \(\sigma^2/N\). Build 100+ trees and average them — variance collapses toward zero.</p>
+
+      <h4>Making Trees Independent (The "Random" Part)</h4>
+      <ol>
+        <li><strong>Bootstrap Sampling (Bagging):</strong> Each tree gets a random sample with replacement of the training data. ~63% of data is used per tree; the rest are "out-of-bag" samples (can be used as free validation).</li>
+        <li><strong>Feature Randomness:</strong> At each split, only a random subset of \(\sqrt{\text{total features}}\) features is considered. This prevents the strongest feature from dominating every tree, forcing them to learn diverse patterns.</li>
+      </ol>
+
+      <h3>Gradient Boosting (Sequential Error Correction)</h3>
+      <p>Random forests build trees in parallel independently. Boosting builds them <em>sequentially</em>, each one learning from the previous one's mistakes.</p>
+
+      <ol class="step-list">
+        <li><div class="step-num">1</div><div>Build Tree 1. It makes predictions \(\hat{y}\).</div></li>
+        <li><div class="step-num">2</div><div>Compute <strong>residuals</strong>: \(r_i = y_i - \hat{y}_i\)</div></li>
+        <li><div class="step-num">3</div><div>Build Tree 2 to predict these residuals (not the original target)</div></li>
+        <li><div class="step-num">4</div><div>Update: \(\hat{y}_{\text{new}} = \hat{y}_{\text{old}} + \alpha \cdot \text{Tree}_2(x)\)</div></li>
+        <li><div class="step-num">5</div><div>Repeat for Tree 3, 4, ..., N</div></li>
+      </ol>
+
+      <p><strong>Final prediction</strong> = sum of all tree predictions (each scaled by learning rate \(\alpha\)):</p>
+      <div class="math-block">
+        \[ F(x) = F_0(x) + \alpha f_1(x) + \alpha f_2(x) + \cdots + \alpha f_N(x) \]
+      </div>
+
+      <h3>XGBoost — Why It Wins Kaggle</h3>
+      <p>XGBoost is a mathematically rigorous version of gradient boosting. Standard GBM uses the first-order Taylor approximation of the loss. XGBoost uses the <strong>second-order (quadratic) Taylor approximation</strong>:</p>
+
+      <div class="math-block">
+        <span class="label">2nd-Order Taylor Expansion of Loss</span>
+        \[ L(y, F_{t-1} + f_t) \approx L(y, F_{t-1}) + g_i f_t + \frac{1}{2}h_i f_t^2 \]
+      </div>
+      <p>Where \(g_i = \frac{\partial L}{\partial F_{t-1}}\) (gradient) and \(h_i = \frac{\partial^2 L}{\partial F_{t-1}^2}\) (Hessian — second derivative).</p>
+
+      <p>Setting derivative to zero (Newton's Method) gives the <strong>optimal leaf weight in one step</strong>:</p>
+      <div class="math-block">
+        <span class="label">XGBoost Optimal Leaf Weight</span>
+        \[ w^* = -\frac{\sum_i g_i}{\sum_i h_i + \lambda} \]
+      </div>
+
+      <div class="callout interview">
+        <div class="callout-title">🎯 "Why is XGBoost better than standard GBM?"</div>
+        <p><strong>Three reasons:</strong><br>
+        1. <strong>2nd-order optimization</strong>: Uses Hessian for curvature information. Like Newton-Raphson vs plain gradient descent — converges in far fewer trees.<br>
+        2. <strong>Adaptive step size</strong>: Large Hessian (steep curvature) → small step; flat curvature → large step. Self-regulating.<br>
+        3. <strong>Built-in L1/L2 regularization</strong>: \(\lambda\) in the leaf weight formula directly prevents overfitting at the tree-building stage.</p>
+      </div>
+
+      <pre><code><span class="kw">import</span> xgboost <span class="kw">as</span> xgb
+<span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> RandomForestClassifier, GradientBoostingClassifier
+
+<span class="cm"># Random Forest</span>
+rf = RandomForestClassifier(
+    n_estimators=<span class="num">100</span>,     <span class="cm"># number of trees</span>
+    max_features=<span class="st">'sqrt'</span>,  <span class="cm"># sqrt(n_features) per split</span>
+    oob_score=<span class="kw">True</span>,        <span class="cm"># free out-of-bag validation</span>
+    random_state=<span class="num">42</span>
+)
+
+<span class="cm"># XGBoost (industry standard for tabular data)</span>
+xgb_model = xgb.XGBClassifier(
+    n_estimators=<span class="num">300</span>,
+    max_depth=<span class="num">6</span>,
+    learning_rate=<span class="num">0.05</span>,    <span class="cm"># α — shrinkage rate</span>
+    subsample=<span class="num">0.8</span>,         <span class="cm"># row sampling (like bagging)</span>
+    colsample_bytree=<span class="num">0.8</span>,  <span class="cm"># feature sampling</span>
+    reg_alpha=<span class="num">0.1</span>,          <span class="cm"># L1 regularization</span>
+    reg_lambda=<span class="num">1.0</span>,         <span class="cm"># L2 regularization</span>
+    use_label_encoder=<span class="kw">False</span>,
+    eval_metric=<span class="st">'logloss'</span>
+)
+
+rf.fit(X_train, y_train)
+xgb_model.fit(X_train, y_train,
+              eval_set=[(X_val, y_val)],
+              early_stopping_rounds=<span class="num">10</span>,
+              verbose=<span class="kw">False</span>)<span class="lang-tag">python</span></code></pre>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- KNN -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <section class="chapter" id="chapter-knn">
+      <div class="chapter-label">Chapters 39–44</div>
+      <h2>K-Nearest Neighbors — Lazy Learning</h2>
+
+      <p>KNN is a <strong>non-parametric, instance-based</strong> algorithm. It stores the entire training dataset and makes predictions at query time by looking up the nearest neighbors.</p>
+
+      <table class="compare-table">
+        <thead>
+          <tr><th></th><th>Eager Learners (LR, SVM, Trees)</th><th>KNN (Lazy Learner)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Training</strong></td><td>Heavy computation (gradient descent, optimization)</td><td>\(O(1)\) — just save the dataset</td></tr>
+          <tr><td><strong>Prediction</strong></td><td>Fast — formula evaluation</td><td>\(O(N \cdot d)\) — compute distances to all N points</td></tr>
+          <tr><td><strong>Memory</strong></td><td>Stores only weights</td><td>Stores entire dataset</td></tr>
+        </tbody>
+      </table>
+
+      <h3>The Distance Metric (Minkowski)</h3>
+      <div class="math-block">
+        <span class="label">Minkowski Distance</span>
+        \[ D(x, z) = \left(\sum_{i=1}^{d} |x_i - z_i|^p\right)^{1/p} \]
+      </div>
+      <ul>
+        <li>\(p=1\) → <strong>Manhattan Distance</strong> (L1 norm) — grid-walking, robust in high dimensions</li>
+        <li>\(p=2\) → <strong>Euclidean Distance</strong> (L2 norm) — straight-line, standard default</li>
+      </ul>
+
+      <div class="callout warning">
+        <div class="callout-title">⚠️ The Standardization Trap</div>
+        <p><strong>Q: Your KNN for house price prediction fails miserably. Why?</strong></p>
+        <p><strong>A:</strong> Features have different scales: square footage ranges 500–5000, bedrooms range 1–5. The distance formula treats all numbers equally, so the large-scale "square footage" feature completely dominates the distance calculation — bedrooms become irrelevant. <strong>Always normalize/standardize features before using KNN.</strong></p>
+      </div>
+
+      <h3>Choosing K: The Bias-Variance Tradeoff</h3>
+      <!-- KNN Viz -->
+      <div class="viz-container">
+        <div class="viz-title">🔍 Interactive: KNN — Effect of K Value</div>
+        <canvas id="knnCanvas" height="300"></canvas>
+        <div class="viz-controls">
+          <label>K = <input type="range" id="kSlider" min="1" max="15" step="2" value="3"> <span id="kVal">3</span></label>
+          <button onclick="generateKNN()">Generate New Data</button>
+        </div>
+        <p style="margin-top:0.6rem; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-muted)">
+          K=1: Jagged islands, overfitting. High K: Smooth boundary, underfitting. Find the sweet spot via cross-validation.
+        </p>
+      </div>
+
+      <table class="compare-table">
+        <thead>
+          <tr><th>K</th><th>Variance</th><th>Bias</th><th>Boundary Shape</th><th>Effect</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>K = 1</td><td>Very High</td><td>Very Low</td><td>Jagged, irregular</td><td>Memorizes noise, creates "islands" around outliers</td></tr>
+          <tr><td>K = 5–15</td><td>Moderate</td><td>Moderate</td><td>Smooth, generalized</td><td>Good balance — start here, tune with CV</td></tr>
+          <tr><td>K = N (all data)</td><td>Zero</td><td>Maximum</td><td>Flat line</td><td>Predicts majority class regardless of input</td></tr>
+        </tbody>
+      </table>
+
+      <h4>The Odd K Rule</h4>
+      <p>For binary classification, always choose odd K to avoid ties. For multi-class (\(k=3\) classes, \(K=3\) neighbors), ties can still occur — fix with <strong>Distance-Weighted Voting</strong>: each neighbor votes with weight \(1/d\) (inverse distance). The nearest neighbor counts more.</p>
+
+      <h3>KNN Regression</h3>
+      <p>For continuous targets, simply take the <strong>mean</strong> of the K nearest neighbors' values (instead of majority vote).</p>
+      <div class="callout warning">
+        <div class="callout-title">⚠️ KNN Regression Cannot Extrapolate</div>
+        <p>If the most expensive house in training data is $1M, KNN can never predict >$1M — it just averages the highest nearby values. Linear regression can extrapolate indefinitely along its line. This is a fundamental limitation of instance-based methods.</p>
+      </div>
+
+      <h3>Production Scaling: Approximate Nearest Neighbors</h3>
+      <p><strong>The Problem:</strong> 100M songs at Spotify, each a 512-dim vector. Brute-force KNN = 100M × 512 distance calculations per query. Latency: minutes. Unacceptable.</p>
+
+      <table class="compare-table">
+        <thead>
+          <tr><th>Method</th><th>How It Works</th><th>Complexity</th><th>Limitation</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>KD-Trees</strong></td><td>Partition space into boxes. Query searches only relevant boxes.</td><td>\(O(\log N)\)</td><td>Degrades badly in high dimensions (>20D)</td></tr>
+          <tr><td><strong>LSH</strong></td><td>Hash function that puts nearby vectors in the same bucket. Check only that bucket.</td><td>\(O(1)\) per query</td><td>Approximate — may miss some neighbors</td></tr>
+          <tr><td><strong>FAISS / HNSW</strong></td><td>Multi-layer graph. Navigate like a highway system to zoom to nearest neighbors.</td><td>Near \(O(\log N)\)</td><td>Complex to tune, requires index build time</td></tr>
+        </tbody>
+      </table>
+
+      <pre><code><span class="kw">from</span> sklearn.neighbors <span class="kw">import</span> KNeighborsClassifier, KNeighborsRegressor
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+
+<span class="cm"># CRITICAL: always scale before KNN</span>
+scaler = StandardScaler()
+X_train_s = scaler.fit_transform(X_train)
+X_test_s  = scaler.transform(X_test)
+
+<span class="cm"># KNN Classification</span>
+knn = KNeighborsClassifier(
+    n_neighbors=<span class="num">5</span>,          <span class="cm"># K — tune with CV</span>
+    weights=<span class="st">'distance'</span>,    <span class="cm"># distance-weighted voting</span>
+    metric=<span class="st">'euclidean'</span>      <span class="cm"># or 'manhattan'</span>
+)
+knn.fit(X_train_s, y_train)
+
+<span class="cm"># KNN Regression</span>
+knn_reg = KNeighborsRegressor(n_neighbors=<span class="num">5</span>)
+knn_reg.fit(X_train_s, y_train)
+
+<span class="cm"># Choosing K: use cross-validation</span>
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> cross_val_score
+k_scores = [cross_val_score(KNeighborsClassifier(k), X_train_s, y_train, cv=<span class="num">5</span>).mean()
+            <span class="kw">for</span> k <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="num">21</span>, <span class="num">2</span>)]
+best_k = <span class="num">2</span>*k_scores.index(<span class="fn">max</span>(k_scores))+<span class="num">1</span>
+<span class="fn">print</span>(<span class="st">f"Best K: {best_k}"</span>)
+
+<span class="cm"># Production: FAISS for Approximate NN</span>
+<span class="kw">import</span> faiss
+index = faiss.IndexFlatL2(<span class="num">512</span>)        <span class="cm"># 512-dim vectors</span>
+index.add(embeddings.astype(<span class="st">'float32'</span>))
+D, I = index.search(query.reshape(<span class="num">1</span>,-<span class="num">1</span>), k=<span class="num">5</span>)  <span class="cm"># D=distances, I=indices</span><span class="lang-tag">python</span></code></pre>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- MASTER INTERVIEW QUICK REFERENCE -->
+    <section class="chapter" id="interview-ref">
+      <div class="chapter-label">Quick Reference</div>
+      <h2>CDC Interview Rapid-Fire Answers</h2>
+
+      <div class="qa-block">
+        <div class="qa-q">What's the difference between Lasso and Ridge regularization?</div>
+        <div class="qa-a">Ridge (L2) adds \(\lambda\sum\theta_j^2\) — shrinks all weights proportionally toward zero but rarely reaches exactly zero. Lasso (L1) adds \(\lambda\sum|\theta_j|\) — its diamond-shaped constraint region has corners on the axes, so the loss contours are likely to hit a corner first, zeroing out weak features entirely. L1 = automatic feature selection. Probabilistically, L2 = Gaussian prior on weights, L1 = Laplace prior.</div>
+      </div>
+
+      <div class="qa-block">
+        <div class="qa-q">Why does XGBoost outperform standard Gradient Boosting?</div>
+        <div class="qa-a">Three reasons: (1) 2nd-order Taylor expansion — uses the Hessian for curvature info, jumping to the optimal leaf weight analytically in one step (Newton's method vs gradient descent). (2) Built-in L1/L2 regularization — the optimal leaf weight formula is \(-\frac{\sum g_i}{\sum h_i + \lambda}\), directly penalizing large leaf weights. (3) Adaptive step sizing — large Hessian automatically produces smaller steps; flat curvature allows larger jumps.</div>
+      </div>
+
+      <div class="qa-block">
+        <div class="qa-q">What is the Kernel Trick?</div>
+        <div class="qa-a">SVMs in Dual Form only need dot products between training examples, not the actual feature vectors. The Kernel Trick is a function K(x,z) that computes the dot product in a high-dimensional projected space without ever explicitly computing the projection. Example: K(x,z) = (xᵀz)² produces the same result as computing explicit 3D polynomial features and dotting them — but requires 4 operations instead of 11. The RBF kernel implicitly projects into infinite dimensions via the Taylor expansion of e^x.</div>
+      </div>
+
+      <div class="qa-block">
+        <div class="qa-q">Why can't we use MSE for Logistic Regression?</div>
+        <div class="qa-a">Plugging the sigmoid into MSE creates a non-convex cost function — it has multiple local minima. Gradient descent will get stuck in the wrong valley. Log Loss (Cross-Entropy) is strictly convex when combined with the sigmoid, guaranteeing gradient descent finds the global minimum. Additionally, Log Loss is the statistically principled choice — it's MLE under a Bernoulli distribution assumption.</div>
+      </div>
+
+      <div class="qa-block">
+        <div class="qa-q">Why does GDA give a linear boundary even though it models Gaussians?</div>
+        <div class="qa-a">Because both classes share the same covariance matrix Σ. Two Gaussian "bowls" with identical shapes (same Σ) but different centers (μ₀, μ₁) will intersect along a flat plane — a linear boundary. If each class has its own Σ, the surfaces have different orientations and their intersection is a quadratic curve (Quadratic Discriminant Analysis).</div>
+      </div>
+
+      <div class="qa-block">
+        <div class="qa-q">What makes Random Forests different from just training multiple decision trees?</div>
+        <div class="qa-a">Without randomness, all trees would train on the same data and find the same splits — averaging them does nothing. Random Forests introduce two independence mechanisms: (1) Bootstrap sampling — each tree trains on a random sample with replacement (~63% of data), (2) Feature randomness — at each split, only √n_features are available to split on. This forces trees to learn different patterns. The variance-reduction effect requires independence, which these techniques provide.</div>
+      </div>
+
+    </section>
+
+  </div><!-- /content-wrapper -->
+</main>
+
+<footer class="site-footer">
+  <a href="index.html">◈ CDC ML PREP</a> &nbsp;·&nbsp; Supervised Learning Notes &nbsp;·&nbsp; Based on CS229 Stanford
+</footer>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SCRIPTS -->
+<!-- ═══════════════════════════════════════════════════ -->
+<script>
+// Progress bar
+window.addEventListener('scroll', () => {
+  const h = document.documentElement;
+  const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+});
+
+// ─── VIZ 1: Linear Regression ───
+const lrCanvas = document.getElementById('lrCanvas');
+const lrCtx = lrCanvas.getContext('2d');
+const lrData = [[1,2.1],[2,3.8],[3,6.2],[4,7.9],[5,10.1],[6,11.8],[7,14.2],[8,15.9]];
+
+function drawLR() {
+  const W = lrCanvas.width = lrCanvas.offsetWidth;
+  const H = 280;
+  lrCanvas.height = H;
+  lrCtx.clearRect(0,0,W,H);
+  
+  const m = parseFloat(document.getElementById('slopeSlider').value);
+  const b = parseFloat(document.getElementById('interceptSlider').value);
+  document.getElementById('slopeVal').textContent = m.toFixed(1);
+  document.getElementById('interceptVal').textContent = b.toFixed(0);
+  
+  const pad = 40;
+  const sx = x => pad + (x-0.5)*(W-2*pad)/8;
+  const sy = y => H - pad - (y+2)*(H-2*pad)/22;
+  
+  // Grid
+  lrCtx.strokeStyle = '#21262d'; lrCtx.lineWidth = 1;
+  for(let i=0;i<=8;i++){lrCtx.beginPath();lrCtx.moveTo(sx(i),pad);lrCtx.lineTo(sx(i),H-pad);lrCtx.stroke();}
+  for(let j=-2;j<=20;j+=4){lrCtx.beginPath();lrCtx.moveTo(pad,sy(j));lrCtx.lineTo(W-pad,sy(j));lrCtx.stroke();}
+  
+  // Regression line
+  lrCtx.strokeStyle = '#f0a500'; lrCtx.lineWidth = 2.5;
+  lrCtx.beginPath();
+  lrCtx.moveTo(sx(0), sy(b)); lrCtx.lineTo(sx(9), sy(9*m+b));
+  lrCtx.stroke();
+  
+  // Residuals and data points
+  let cost = 0;
+  lrData.forEach(([x,y]) => {
+    const pred = m*x+b/10;
+    cost += (pred-y)**2;
+    // Residual line
+    lrCtx.strokeStyle = 'rgba(255,123,114,0.4)'; lrCtx.lineWidth = 1;
+    lrCtx.beginPath(); lrCtx.moveTo(sx(x),sy(y)); lrCtx.lineTo(sx(x),sy(pred));
+    lrCtx.stroke();
+    // Data point
+    lrCtx.beginPath(); lrCtx.arc(sx(x),sy(y),5,0,Math.PI*2);
+    lrCtx.fillStyle='#58a6ff'; lrCtx.fill();
+    lrCtx.strokeStyle='#0d1117'; lrCtx.lineWidth=1.5; lrCtx.stroke();
+  });
+  document.getElementById('costDisplay').textContent = (cost/2).toFixed(3);
+}
+function resetLR(){document.getElementById('slopeSlider').value=2.5;document.getElementById('interceptSlider').value=20;drawLR();}
+document.getElementById('slopeSlider').addEventListener('input',drawLR);
+document.getElementById('interceptSlider').addEventListener('input',drawLR);
+window.addEventListener('resize',drawLR);
+setTimeout(drawLR,100);
+
+// ─── VIZ 2: Gradient Descent ───
+const gdCanvas = document.getElementById('gdCanvas');
+const gdCtx = gdCanvas.getContext('2d');
+let gdTheta = 6, gdRunning = false, gdInterval = null;
+
+function cost1D(t){return (t-2)**2 + 1;}
+function grad1D(t){return 2*(t-2);}
+
+function drawGD(path=[]) {
+  const W = gdCanvas.width = gdCanvas.offsetWidth;
+  const H = 260; gdCanvas.height = H;
+  gdCtx.clearRect(0,0,W,H);
+  const pad = 40;
+  const sx = t => pad + (t+1)*(W-2*pad)/9;
+  const sy = c => H-pad - c*(H-2*pad)/30;
+  
+  // Draw cost curve
+  gdCtx.strokeStyle='#58a6ff'; gdCtx.lineWidth=2.5;
+  gdCtx.beginPath();
+  for(let t=-1;t<=8;t+=0.05){
+    const c=cost1D(t);
+    t===-1?gdCtx.moveTo(sx(t),sy(c)):gdCtx.lineTo(sx(t),sy(c));
+  }
+  gdCtx.stroke();
+  
+  // Draw path
+  if(path.length>1){
+    gdCtx.strokeStyle='rgba(240,165,0,0.6)'; gdCtx.lineWidth=1.5;
+    gdCtx.setLineDash([4,4]);
+    gdCtx.beginPath();
+    path.forEach(([t,c],i)=>i===0?gdCtx.moveTo(sx(t),sy(c)):gdCtx.lineTo(sx(t),sy(c)));
+    gdCtx.stroke(); gdCtx.setLineDash([]);
+    path.forEach(([t,c])=>{gdCtx.beginPath();gdCtx.arc(sx(t),sy(c),3,0,Math.PI*2);gdCtx.fillStyle='rgba(240,165,0,0.8)';gdCtx.fill();});
+  }
+  
+  // Current point
+  if(path.length>0){
+    const [t,c]=path[path.length-1];
+    gdCtx.beginPath(); gdCtx.arc(sx(t),sy(c),7,0,Math.PI*2);
+    gdCtx.fillStyle='#f0a500'; gdCtx.fill();
+    gdCtx.strokeStyle='#fff'; gdCtx.lineWidth=1.5; gdCtx.stroke();
+    document.getElementById('gdTheta').textContent=t.toFixed(3);
+    document.getElementById('gdCost').textContent=c.toFixed(3);
+  }
+  
+  // Minimum marker
+  gdCtx.beginPath(); gdCtx.arc(sx(2),sy(1),5,0,Math.PI*2);
+  gdCtx.fillStyle='#7ee787'; gdCtx.fill();
+  gdCtx.font='11px IBM Plex Mono'; gdCtx.fillStyle='#7ee787';
+  gdCtx.fillText('min',sx(2)+8,sy(1));
+}
+
+let gdPath = [];
+function runGD(){
+  if(gdInterval) clearInterval(gdInterval);
+  gdTheta=6; gdPath=[[gdTheta,cost1D(gdTheta)]]; 
+  const alpha=parseFloat(document.getElementById('alphaSlider').value);
+  document.getElementById('gdIter').textContent=0;
+  let iter=0;
+  gdInterval=setInterval(()=>{
+    gdTheta -= alpha*grad1D(gdTheta);
+    gdPath.push([gdTheta,cost1D(gdTheta)]);
+    iter++;
+    document.getElementById('gdIter').textContent=iter;
+    drawGD(gdPath);
+    if(iter>=60||Math.abs(cost1D(gdTheta))>1000) clearInterval(gdInterval);
+  },100);
+}
+function resetGD(){if(gdInterval)clearInterval(gdInterval);gdPath=[];drawGD();}
+document.getElementById('alphaSlider').addEventListener('input',()=>{
+  document.getElementById('alphaVal').textContent=parseFloat(document.getElementById('alphaSlider').value).toFixed(2);
+});
+window.addEventListener('resize',()=>drawGD(gdPath));
+setTimeout(()=>drawGD(),200);
+
+// ─── VIZ 3: L1 vs L2 Geometry ───
+const regCanvas = document.getElementById('regCanvas');
+const regCtx = regCanvas.getContext('2d');
+let regType = 'l2';
+
+function setReg(t){
+  regType=t;
+  document.getElementById('btnL2').style.borderColor=t==='l2'?'var(--accent2)':'var(--border)';
+  document.getElementById('btnL2').style.color=t==='l2'?'var(--accent2)':'var(--text-muted)';
+  document.getElementById('btnL1').style.borderColor=t==='l1'?'var(--accent2)':'var(--border)';
+  document.getElementById('btnL1').style.color=t==='l1'?'var(--accent2)':'var(--text-muted)';
+  drawReg();
+}
+
+function drawReg(){
+  const W=regCanvas.width=regCanvas.offsetWidth;
+  const H=320; regCanvas.height=H;
+  regCtx.clearRect(0,0,W,H);
+  const cx=W/2, cy=H/2;
+  const sc=Math.min(W,H)*0.28;
+  const budget=parseFloat(document.getElementById('lambdaSlider').value);
+  document.getElementById('lambdaVal').textContent=budget.toFixed(1);
+  const r=budget*sc/2;
+  
+  // Draw axes
+  regCtx.strokeStyle='#484f58'; regCtx.lineWidth=1;
+  regCtx.beginPath(); regCtx.moveTo(cx-sc*1.5,cy); regCtx.lineTo(cx+sc*1.5,cy); regCtx.stroke();
+  regCtx.beginPath(); regCtx.moveTo(cx,cy-sc*1.5); regCtx.lineTo(cx,cy+sc*1.5); regCtx.stroke();
+  
+  // Labels
+  regCtx.font='12px IBM Plex Mono'; regCtx.fillStyle='#8b949e';
+  regCtx.fillText('θ₁',cx+sc*1.4,cy-8);
+  regCtx.fillText('θ₂',cx+8,cy-sc*1.4);
+  
+  // Unconstrained min star
+  const starX=cx+sc*0.6, starY=cy-sc*0.45;
+  regCtx.font='18px serif'; regCtx.fillStyle='#f0a500';
+  regCtx.fillText('✦',starX-9,starY+7);
+  regCtx.font='10px IBM Plex Mono'; regCtx.fillStyle='var(--text-muted)';
+  regCtx.fillText('OLS min',starX+6,starY+5);
+  
+  // Draw loss ellipses
+  for(let k=1;k<=4;k++){
+    const er=k*sc*0.22; const ea=er*1.6; const eb=er*0.7;
+    regCtx.save(); regCtx.translate(starX,starY);
+    regCtx.rotate(-0.3);
+    regCtx.beginPath(); regCtx.ellipse(0,0,ea,eb,0,0,Math.PI*2);
+    regCtx.strokeStyle=`rgba(88,166,255,${0.15+k*0.05})`; regCtx.lineWidth=1;
+    regCtx.stroke(); regCtx.restore();
+  }
+  
+  // Draw constraint region
+  regCtx.lineWidth=2.5;
+  if(regType==='l2'){
+    regCtx.beginPath(); regCtx.arc(cx,cy,r,0,Math.PI*2);
+    regCtx.strokeStyle='#7ee787'; regCtx.stroke();
+    regCtx.fillStyle='rgba(126,231,135,0.06)'; regCtx.fill();
+    // Find intersection (approximation)
+    const ix=cx+r*Math.cos(-0.9), iy=cy+r*Math.sin(-0.9);
+    regCtx.beginPath(); regCtx.arc(ix,iy,6,0,Math.PI*2);
+    regCtx.fillStyle='#f0a500'; regCtx.fill();
+    regCtx.font='10px IBM Plex Mono'; regCtx.fillStyle='#f0a500';
+    regCtx.fillText('optimal',ix+8,iy-4);
+  } else {
+    regCtx.beginPath();
+    regCtx.moveTo(cx,cy-r); regCtx.lineTo(cx+r,cy);
+    regCtx.lineTo(cx,cy+r); regCtx.lineTo(cx-r,cy);
+    regCtx.closePath();
+    regCtx.strokeStyle='#7ee787'; regCtx.stroke();
+    regCtx.fillStyle='rgba(126,231,135,0.06)'; regCtx.fill();
+    // Hit the corner!
+    regCtx.beginPath(); regCtx.arc(cx+r,cy,7,0,Math.PI*2);
+    regCtx.fillStyle='#f0a500'; regCtx.fill();
+    regCtx.font='10px IBM Plex Mono'; regCtx.fillStyle='#f0a500';
+    regCtx.fillText('θ₂=0! (sparse)',cx+r+10,cy+4);
+    // Corner markers
+    [[-r,0],[r,0],[0,-r],[0,r]].forEach(([dx,dy])=>{
+      regCtx.beginPath(); regCtx.arc(cx+dx,cy+dy,5,0,Math.PI*2);
+      regCtx.fillStyle='rgba(255,123,114,0.7)'; regCtx.fill();
+    });
+  }
+  
+  regCtx.font='11px IBM Plex Mono'; regCtx.fillStyle='#8b949e';
+  regCtx.fillText(regType==='l2'?'Circle: L2 constraint':'Diamond: L1 constraint',16,H-12);
+}
+
+document.getElementById('lambdaSlider').addEventListener('input',drawReg);
+window.addEventListener('resize',drawReg);
+setTimeout(()=>drawReg(),300);
+
+// ─── VIZ 4: Sigmoid ───
+const sigCanvas = document.getElementById('sigmoidCanvas');
+const sigCtx = sigCanvas.getContext('2d');
+
+function drawSigmoid(){
+  const W=sigCanvas.width=sigCanvas.offsetWidth;
+  const H=220; sigCanvas.height=H;
+  sigCtx.clearRect(0,0,W,H);
+  const t=parseFloat(document.getElementById('tempSlider').value);
+  document.getElementById('tempVal').textContent=t.toFixed(1);
+  const pad=35;
+  const sx=z=>pad+(z+6)*(W-2*pad)/12;
+  const sy=v=>H-pad-v*(H-2*pad);
+  
+  // Grid
+  sigCtx.strokeStyle='#21262d'; sigCtx.lineWidth=1;
+  for(let x=-6;x<=6;x+=2){sigCtx.beginPath();sigCtx.moveTo(sx(x),pad);sigCtx.lineTo(sx(x),H-pad);sigCtx.stroke();}
+  for(let y=0;y<=1;y+=0.25){sigCtx.beginPath();sigCtx.moveTo(pad,sy(y));sigCtx.lineTo(W-pad,sy(y));sigCtx.stroke();}
+  
+  // 0.5 line
+  sigCtx.strokeStyle='rgba(240,165,0,0.3)'; sigCtx.setLineDash([5,5]);
+  sigCtx.beginPath(); sigCtx.moveTo(pad,sy(0.5)); sigCtx.lineTo(W-pad,sy(0.5)); sigCtx.stroke();
+  sigCtx.setLineDash([]);
+  sigCtx.font='10px IBM Plex Mono'; sigCtx.fillStyle='#f0a500';
+  sigCtx.fillText('0.5',pad-28,sy(0.5)+4);
+  
+  // Sigmoid curve
+  sigCtx.strokeStyle='#58a6ff'; sigCtx.lineWidth=2.5;
+  sigCtx.beginPath();
+  for(let z=-6;z<=6;z+=0.05){
+    const v=1/(1+Math.exp(-z*t));
+    z===-6?sigCtx.moveTo(sx(z),sy(v)):sigCtx.lineTo(sx(z),sy(v));
+  }
+  sigCtx.stroke();
+  
+  // Labels
+  sigCtx.fillStyle='#8b949e'; sigCtx.font='10px IBM Plex Mono';
+  sigCtx.fillText('0',sx(0)-4,H-pad+14);
+  sigCtx.fillText('z',W-pad+4,H-pad+4);
+  sigCtx.fillText('σ(z)',pad-28,pad+4);
+}
+document.getElementById('tempSlider').addEventListener('input',drawSigmoid);
+window.addEventListener('resize',drawSigmoid);
+setTimeout(drawSigmoid,400);
+
+// ─── VIZ 5: SVM ───
+const svmCanvas = document.getElementById('svmCanvas');
+const svmCtx = svmCanvas.getContext('2d');
+let svmMode='linear';
+
+const svmLinearData = {
+  pos:[[2,6],[2.5,7],[3,5.5],[3.5,7.5],[4,6.5],[2,8],[4.5,5]],
+  neg:[[6,3],[6.5,4],[7,2.5],[7.5,3.5],[8,3],[6,2],[8.5,4.5]]
+};
+
+function setSVMData(m){
+  svmMode=m;
+  document.getElementById('btnLinear').style.borderColor=m==='linear'?'var(--accent2)':'var(--border)';
+  document.getElementById('btnLinear').style.color=m==='linear'?'var(--accent2)':'var(--text-muted)';
+  document.getElementById('btnConcentric').style.borderColor=m==='concentric'?'var(--accent2)':'var(--border)';
+  document.getElementById('btnConcentric').style.color=m==='concentric'?'var(--accent2)':'var(--text-muted)';
+  drawSVM();
+}
+document.getElementById('cSlider').addEventListener('input',()=>{
+  document.getElementById('cVal').textContent=parseFloat(document.getElementById('cSlider').value).toFixed(1);
+  drawSVM();
+});
+
+function drawSVM(){
+  const W=svmCanvas.width=svmCanvas.offsetWidth;
+  const H=300; svmCanvas.height=H;
+  svmCtx.clearRect(0,0,W,H);
+  const pad=20;
+  const sx=x=>pad+x*(W-2*pad)/10;
+  const sy=y=>H-pad-y*(H-2*pad)/10;
+  
+  if(svmMode==='linear'){
+    // Shaded regions
+    svmCtx.fillStyle='rgba(88,166,255,0.05)';
+    svmCtx.fillRect(pad,pad,(W-2*pad)*0.52,H-2*pad);
+    svmCtx.fillStyle='rgba(255,123,114,0.05)';
+    svmCtx.fillRect(pad+(W-2*pad)*0.52,pad,(W-2*pad)*0.48,H-2*pad);
+    
+    // Margin lines
+    const lineY = y => pad + (H-2*pad)*(1 - y/10);
+    // Decision boundary: x1 + x2 = 9.5 -> y = 9.5 - x
+    const dbx1=0, dby1=9.5, dbx2=9.5, dby2=0;
+    svmCtx.strokeStyle='#f0a500'; svmCtx.lineWidth=2.5;
+    svmCtx.beginPath(); svmCtx.moveTo(sx(dbx1),sy(dby1)); svmCtx.lineTo(sx(dbx2),sy(dby2)); svmCtx.stroke();
+    
+    // Margin gutters
+    svmCtx.strokeStyle='rgba(240,165,0,0.4)'; svmCtx.lineWidth=1.5; svmCtx.setLineDash([5,5]);
+    svmCtx.beginPath(); svmCtx.moveTo(sx(0),sy(10.2)); svmCtx.lineTo(sx(10.2),sy(0)); svmCtx.stroke();
+    svmCtx.beginPath(); svmCtx.moveTo(sx(0),sy(8.8)); svmCtx.lineTo(sx(8.8),sy(0)); svmCtx.stroke();
+    svmCtx.setLineDash([]);
+    
+    // Fill margin strip
+    svmCtx.fillStyle='rgba(240,165,0,0.04)';
+    svmCtx.beginPath();
+    svmCtx.moveTo(sx(0),sy(10.2));
+    svmCtx.lineTo(sx(10.2),sy(0));
+    svmCtx.lineTo(sx(8.8),sy(0));
+    svmCtx.lineTo(sx(0),sy(8.8));
+    svmCtx.closePath(); svmCtx.fill();
+    
+    // Margin label
+    svmCtx.fillStyle='rgba(240,165,0,0.6)'; svmCtx.font='10px IBM Plex Mono';
+    svmCtx.fillText('← margin →',sx(1.5),sy(7.5));
+    
+    // Data points
+    svmLinearData.pos.forEach(([x,y],i)=>{
+      const isSV=(i===0||i===3);
+      svmCtx.beginPath(); svmCtx.arc(sx(x),sy(y),isSV?8:5,0,Math.PI*2);
+      svmCtx.fillStyle=isSV?'#58a6ff':'rgba(88,166,255,0.7)'; svmCtx.fill();
+      if(isSV){svmCtx.strokeStyle='#fff';svmCtx.lineWidth=2;svmCtx.stroke();}
+    });
+    svmLinearData.neg.forEach(([x,y],i)=>{
+      const isSV=(i===1||i===4);
+      svmCtx.beginPath(); svmCtx.arc(sx(x),sy(y),isSV?8:5,0,Math.PI*2);
+      svmCtx.fillStyle=isSV?'#ff7b72':'rgba(255,123,114,0.7)'; svmCtx.fill();
+      if(isSV){svmCtx.strokeStyle='#fff';svmCtx.lineWidth=2;svmCtx.stroke();}
+    });
+    
+    svmCtx.fillStyle='var(--text-muted)'; svmCtx.font='10px IBM Plex Mono';
+    svmCtx.fillText('White ring = Support Vector',16,H-10);
+    
+  } else {
+    // Concentric circles
+    const cx=W/2, cy=H/2;
+    for(let i=0;i<20;i++){
+      const angle=Math.random()*Math.PI*2;
+      const r=(Math.random()*0.8+0.2)*Math.min(W,H)*0.17;
+      svmCtx.beginPath(); svmCtx.arc(cx+r*Math.cos(angle), cy+r*Math.sin(angle),5,0,Math.PI*2);
+      svmCtx.fillStyle='rgba(88,166,255,0.8)'; svmCtx.fill();
+    }
+    for(let i=0;i<20;i++){
+      const angle=Math.random()*Math.PI*2;
+      const r=(Math.random()*0.5+1.1)*Math.min(W,H)*0.2;
+      svmCtx.beginPath(); svmCtx.arc(cx+r*Math.cos(angle), cy+r*Math.sin(angle),5,0,Math.PI*2);
+      svmCtx.fillStyle='rgba(255,123,114,0.8)'; svmCtx.fill();
+    }
+    // No linear boundary works — show fail
+    svmCtx.strokeStyle='rgba(255,123,114,0.5)'; svmCtx.lineWidth=2; svmCtx.setLineDash([6,6]);
+    svmCtx.beginPath(); svmCtx.moveTo(pad,H/2); svmCtx.lineTo(W-pad,H/2); svmCtx.stroke();
+    svmCtx.setLineDash([]);
+    
+    svmCtx.fillStyle='#ff7b72'; svmCtx.font='bold 12px IBM Plex Mono';
+    svmCtx.fillText('Linear fails here — use RBF Kernel!',pad,H-10);
+    
+    // RBF circular boundary
+    svmCtx.strokeStyle='#7ee787'; svmCtx.lineWidth=2.5;
+    svmCtx.beginPath(); svmCtx.arc(cx,cy,Math.min(W,H)*0.27,0,Math.PI*2); svmCtx.stroke();
+    svmCtx.fillStyle='#7ee787'; svmCtx.font='10px IBM Plex Mono';
+    svmCtx.fillText('← RBF kernel boundary',cx+Math.min(W,H)*0.28,cy+4);
+  }
+}
+window.addEventListener('resize',drawSVM);
+setTimeout(drawSVM,500);
+
+// ─── VIZ 6: KNN ───
+const knnCanvas = document.getElementById('knnCanvas');
+const knnCtx = knnCanvas.getContext('2d');
+let knnPoints = [];
+
+function generateKNN(){
+  knnPoints=[];
+  for(let i=0;i<30;i++){
+    knnPoints.push({x:Math.random()*8+1,y:Math.random()*8+1,c:Math.random()<0.5?0:1});
+  }
+  drawKNN();
+}
+
+function drawKNN(){
+  const W=knnCanvas.width=knnCanvas.offsetWidth;
+  const H=300; knnCanvas.height=H;
+  knnCtx.clearRect(0,0,W,H);
+  const K=parseInt(document.getElementById('kSlider').value);
+  document.getElementById('kVal').textContent=K;
+  
+  if(knnPoints.length===0){generateKNN();return;}
+  
+  const pad=20;
+  const sx=x=>pad+x*(W-2*pad)/10;
+  const sy=y=>H-pad-y*(H-2*pad)/10;
+  
+  // Draw decision background
+  const step=15;
+  for(let px=0;px<W;px+=step){
+    for(let py=0;py<H;py+=step){
+      const qx=(px-pad)/(W-2*pad)*10;
+      const qy=(H-pad-py)/(H-2*pad)*10;
+      const dists=knnPoints.map((p,i)=>({d:Math.sqrt((p.x-qx)**2+(p.y-qy)**2),c:p.c}));
+      dists.sort((a,b)=>a.d-b.d);
+      const votes=dists.slice(0,K).reduce((a,b)=>a+b.c,0);
+      knnCtx.fillStyle=votes>K/2?'rgba(88,166,255,0.06)':'rgba(255,123,114,0.06)';
+      knnCtx.fillRect(px-step/2,py-step/2,step,step);
+    }
+  }
+  
+  // Query point
+  const qx=5,qy=5;
+  const dists=knnPoints.map((p,i)=>({d:Math.sqrt((p.x-qx)**2+(p.y-qy)**2),c:p.c,idx:i}));
+  dists.sort((a,b)=>a.d-b.d);
+  const kNeighbors=dists.slice(0,K);
+  
+  // Draw K-radius circle
+  const kRadius=dists[K-1].d;
+  knnCtx.strokeStyle='rgba(240,165,0,0.4)'; knnCtx.lineWidth=1.5;
+  knnCtx.beginPath(); knnCtx.arc(sx(qx),sy(qy),(kRadius)*(W-2*pad)/10,0,Math.PI*2); knnCtx.stroke();
+  
+  // Connect to neighbors
+  kNeighbors.forEach(nb=>{
+    const pt=knnPoints[nb.idx];
+    knnCtx.strokeStyle='rgba(240,165,0,0.3)'; knnCtx.lineWidth=1;
+    knnCtx.beginPath(); knnCtx.moveTo(sx(qx),sy(qy)); knnCtx.lineTo(sx(pt.x),sy(pt.y)); knnCtx.stroke();
+  });
+  
+  // Points
+  knnPoints.forEach((p,i)=>{
+    const isN=kNeighbors.some(n=>n.idx===i);
+    knnCtx.beginPath(); knnCtx.arc(sx(p.x),sy(p.y),isN?7:5,0,Math.PI*2);
+    knnCtx.fillStyle=p.c===1?'rgba(88,166,255,0.85)':'rgba(255,123,114,0.85)'; knnCtx.fill();
+    if(isN){knnCtx.strokeStyle='#f0a500';knnCtx.lineWidth=2;knnCtx.stroke();}
+  });
+  
+  // Query point
+  knnCtx.beginPath(); knnCtx.arc(sx(qx),sy(qy),9,0,Math.PI*2);
+  const votes=kNeighbors.reduce((a,b)=>a+b.c,0);
+  knnCtx.fillStyle=votes>K/2?'#58a6ff':'#ff7b72'; knnCtx.fill();
+  knnCtx.strokeStyle='#fff'; knnCtx.lineWidth=2.5; knnCtx.stroke();
+  knnCtx.fillStyle='#fff'; knnCtx.font='bold 10px IBM Plex Mono';
+  knnCtx.fillText('?',sx(qx)-4,sy(qy)+4);
+  
+  // Legend
+  knnCtx.fillStyle='var(--text-muted)'; knnCtx.font='10px IBM Plex Mono';
+  knnCtx.fillText(`K=${K} | Prediction: ${votes>K/2?'Class 1 (Blue)':'Class 0 (Red)'}`,16,H-10);
+}
+
+document.getElementById('kSlider').addEventListener('input',drawKNN);
+window.addEventListener('resize',drawKNN);
+setTimeout(generateKNN,600);
+</script>
+
+<!-- MathJax config -->
+<script>
+MathJax = {
+  tex: { inlineMath: [['\\(','\\)'], ['$','$']], displayMath: [['\\[','\\]'], ['$$','$$']] },
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+};
+</script>
+</body>
+</html>
