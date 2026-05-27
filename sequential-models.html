@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sequential Models — RNNs, LSTMs, GRUs | CDC ML Prep</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&family=Newsreader:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+<style>
+  :root {
+    --bg:#07090f; --bg2:#0c0f18; --bg3:#111520;
+    --border:#1a2030; --accent:#34d399; --accent2:#60a5fa;
+    --accent3:#f472b6; --accent4:#fb923c; --accent5:#a78bfa;
+    --text:#e2e8f0; --text-muted:#94a3b8; --text-dim:#475569;
+    --highlight:rgba(52,211,153,0.07);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--bg);color:var(--text);font-family:'Newsreader',Georgia,serif;font-size:17px;line-height:1.82;overflow-x:hidden;}
+  .progress-bar{position:fixed;top:56px;left:0;height:2px;background:var(--accent);width:0%;z-index:99;transition:width 0.1s;}
+  .site-header{position:sticky;top:0;z-index:100;background:rgba(7,9,15,0.95);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px;}
+  .logo{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--accent);text-decoration:none;letter-spacing:0.08em;}
+  .header-nav{display:flex;gap:1.5rem;}
+  .header-nav a{font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--text-muted);text-decoration:none;transition:color 0.2s;}
+  .header-nav a:hover{color:var(--accent2);}
+  .hero{padding:5rem 2rem 3rem;max-width:980px;margin:0 auto;}
+  .hero-tag{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:0.15em;text-transform:uppercase;border:1px solid rgba(52,211,153,0.3);display:inline-block;padding:3px 10px;border-radius:3px;margin-bottom:1.5rem;}
+  .hero h1{font-family:'Newsreader',serif;font-size:clamp(2.2rem,5vw,3.6rem);font-weight:300;line-height:1.12;margin-bottom:1.2rem;}
+  .hero h1 em{font-style:italic;color:var(--accent);}
+  .hero-desc{font-size:1.1rem;color:var(--text-muted);max-width:680px;line-height:1.75;}
+  .hero-meta{margin-top:2.5rem;display:flex;gap:2rem;flex-wrap:wrap;}
+  .hero-meta-item{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-dim);}
+  .hero-meta-item span{color:var(--accent);}
+  .toc-container{max-width:980px;margin:0 auto 3rem;padding:0 2rem;}
+  .toc{background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:1.5rem 2rem;}
+  .toc-title{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:1rem;}
+  .toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0.35rem 2rem;}
+  .toc a{font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--text-muted);text-decoration:none;transition:color 0.2s;display:flex;align-items:center;gap:0.5rem;}
+  .toc a::before{content:'→';color:var(--accent);font-size:11px;}
+  .toc a:hover{color:var(--accent2);}
+  .content-wrapper{max-width:980px;margin:0 auto;padding:0 2rem 6rem;}
+  .chapter{margin-bottom:5rem;scroll-margin-top:70px;}
+  .chapter-label{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:0.18em;text-transform:uppercase;margin-bottom:0.5rem;display:flex;align-items:center;gap:0.6rem;}
+  .chapter-label::after{content:'';flex:1;height:1px;background:linear-gradient(to right,var(--border),transparent);}
+  .chapter h2{font-family:'Newsreader',serif;font-size:clamp(1.6rem,3vw,2.3rem);font-weight:400;color:var(--text);margin-bottom:1.5rem;line-height:1.2;}
+  .chapter h3{font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:500;color:var(--accent2);margin:2.2rem 0 0.8rem;}
+  .chapter h4{font-family:'Space Grotesk',sans-serif;font-size:0.95rem;font-weight:500;color:var(--accent);margin:1.5rem 0 0.5rem;}
+  .chapter p{margin-bottom:1.1rem;}
+  .chapter ul,.chapter ol{margin:0.8rem 0 1.2rem 1.5rem;}
+  .chapter li{margin-bottom:0.5rem;}
+  .math-block{background:#090c14;border:1px solid var(--border);border-left:3px solid var(--accent2);border-radius:6px;padding:1.2rem 1.5rem;margin:1.5rem 0;overflow-x:auto;text-align:center;}
+  .math-block .label{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-dim);text-align:left;display:block;margin-bottom:0.5rem;letter-spacing:0.1em;text-transform:uppercase;}
+  pre{background:#090c14;border:1px solid var(--border);border-radius:6px;padding:1.2rem 1.5rem;overflow-x:auto;margin:1.5rem 0;position:relative;}
+  pre .lang-tag{position:absolute;top:8px;right:12px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-dim);}
+  code{font-family:'IBM Plex Mono',monospace;font-size:0.84rem;line-height:1.65;color:var(--text);}
+  p code,li code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-size:0.82rem;color:var(--accent);}
+  .kw{color:#f472b6;}.fn{color:#a78bfa;}.st{color:#7dd3fc;}.cm{color:#475569;font-style:italic;}.num{color:#60a5fa;}.cl{color:#fb923c;}
+  .callout{border-radius:6px;padding:1.2rem 1.5rem;margin:1.8rem 0;border-left:4px solid;}
+  .callout-title{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.5rem;}
+  .callout.interview{background:rgba(96,165,250,0.06);border-color:var(--accent2);}
+  .callout.interview .callout-title{color:var(--accent2);}
+  .callout.warning{background:rgba(244,114,182,0.06);border-color:var(--accent3);}
+  .callout.warning .callout-title{color:var(--accent3);}
+  .callout.insight{background:rgba(52,211,153,0.06);border-color:var(--accent);}
+  .callout.insight .callout-title{color:var(--accent);}
+  .callout.gold{background:rgba(251,146,60,0.07);border-color:var(--accent4);}
+  .callout.gold .callout-title{color:var(--accent4);}
+  .callout.purple{background:rgba(167,139,250,0.07);border-color:var(--accent5);}
+  .callout.purple .callout-title{color:var(--accent5);}
+  .qa-block{border:1px solid var(--border);border-radius:8px;overflow:hidden;margin:2rem 0;}
+  .qa-q{background:var(--bg3);padding:1rem 1.4rem;font-family:'Space Grotesk',sans-serif;font-size:0.95rem;font-weight:500;color:var(--accent2);display:flex;align-items:flex-start;gap:0.8rem;}
+  .qa-q::before{content:'Q';background:var(--accent2);color:var(--bg);font-size:11px;font-weight:700;padding:1px 6px;border-radius:3px;flex-shrink:0;margin-top:2px;font-family:'IBM Plex Mono',monospace;}
+  .qa-a{background:var(--bg2);padding:1rem 1.4rem;border-top:1px solid var(--border);display:flex;align-items:flex-start;gap:0.8rem;font-size:0.95rem;}
+  .qa-a::before{content:'A';background:var(--accent);color:var(--bg);font-size:11px;font-weight:700;padding:1px 6px;border-radius:3px;flex-shrink:0;margin-top:2px;font-family:'IBM Plex Mono',monospace;}
+  .data-table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:0.9rem;}
+  .data-table th{background:var(--bg3);font-family:'Space Grotesk',sans-serif;font-size:0.85rem;font-weight:500;color:var(--text);padding:0.8rem 1rem;border-bottom:2px solid var(--accent);border-right:1px solid var(--border);}
+  .data-table td{padding:0.75rem 1rem;border-bottom:1px solid var(--border);border-right:1px solid var(--border);vertical-align:top;}
+  .data-table tr:hover td{background:var(--highlight);}
+  .step-list{list-style:none;margin:1rem 0 1.5rem;padding:0;}
+  .step-list li{display:flex;gap:1rem;align-items:flex-start;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--border);}
+  .step-list li:last-child{border-bottom:none;}
+  .step-num{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;background:var(--accent);color:var(--bg);width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+  .viz-container{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin:2rem 0;}
+  .viz-title{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:1rem;}
+  .viz-controls{display:flex;gap:1rem;flex-wrap:wrap;align-items:center;margin-top:1rem;}
+  .viz-controls label{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:0.5rem;}
+  .viz-controls input[type=range]{accent-color:var(--accent);width:130px;}
+  .viz-controls button{background:var(--bg2);border:1px solid var(--border);color:var(--text-muted);font-family:'IBM Plex Mono',monospace;font-size:11px;padding:5px 12px;border-radius:4px;cursor:pointer;transition:all 0.2s;}
+  .viz-controls button:hover,.viz-controls button.active{border-color:var(--accent2);color:var(--accent2);}
+  canvas{display:block;border-radius:4px;width:100%;max-width:100%;}
+  .badge{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:10px;padding:2px 8px;border-radius:3px;letter-spacing:0.05em;text-transform:uppercase;font-weight:600;margin:0 2px;}
+  .badge-green{background:rgba(52,211,153,0.15);color:var(--accent);}
+  .badge-blue{background:rgba(96,165,250,0.15);color:var(--accent2);}
+  .badge-pink{background:rgba(244,114,182,0.15);color:var(--accent3);}
+  .badge-orange{background:rgba(251,146,60,0.15);color:var(--accent4);}
+  .badge-purple{background:rgba(167,139,250,0.15);color:var(--accent5);}
+  .highlight-box{background:var(--highlight);border:1px solid rgba(52,211,153,0.2);border-radius:6px;padding:1rem 1.4rem;margin:1.5rem 0;}
+  .proof-box{background:#090c14;border:1px solid var(--border);border-radius:8px;padding:1.5rem 2rem;margin:1.5rem 0;}
+  .proof-box .proof-title{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--accent5);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:1rem;border-bottom:1px solid var(--border);padding-bottom:0.5rem;}
+  .chapter-divider{height:1px;background:linear-gradient(to right,transparent,var(--border),transparent);margin:4rem 0;}
+  .site-footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-dim);letter-spacing:0.08em;}
+  .site-footer a{color:var(--accent2);text-decoration:none;}
+  @media(max-width:640px){.hero{padding:3rem 1.2rem 2rem;}.content-wrapper{padding:0 1.2rem 4rem;}.toc-grid{grid-template-columns:1fr;}.header-nav{display:none;}}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+<header class="site-header">
+  <a href="index.html" class="logo">◈ CDC ML PREP</a>
+  <nav class="header-nav">
+    <a href="index.html">Home</a>
+    <a href="#ch-why">Why RNN</a>
+    <a href="#ch-rnn">Vanilla RNN</a>
+    <a href="#ch-bptt">BPTT</a>
+    <a href="#ch-vanexp">Vanishing/Exploding</a>
+    <a href="#ch-lstm">LSTM</a>
+    <a href="#ch-gru">GRU</a>
+    <a href="#ch-birnn">Bi-RNN</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="hero-tag">Pillar 2 · Sequential Models</div>
+    <h1>Sequential Models —<br><em>RNNs, LSTMs,</em><br>GRUs & Beyond</h1>
+    <p class="hero-desc">Complete mathematical treatment of sequential architectures from scratch — why feedforward networks fail on sequences, the full BPTT derivation, exact proof of vanishing/exploding gradients with spectral radius analysis, LSTM gate mechanics, GRU simplifications, bidirectional RNNs, and deep stacked architectures. Every formula, every engineering trap, every CDC interview question.</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">Source: <span>CS224n Stanford</span></div>
+      <div class="hero-meta-item">Math depth: <span>Proof level</span></div>
+      <div class="hero-meta-item">Target: <span>Applied Scientist + NLP/ML Eng</span></div>
+    </div>
+  </section>
+
+  <div class="toc-container">
+    <div class="toc">
+      <div class="toc-title">📋 Table of Contents</div>
+      <div class="toc-grid">
+        <a href="#ch-why">Why FNNs Fail on Sequences</a>
+        <a href="#ch-rnn">Vanilla RNN — Full Math</a>
+        <a href="#ch-loss">Sequence Loss Function Anatomy</a>
+        <a href="#ch-bptt">BPTT — Full Derivation</a>
+        <a href="#ch-vanexp">Vanishing & Exploding Gradients</a>
+        <a href="#ch-spectral">Spectral Radius — Exact Threshold</a>
+        <a href="#ch-diagnose">Diagnosing Gradient Problems</a>
+        <a href="#ch-lstm">LSTM — Architecture & Proof</a>
+        <a href="#ch-lstm-why">Why LSTM Fixes Vanishing Gradients</a>
+        <a href="#ch-gru">GRU — Algorithm & Comparison</a>
+        <a href="#ch-gru-vs-lstm">GRU vs LSTM — Full Comparison</a>
+        <a href="#ch-birnn">Bidirectional RNNs</a>
+        <a href="#ch-deep">Deep Stacked RNNs</a>
+        <a href="#ch-interview">Rapid-Fire Interview Reference</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-wrapper">
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- WHY FNNs FAIL -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="chapter" id="ch-why">
+      <div class="chapter-label">Motivation</div>
+      <h2>Why Feedforward Networks Fail on Sequences</h2>
+
+      <p>Standard feedforward networks (FNNs) treat every input as independent. For images or tabular data, this is fine. But for sequential data — natural language, time-series, audio, DNA — the order and context of data matter fundamentally. Consider the sentence: <em>"The bank by the river was flooded after the river burst its bank."</em> Understanding the second "bank" depends on every word before it. FNNs have two fatal architectural limitations:</p>
+
+      <h3>Fatal Flaw 1: Fixed-Size Input</h3>
+      <p>An FNN requires a fixed-length input vector. To process text, you'd need to decide on a maximum window size \(W\) (say, 5 words) and slide it across the sequence. But:</p>
+      <ul>
+        <li>A review might be 3 words. A novel chapter might be 3,000. You can't pad/truncate both sensibly.</li>
+        <li>You lose all context outside the window — the model physically cannot see a dependency between a pronoun and its antecedent 50 words back.</li>
+      </ul>
+
+      <h3>Fatal Flaw 2: No Parameter Sharing Across Time</h3>
+      <p>Even if you fix the window size, an FNN learns separate weights for every position. The word "cat" at position 1 and "cat" at position 5 are treated as completely different features — the network must learn to recognize "cat" independently at every possible position. This is wildly inefficient and fails to generalize.</p>
+
+      <div class="highlight-box">
+        <strong>What we need:</strong> An architecture that (1) handles variable-length sequences, (2) shares parameters across all time steps, and (3) maintains a memory of what it has seen. This is the Recurrent Neural Network.
+      </div>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- VANILLA RNN -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="chapter" id="ch-rnn">
+      <div class="chapter-label">Chapter 1</div>
+      <h2>The Vanilla RNN — Full Mathematical Formulation</h2>
+
+      <h3>The Core Intuition</h3>
+      <p>An RNN processes a sequence step by step. At each time step \(t\), it receives the current input \(x_t\) <em>and</em> a hidden state \(h_{t-1}\) — a vector that encodes everything the network has seen up to time \(t-1\). This hidden state is the network's "memory." It computes a new hidden state and outputs a prediction.</p>
+
+      <h3>Mathematical Formulation</h3>
+      <p>At each time step \(t\), given input \(x_t \in \mathbb{R}^d\) and previous hidden state \(h_{t-1} \in \mathbb{R}^h\):</p>
+      <div class="math-block">
+        <span class="label">RNN Forward Pass — Full Equations</span>
+        \[ h_t = \tanh(W_{hh}\, h_{t-1} + W_{xh}\, x_t + b_h) \]
+        \[ \hat{y}_t = \text{softmax}(W_{hy}\, h_t + b_y) \]
+      </div>
+
+      <h4>Every Weight Matrix — What It Does</h4>
+      <table class="data-table">
+        <thead><tr><th>Matrix</th><th>Shape</th><th>Role</th><th>Intuition</th></tr></thead>
+        <tbody>
+          <tr><td>\(W_{hh}\)</td><td>\(h \times h\)</td><td>Hidden-to-hidden</td><td>Transforms the past memory into a form compatible with the present. <strong>This matrix is the source of all gradient pathology.</strong></td></tr>
+          <tr><td>\(W_{xh}\)</td><td>\(h \times d\)</td><td>Input-to-hidden</td><td>Projects the current input \(x_t\) into the hidden state space.</td></tr>
+          <tr><td>\(W_{hy}\)</td><td>\(|V| \times h\)</td><td>Hidden-to-output</td><td>Projects hidden state to the output space (vocabulary \(|V|\) or target space).</td></tr>
+          <tr><td>\(b_h, b_y\)</td><td>\(h, |V|\)</td><td>Bias vectors</td><td>Shift terms allowing the network to learn non-zero-mean activations.</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout insight">
+        <div class="callout-title">🔑 The Crucial Point: Parameter Sharing</div>
+        <p>The matrices \(W_{hh}\), \(W_{xh}\), \(W_{hy}\) are <strong>identical at every time step</strong> — there is exactly one copy of each, shared across all \(T\) steps. This is what allows RNNs to generalize to variable-length sequences and gives them translation equivariance over time. It is also what creates the vanishing/exploding gradient problem, as we will see.</p>
+      </div>
+
+      <h3>The Forward Algorithm — Step by Step</h3>
+      <ol class="step-list">
+        <li><div class="step-num">1</div><div><strong>Initialize:</strong> Set \(h_0 = \mathbf{0}\) (zero vector). This is the blank "memory" before seeing any input.</div></li>
+        <li><div class="step-num">2</div><div><strong>For \(t = 1\) to \(T\):</strong> Compute \(z_t = W_{hh} h_{t-1} + W_{xh} x_t + b_h\) (linear pre-activation)</div></li>
+        <li><div class="step-num">3</div><div>Apply non-linearity: \(h_t = \tanh(z_t)\)</div></li>
+        <li><div class="step-num">4</div><div>Compute output logits: \(\theta_t = W_{hy} h_t + b_y\)</div></li>
+        <li><div class="step-num">5</div><div>Produce probability distribution: \(\hat{y}_t = \text{softmax}(\theta_t)\)</div></li>
+        <li><div class="step-num">6</div><div>Compute per-step loss: \(L_t = -\sum_k y_{t,k} \log \hat{y}_{t,k}\)</div></li>
+        <li><div class="step-num">7</div><div><strong>Total loss:</strong> \(L = \sum_{t=1}^T L_t\)</div></li>
+      </ol>
+
+      <!-- RNN Unroll viz -->
+      <div class="viz-container">
+        <div class="viz-title">🔁 Interactive: RNN Unrolled Through Time</div>
+        <canvas id="rnnUnroll" height="220"></canvas>
+        <div class="viz-controls">
+          <label>Sequence length T: <input type="range" id="seqT" min="3" max="8" step="1" value="5"> <span id="seqTVal">5</span></label>
+          <button onclick="animateRNN()" id="animBtn">▶ Animate Forward Pass</button>
+          <button onclick="resetRNN()">↺ Reset</button>
+        </div>
+        <p style="margin-top:0.6rem;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-muted)">
+          Watch data flow forward (blue x→h) then the loss signal flow backward (orange). The same W<sub>hh</sub> is used at every step.
+        </p>
+      </div>
+
+      <pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># Vanilla RNN Cell — from scratch in NumPy</span>
+<span class="kw">class</span> <span class="cl">VanillaRNNCell</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, d, h):
+        <span class="cm"># Xavier initialization</span>
+        self.Whh = np.random.randn(h, h) * np.sqrt(<span class="num">1</span>/h)
+        self.Wxh = np.random.randn(h, d) * np.sqrt(<span class="num">1</span>/d)
+        self.bh  = np.zeros(h)
+    
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x_t, h_prev):
+        <span class="cm"># x_t: (d,), h_prev: (h,)</span>
+        z = self.Whh @ h_prev + self.Wxh @ x_t + self.bh
+        h_t = np.tanh(z)
+        <span class="kw">return</span> h_t, z  <span class="cm"># store z for backward pass</span>
+
+<span class="cm"># PyTorch equivalent</span>
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+rnn = nn.RNN(input_size=<span class="num">128</span>, hidden_size=<span class="num">256</span>, batch_first=<span class="kw">True</span>)
+<span class="cm"># input: (batch, seq, features) → output: (batch, seq, hidden), h_n</span><span class="lang-tag">python</span></code></pre>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- LOSS FUNCTION -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="chapter" id="ch-loss">
+      <div class="chapter-label">Loss Function Anatomy</div>
+      <h2>The Sequence Loss Function — Every Term Explained</h2>
+
+      <div class="math-block">
+        <span class="label">Total Sequence Loss (Categorical Cross-Entropy over T steps)</span>
+        \[ L = -\sum_{t=1}^{T} \sum_{k=1}^{|V|} y_{t,k} \log \hat{y}_{t,k} \]
+      </div>
+
+      <h3>Every Symbol, What It Is and Why</h3>
+      <table class="data-table">
+        <thead><tr><th>Symbol</th><th>What It Is</th><th>Intuition</th></tr></thead>
+        <tbody>
+          <tr><td>\(L\)</td><td>Total loss over the whole sequence</td><td>The single number we minimize by adjusting all weights</td></tr>
+          <tr><td>\(\sum_{t=1}^T\)</td><td>Outer sum over time steps</td><td>Sum the error at every word/token position in the sequence</td></tr>
+          <tr><td>\(\sum_{k=1}^{|V|}\)</td><td>Inner sum over vocabulary</td><td>For each time step, consider all possible words</td></tr>
+          <tr><td>\(y_{t,k}\)</td><td>Ground-truth label at step \(t\), vocab index \(k\)</td><td>One-hot: 1 for the correct word, 0 everywhere else. Mathematically collapses the inner sum to a single term.</td></tr>
+          <tr><td>\(\hat{y}_{t,k}\)</td><td>Model's predicted probability of word \(k\) at step \(t\)</td><td>The softmax output. This is what we're trying to make as large as possible for the correct word.</td></tr>
+          <tr><td>\(\log \hat{y}_{t,k}\)</td><td>Log of predicted probability</td><td>If \(\hat{y} \to 1\): \(\log(1)=0\) — perfect, no penalty. If \(\hat{y} \to 0\): \(\log(0) \to -\infty\) — infinite penalty for a confident wrong prediction.</td></tr>
+          <tr><td>The \(-\) sign</td><td>Negation</td><td>Makes the loss positive (since log probs are negative). We minimize positive loss.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>The Beautiful Collapse (Why One-Hot Simplifies Everything)</h3>
+      <p>Because \(y_{t,k} = 1\) only for the correct word index \(k^*\) and zero everywhere else, the inner sum collapses:</p>
+      <div class="math-block">
+        \[ \sum_{k=1}^{|V|} y_{t,k} \log \hat{y}_{t,k} = 1 \cdot \log \hat{y}_{t,k^*} + 0 + 0 + \cdots = \log \hat{y}_{t,k^*} \]
+        \[ \therefore\quad L_t = -\log\hat{y}_{t,\text{correct}} \]
+      </div>
+      <p>At each step, the loss is simply the negative log probability of the correct word. The model is ruthlessly penalized for assigning low confidence to the right answer.</p>
+
+      <div class="callout insight">
+        <div class="callout-title">🔑 Connection to Perplexity</div>
+        <p>In NLP, we report language model quality as <strong>Perplexity (PPL)</strong>: \(\text{PPL} = \exp\!\left(\frac{L}{T}\right)\). It's the exponential of average per-token cross-entropy loss. A perplexity of 50 means the model is "as confused as choosing uniformly among 50 words." Lower is better. State-of-the-art LLMs achieve single-digit perplexity on standard benchmarks.</p>
+      </div>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- BPTT -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="chapter" id="ch-bptt">
+      <div class="chapter-label">Chapter 2</div>
+      <h2>Backpropagation Through Time (BPTT) — Full Derivation</h2>
+
+      <p>To train an RNN, we compute \(\frac{\partial L}{\partial W_{hh}}\). Because \(W_{hh}\) is shared across all time steps, its gradient is the <em>sum</em> of its contributions from every step. This is BPTT.</p>
+
+      <h3>Step 1: Sum Contributions Across All Time Steps</h3>
+      <div class="math-block">
+        \[ \frac{\partial L}{\partial W_{hh}} = \sum_{t=1}^{T} \frac{\partial L_t}{\partial W_{hh}} \]
+      </div>
+
+      <h3>Step 2: Expand Each Term — The Chain Unrolls</h3>
+      <p>\(L_t\) depends on \(h_t\), which depends on \(h_{t-1}\), which depends on \(h_{t-2}\), all the way back to \(h_1\). The full derivative at step \(t\) requires backpropagating through every earlier step:</p>
+      <div class="math-block">
+        \[ \frac{\partial L_t}{\partial W_{hh}} = \sum_{k=1}^{t} \underbrace{\frac{\partial L_t}{\partial h_t}}_{\text{loss→}h_t} \cdot \underbrace{\prod_{j=k+1}^{t} \frac{\partial h_j}{\partial h_{j-1}}}_{\text{chain across time}} \cdot \underbrace{\frac{\partial h_k}{\partial W_{hh}}}_{\text{local weight grad}} \]
+      </div>
+
+      <h3>Step 3: The Single-Step Jacobian</h3>
+      <p>Let's compute \(\frac{\partial h_j}{\partial h_{j-1}}\). From \(h_j = \tanh(W_{hh} h_{j-1} + W_{xh} x_j + b_h)\):</p>
+      <div class="math-block">
+        <span class="label">Single-Step Jacobian</span>
+        \[ \frac{\partial h_j}{\partial h_{j-1}} = W_{hh}^T \cdot \text{diag}(\tanh'(z_j)) \]
+      </div>
+      <p>Where \(z_j = W_{hh}h_{j-1} + W_{xh}x_j + b_h\) and \(\text{diag}(\tanh'(z_j))\) is a diagonal matrix of activation derivatives. <strong>Note: \(x_j\) is treated as a constant here</strong> — when differentiating w.r.t. \(h_{j-1}\), the term \(W_{xh}x_j\) has zero derivative. This is why the input \(x_t\) has no effect on the vanishing/exploding problem — only \(W_{hh}\) drives it.</p>
+
+      <h3>Step 4: The Compounding Product — The Danger Zone</h3>
+      <div class="math-block">
+        <span class="label">The Product of Jacobians — Source of All Pathology</span>
+        \[ \prod_{j=k+1}^{t} \frac{\partial h_j}{\partial h_{j-1}} = \prod_{j=k+1}^{t} W_{hh}^T \cdot \text{diag}(\tanh'(z_j)) = (W_{hh}^T)^{t-k} \cdot \prod_{j=k+1}^{t} \text{diag}(\tanh'(z_j)) \]
+      </div>
+      <p>We are multiplying \(W_{hh}^T\) by itself \((t-k)\) times. This is where the exponential behaviour lives.</p>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- VANISHING AND EXPLODING -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="chapter" id="ch-vanexp">
+      <div class="chapter-label">Chapter 3</div>
+      <h2>Vanishing & Exploding Gradients — Mathematical Proof</h2>
+
+      <p>To understand exactly why the product \((W_{hh}^T)^{t-k}\) causes catastrophic failure, we apply a norm bound:</p>
+
+      <div class="proof-box">
+        <div class="proof-title">Proof: The Norm Bound</div>
+        <p>Using the matrix norm inequality \(\|AB\| \leq \|A\| \cdot \|B\|\), applied recursively to the product of Jacobians:</p>
+        \[ \left\|\prod_{j=k+1}^{t} \frac{\partial h_j}{\partial h_{j-1}}\right\| \leq \prod_{j=k+1}^{t} \left\|W_{hh}^T\right\| \cdot \left\|\text{diag}(\tanh'(z_j))\right\| \]
+        <p style="margin-top:0.8rem">Let \(\gamma_W\) = largest singular value (spectral norm) of \(W_{hh}\), and \(\gamma_\sigma\) = max derivative of the activation function. For \(\tanh\): \(\gamma_\sigma = 1\). Then:</p>
+        \[ \left\|\prod_{j=k+1}^{t} \frac{\partial h_j}{\partial h_{j-1}}\right\| \leq (\gamma_W \cdot \gamma_\sigma)^{t-k} \]
+        <p style="margin-top:0.8rem">This is a geometric series in \((t-k)\). Its fate is entirely determined by whether \(\gamma_W \gamma_\sigma\) is less than, greater than, or equal to 1.</p>
+      </div>
+
+      <h3>The Vanishing Case: \(\gamma_W \gamma_\sigma < 1\)</h3>
+      <p><strong>What happens physically:</strong> Every time the gradient travels backward one time step, it gets multiplied by a number less than 1. Over \(T\) steps, this is like compound decay. Example: \(\gamma_W\gamma_\sigma = 0.9\), \(T = 50\) steps:</p>
+      <div class="math-block">
+        \[ 0.9^{50} \approx 0.0052 \]
+      </div>
+      <p>The gradient at step \(t=1\) is 200 times smaller than the gradient at step \(t=50\). The early weights receive essentially zero update signal — the model cannot learn any dependency that spans more than a handful of steps.</p>
+
+      <p><strong>Physical consequence:</strong> The model becomes a short-term memory system. It can predict "The cat sat on the ___" (mat — nearby context). But it fails completely at "The trophy that sat on the large wooden shelf in the corner of the room didn't fit in the suitcase because it was too ___" (big — the pronoun resolution requires remembering "trophy," far back).</p>
+
+      <h3>The Exploding Case: \(\gamma_W \gamma_\sigma > 1\)</h3>
+      <p><strong>What happens physically:</strong> Every backward step multiplies by a number greater than 1. Example: \(\gamma_W\gamma_\sigma = 1.1\), \(T = 100\) steps:</p>
+      <div class="math-block">
+        \[ 1.1^{100} \approx 13{,}780 \]
+      </div>
+      <p>The gradient at the early layers is 13,780× larger than it should be. The optimizer update step \(W \leftarrow W - \alpha \cdot g\) becomes catastrophically large — weights jump wildly across the loss landscape, completely skipping the minimum, often producing NaN within a few batches.</p>
+
+      <!-- Gradient flow viz -->
+      <div class="viz-container">
+        <div class="viz-title">📉 Interactive: Gradient Flow — Vanishing vs Exploding</div>
+        <canvas id="gradCanvas" height="260"></canvas>
+        <div class="viz-controls">
+          <label>Spectral radius ρ: <input type="range" id="rhoSlider" min="0.5" max="1.5" step="0.01" value="0.9"> <span id="rhoVal">0.90</span></label>
+          <label>Steps T: <input type="range" id="stepsSlider" min="5" max="50" step="1" value="20"> <span id="stepsVal">20</span></label>
+        </div>
+        <p style="margin-top:0.6rem;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-muted)">
+          ρ &lt; 1: gradient vanishes exponentially. ρ = 1: stable. ρ &gt; 1: gradient explodes. Watch how quickly the signal dies or grows.
+        </p>
+      </div>
+
+      <h3>When Do Weights Actually Become Large Enough to Explode?</h3>
+      <p>This is the physical origins question. The "perfect storm" conditions:</p>
+      <ol>
+        <li><strong>Bad initialization:</strong> Standard \(\mathcal{N}(0,1)\) weights without scaling give spectral radius \(\approx \sqrt{h}\) (random matrix theory). For \(h=256\), that's 16 — already massively explosive.</li>
+        <li><strong>Long sequences:</strong> Even a spectral radius of 1.05 is harmless for \(T=5\) but catastrophic for \(T=100\): \(1.05^{100} \approx 131\).</li>
+        <li><strong>High-loss batches:</strong> A "shocking" sequence that contradicts everything learned → large \(L\) → large initial gradient → each backward step multiplies this already-large number by \(>1\).</li>
+        <li><strong>The feedback loop:</strong> The large gradient causes a large weight update → new weights have even larger spectral radius → even larger gradient next step → runaway.</li>
+      </ol>
+
+      <h3>The Fixes</h3>
+      <table class="data-table">
+        <thead><tr><th>Problem</th><th>Fix</th><th>How It Works</th><th>Limitation</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Exploding gradients</strong></td>
+            <td>Gradient Clipping</td>
+            <td>\(g \leftarrow g \cdot \min\!\left(1, \frac{\tau}{\|g\|}\right)\) — rescale gradient to have norm \(\leq \tau\). Preserves direction.</td>
+            <td>Heuristic. Doesn't solve fundamental architecture issue.</td>
+          </tr>
+          <tr>
+            <td><strong>Both</strong></td>
+            <td>Orthogonal Initialization</td>
+            <td>Initialize \(W_{hh}\) as an orthogonal matrix → spectral radius exactly 1 at start.</td>
+            <td>Only fixes init; weights drift during training.</td>
+          </tr>
+          <tr>
+            <td><strong>Vanishing gradients</strong></td>
+            <td>LSTM / GRU architectures</td>
+            <td>Replace multiplicative recurrence with additive cell state updates. Gradient of cell state w.r.t. previous cell = \(f_t\) (learned, ~1). Not matrix multiplication.</td>
+            <td>More parameters, slower per-step.</td>
+          </tr>
+          <tr>
+            <td><strong>Both</strong></td>
+            <td>L2 Weight Decay</td>
+            <td>Penalty \(\lambda\|W_{hh}\|^2\) in loss → optimizer constantly pulls weights toward smaller values → spectral radius stays near 1.</td>
+            <td>Requires careful tuning of \(\lambda\).</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- SPECTRAL RADIUS -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="chapter" id="ch-spectral">
+      <div class="chapter-label">Mathematical Deep Dive</div>
+      <h2>Spectral Radius — The Exact Trigger for Gradient Explosion</h2>
+
+      <h3>What Is an Eigenvalue?</h3>
+      <p>When a matrix \(W\) multiplies a vector \(v\), it generally rotates and scales \(v\) into a completely new direction. But for special vectors — called <strong>eigenvectors</strong> — the matrix only scales them, without changing their direction:</p>
+      <div class="math-block">
+        \[ W v = \lambda v \]
+      </div>
+      <p>\(\lambda\) is the <strong>eigenvalue</strong> — the scaling factor for that eigenvector. If \(\lambda = 2\), the vector doubles in length. If \(\lambda = 0.5\), it halves. If \(\lambda = -1\), it flips direction.</p>
+
+      <h3>The Spectral Radius</h3>
+      <div class="math-block">
+        <span class="label">Definition</span>
+        \[ \rho(W) = \max_i |\lambda_i| \]
+      </div>
+      <p>The spectral radius is the <em>maximum absolute eigenvalue</em> — the maximum "stretching power" of the matrix. No input vector can be stretched by more than \(\rho(W)\) when multiplied by \(W\).</p>
+
+      <h3>Why Repeated Multiplication Is Dominated by the Largest Eigenvalue</h3>
+      <p>When we compute \(W^n v\) (multiply by \(W\) exactly \(n\) times), by the eigendecomposition \(W = P\Lambda P^{-1}\):</p>
+      <div class="math-block">
+        \[ W^n v = P \Lambda^n P^{-1} v \]
+      </div>
+      <p>The diagonal matrix \(\Lambda^n\) has entries \(\lambda_1^n, \lambda_2^n, \ldots\). As \(n \to \infty\), the term with the largest \(|\lambda_i|\) dominates all others. The long-run behavior is entirely determined by \(\rho(W)\).</p>
+
+      <div class="callout interview">
+        <div class="callout-title">🎯 Exact Threshold Conditions</div>
+        <p>Let \(\gamma_\sigma\) = max activation derivative (\(= 1\) for tanh, \(= 0.25\) for sigmoid):</p>
+        <ul>
+          <li><strong>Vanishing:</strong> \(\rho(W_{hh}) < \frac{1}{\gamma_\sigma}\) — e.g., for tanh: \(\rho < 1\). Gradients decay as \(\rho^T \to 0\).</li>
+          <li><strong>Exploding:</strong> \(\rho(W_{hh}) > \frac{1}{\gamma_\sigma}\) — e.g., for tanh: \(\rho > 1\). Gradients grow as \(\rho^T \to \infty\).</li>
+          <li><strong>Stable:</strong> \(\rho(W_{hh}) = 1\) — gradient magnitude preserved exactly. Only orthogonal matrices guarantee this.</li>
+        </ul>
+      </div>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- DIAGNOSING -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="chapter" id="ch-diagnose">
+      <div class="chapter-label">Engineering Diagnostics</div>
+      <h2>Diagnosing Gradient Problems in Production</h2>
+
+      <p>You don't compute eigenvalues during training. You look for these symptoms:</p>
+
+      <h3>Signs of Exploding Gradients</h3>
+      <ul>
+        <li><strong>Loss → NaN:</strong> Weight overflows a 32-bit float. First sign is usually a loss spike, then NaN.</li>
+        <li><strong>Loss spikes:</strong> Smooth downward trend punctuated by sudden jumps to 10× the usual value.</li>
+        <li><strong>Gradient norm spikes:</strong> Monitor with <code>torch.nn.utils.clip_grad_norm_</code> — if you see the gradient norm jump from 2.0 to 50,000 in one batch, you have explosion.</li>
+        <li><strong>Weight values diverge:</strong> Print model weight stats each epoch — if \(\|W\|\) is growing exponentially, explosion is underway.</li>
+      </ul>
+
+      <h3>Signs of Vanishing Gradients</h3>
+      <ul>
+        <li><strong>Early layer gradient norms near zero:</strong> Logging gradient norms layer by layer (or step by step in BPTT) — the norm at step \(t=1\) is \(10^{-7}\) while step \(t=T\) is 0.5.</li>
+        <li><strong>Model fails on long-range tasks:</strong> Performs well on local context prediction but collapses on tasks requiring memory beyond ~5–10 steps.</li>
+        <li><strong>Loss plateaus immediately:</strong> The model learns short patterns in the first few epochs but then completely stalls — the gradient signal for deeper patterns is dead.</li>
+        <li><strong>"Dead" neurons in early layers:</strong> Activations in first-layer hidden states stop changing across training batches.</li>
+      </ul>
+
+      <pre><code><span class="kw">import</span> torch
+
+<span class="cm"># Monitor gradient norms during training</span>
+total_norm = <span class="num">0</span>
+<span class="kw">for</span> p <span class="kw">in</span> model.parameters():
+    <span class="kw">if</span> p.grad <span class="kw">is not</span> <span class="kw">None</span>:
+        total_norm += p.grad.data.norm(<span class="num">2</span>).item() ** <span class="num">2</span>
+total_norm = total_norm ** <span class="num">0.5</span>
+<span class="fn">print</span>(<span class="st">f"Gradient norm: {total_norm:.4f}"</span>)
+
+<span class="cm"># Gradient clipping — THE fix for exploding gradients</span>
+<span class="cm"># Call BEFORE optimizer.step()</span>
+torch.nn.utils.<span class="fn">clip_grad_norm_</span>(model.parameters(), max_norm=<span class="num">5.0</span>)
+
+<span class="cm"># Monitor per-layer grad norms</span>
+<span class="kw">for</span> name, p <span class="kw">in</span> model.named_parameters():
+    <span class="kw">if</span> p.grad <span class="kw">is not</span> <span class="kw">None</span>:
+        <span class="fn">print</span>(<span class="st">f"{name}: grad norm = {p.grad.norm():.4f}"</span>)<span class="lang-tag">python</span></code></pre>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- LSTM -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="chapter" id="ch-lstm">
+      <div class="chapter-label">Chapter 4</div>
+      <h2>Long Short-Term Memory (LSTM) — Architecture & Full Math</h2>
+
+      <p>The LSTM (Hochreiter & Schmidhuber, 1997) was the first architecture to fundamentally solve the vanishing gradient problem. Its key innovation: introduce a <strong>Cell State</strong> \(C_t\) — a separate "memory highway" that flows through time with only <em>additive</em> interactions, not multiplicative ones. Additive gradient paths have derivative 1, not shrinking toward 0.</p>
+
+      <h3>The Dual-State Architecture</h3>
+      <p>An LSTM maintains two separate state vectors at each time step:</p>
+      <ul>
+        <li><strong>Cell State \(C_t \in \mathbb{R}^h\):</strong> The long-term internal memory. Flows with minimal modification. This is the gradient highway.</li>
+        <li><strong>Hidden State \(h_t \in \mathbb{R}^h\):</strong> The filtered output — what the LSTM exposes to the next layer or the output head. A compressed, task-relevant summary of \(C_t\).</li>
+      </ul>
+
+      <h3>The Complete LSTM Equations</h3>
+      <div class="math-block">
+        <span class="label">All Six LSTM Equations</span>
+        \[ f_t = \sigma(W_f [h_{t-1}, x_t] + b_f) \quad \text{Forget Gate} \]
+        \[ i_t = \sigma(W_i [h_{t-1}, x_t] + b_i) \quad \text{Input Gate} \]
+        \[ \tilde{C}_t = \tanh(W_C [h_{t-1}, x_t] + b_C) \quad \text{Candidate Cell State} \]
+        \[ C_t = f_t \odot C_{t-1} + i_t \odot \tilde{C}_t \quad \text{Cell State Update (THE KEY EQUATION)} \]
+        \[ o_t = \sigma(W_o [h_{t-1}, x_t] + b_o) \quad \text{Output Gate} \]
+        \[ h_t = o_t \odot \tanh(C_t) \quad \text{Hidden State} \]
+      </div>
+      <p>Notation: \([h_{t-1}, x_t]\) denotes concatenation of the two vectors. \(\odot\) is element-wise (Hadamard) product. \(\sigma\) is Sigmoid. All weight matrices are learned.</p>
+
+      <h3>Every Gate — Exact Purpose and Intuition</h3>
+      <table class="data-table">
+        <thead><tr><th>Gate/State</th><th>Formula</th><th>Output Range</th><th>Physical Role</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Forget Gate \(f_t\)</strong></td>
+            <td>\(\sigma(\cdots)\)</td>
+            <td>(0, 1) per element</td>
+            <td>Looks at the current input and past hidden state, decides what fraction of <em>each element</em> of \(C_{t-1}\) to throw away. \(f_t \approx 0\): forget completely. \(f_t \approx 1\): keep perfectly. Example: when processing a new sentence, forget the previous sentence's subject.</td>
+          </tr>
+          <tr>
+            <td><strong>Input Gate \(i_t\)</strong></td>
+            <td>\(\sigma(\cdots)\)</td>
+            <td>(0, 1) per element</td>
+            <td>Decides <em>how much</em> of the candidate state \(\tilde{C}_t\) to actually write into cell memory. A modulation of importance.</td>
+          </tr>
+          <tr>
+            <td><strong>Candidate State \(\tilde{C}_t\)</strong></td>
+            <td>\(\tanh(\cdots)\)</td>
+            <td>(-1, 1) per element</td>
+            <td>The new information proposed to be written to memory. Tanh is used here (not sigmoid) because memory can increase (+) or decrease (-). Sigmoid only increases.</td>
+          </tr>
+          <tr>
+            <td><strong>Cell State Update \(C_t\)</strong></td>
+            <td>\(f_t \odot C_{t-1} + i_t \odot \tilde{C}_t\)</td>
+            <td>Unbounded</td>
+            <td><strong>The gradient highway.</strong> Old memory scaled by forget gate, plus new information scaled by input gate. This is a linear (additive) operation — gradients flow through the \(+\) sign with derivative 1.</td>
+          </tr>
+          <tr>
+            <td><strong>Output Gate \(o_t\)</strong></td>
+            <td>\(\sigma(\cdots)\)</td>
+            <td>(0, 1) per element</td>
+            <td>Decides what portion of the cell state to reveal as the hidden state output \(h_t\). The cell state might contain irrelevant long-term info — output gate filters what to expose.</td>
+          </tr>
+          <tr>
+            <td><strong>Hidden State \(h_t\)</strong></td>
+            <td>\(o_t \odot \tanh(C_t)\)</td>
+            <td>(-1, 1) per element</td>
+            <td>The filtered memory exposed to the next layer. \(\tanh(C_t)\) squashes the cell state to (-1, 1). Then \(o_t\) masks which dimensions are relevant right now.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout interview">
+        <div class="callout-title">🎯 Why Sigmoid for Gates, Tanh for Data?</div>
+        <p><strong>A:</strong> Sigmoid outputs values in (0, 1). Multiplying any vector by a Sigmoid output is a physical valve — it keeps exactly that percentage of each dimension (0 = delete, 1 = keep all). This is the semantics of "forgetting" and "remembering." Tanh is used for the cell candidate \(\tilde{C}_t\) and the output \(\tanh(C_t)\) because: (1) memory operations should be able to both add (+) and subtract (−) from stored values — tanh allows this, sigmoid doesn't. (2) tanh bounds the values to (-1,1), preventing the cell state from diverging to ±∞ over long sequences.</p>
+      </div>
+
+      <!-- LSTM viz -->
+      <div class="viz-container">
+        <div class="viz-title">🔒 Interactive: LSTM Cell — Gate Activations Through a Sequence</div>
+        <canvas id="lstmCanvas" height="280"></canvas>
+        <div class="viz-controls">
+          <label>Time step t: <input type="range" id="lstmT" min="1" max="10" step="1" value="1"> <span id="lstmTVal">1</span></label>
+          <button onclick="randomizeLSTM()">Randomize Gates</button>
+        </div>
+        <p style="margin-top:0.6rem;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-muted)">
+          Bar height = gate activation value. Watch how the cell state accumulates or forgets information at each step.
+        </p>
+      </div>
+    </section>
+
+    <section class="chapter" id="ch-lstm-why">
+      <div class="chapter-label">The Key Proof</div>
+      <h2>Why LSTM Actually Solves Vanishing Gradients</h2>
+
+      <div class="proof-box">
+        <div class="proof-title">Mathematical Proof: Gradient Through Cell State</div>
+        <p>Look at the cell state update: \(C_t = f_t \odot C_{t-1} + i_t \odot \tilde{C}_t\)</p>
+        <p style="margin-top:0.8rem">The gradient of \(C_t\) w.r.t. \(C_{t-1}\):</p>
+        \[ \frac{\partial C_t}{\partial C_{t-1}} = \text{diag}(f_t) \]
+        <p style="margin-top:0.8rem">Chaining this over multiple timesteps (backprop through time on the cell state):</p>
+        \[ \frac{\partial C_t}{\partial C_k} = \prod_{j=k+1}^{t} \text{diag}(f_j) \]
+        <p style="margin-top:0.8rem">Compare this to the vanilla RNN, where the product was \(\prod (W_{hh}^T \cdot \text{diag}(\sigma'))\) — a product of potentially large or small matrices.</p>
+        <p style="margin-top:0.8rem">In the LSTM, the product is just the <em>element-wise product of forget gate values</em>. If the forget gate learns to stay near 1 (e.g., \(f_t \approx 0.98\) for a memory that should persist), then:</p>
+        \[ \prod_{j=k+1}^{t} f_j \approx 0.98^{t-k} \]
+        <p style="margin-top:0.8rem">For \(t-k = 100\): \(0.98^{100} \approx 0.13\) — still meaningful! Compare to sigmoid's \(0.25^{100} \approx 10^{-60}\) in vanilla RNNs.</p>
+        <p style="margin-top:0.8rem; color:var(--accent)"><strong>The key insight:</strong> The forget gate is a learned per-element scalar, not a repeated matrix multiplication. The network can learn \(f_t \approx 1\) for information it wants to remember. The gradient doesn't decay exponentially — it decays only as fast as the network decides to forget.</p>
+      </div>
+
+      <h3>Parameter Count for LSTM</h3>
+      <p>An LSTM has 4 gates (\(f_t, i_t, \tilde{C}_t, o_t\)), each with input weight \(W \in \mathbb{R}^{h \times d}\), hidden weight \(U \in \mathbb{R}^{h \times h}\), and bias \(b \in \mathbb{R}^h\):</p>
+      <div class="math-block">
+        \[ \text{LSTM params} = 4 \times (h \times d + h \times h + h) = 4(hd + h^2 + h) \]
+      </div>
+
+      <pre><code><span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+<span class="kw">import</span> torch
+
+<span class="cm"># LSTM in PyTorch</span>
+lstm = nn.LSTM(
+    input_size=<span class="num">256</span>,    <span class="cm"># d: embedding dim</span>
+    hidden_size=<span class="num">512</span>,   <span class="cm"># h: hidden/cell state dim</span>
+    num_layers=<span class="num">2</span>,      <span class="cm"># stacked LSTM layers</span>
+    dropout=<span class="num">0.3</span>,       <span class="cm"># dropout between layers (not last)</span>
+    bidirectional=<span class="kw">False</span>,
+    batch_first=<span class="kw">True</span>   <span class="cm"># input: (batch, seq, feat)</span>
+)
+x = torch.randn(<span class="num">32</span>, <span class="num">100</span>, <span class="num">256</span>)   <span class="cm"># (batch=32, seq=100, feat=256)</span>
+h0 = torch.zeros(<span class="num">2</span>, <span class="num">32</span>, <span class="num">512</span>)    <span class="cm"># (num_layers, batch, hidden)</span>
+c0 = torch.zeros(<span class="num">2</span>, <span class="num">32</span>, <span class="num">512</span>)
+output, (hn, cn) = lstm(x, (h0, c0))
+<span class="cm"># output: (32, 100, 512) — all hidden states across sequence</span>
+<span class="cm"># hn: (2, 32, 512) — final hidden state, both layers</span>
+<span class="cm"># cn: (2, 32, 512) — final cell state, both layers</span>
+
+<span class="cm"># LSTM from scratch — one cell forward</span>
+<span class="kw">class</span> <span class="cl">LSTMCell</span>(nn.Module):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, d, h):
+        <span class="fn">super</span>().__init__()
+        self.W = nn.Linear(d+h, <span class="num">4</span>*h)  <span class="cm"># all 4 gates in one matrix</span>
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x, h_prev, c_prev):
+        gates = self.W(torch.cat([x, h_prev], dim=-<span class="num">1</span>))
+        f, i, g, o = gates.chunk(<span class="num">4</span>, dim=-<span class="num">1</span>)
+        f = torch.sigmoid(f); i = torch.sigmoid(i)
+        g = torch.tanh(g);    o = torch.sigmoid(o)
+        c_t = f * c_prev + i * g
+        h_t = o * torch.tanh(c_t)
+        <span class="kw">return</span> h_t, c_t<span class="lang-tag">python</span></code></pre>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- GRU -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="chapter" id="ch-gru">
+      <div class="chapter-label">Chapter 5</div>
+      <h2>Gated Recurrent Unit (GRU) — The Streamlined Alternative</h2>
+
+      <p>The GRU (Cho et al., 2014) was designed as a simpler, faster alternative to LSTM that achieves comparable performance. Its philosophy: eliminate the separate cell state, merge the forget and input gates into a single update gate.</p>
+
+      <h3>GRU Equations</h3>
+      <div class="math-block">
+        <span class="label">GRU — Three Equations</span>
+        \[ z_t = \sigma(W_z [h_{t-1}, x_t] + b_z) \quad \text{Update Gate} \]
+        \[ r_t = \sigma(W_r [h_{t-1}, x_t] + b_r) \quad \text{Reset Gate} \]
+        \[ \tilde{h}_t = \tanh(W_h [r_t \odot h_{t-1}, x_t] + b_h) \quad \text{Candidate State} \]
+        \[ h_t = (1 - z_t) \odot h_{t-1} + z_t \odot \tilde{h}_t \quad \text{Final Update (Convex Combination)} \]
+      </div>
+
+      <h3>Each GRU Gate — What It Does</h3>
+      <table class="data-table">
+        <thead><tr><th>Gate/State</th><th>Role</th><th>When \(\approx 0\)</th><th>When \(\approx 1\)</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Update Gate \(z_t\)</strong></td>
+            <td>Controls blend between old and new memory. Simultaneously acts as both forget gate and input gate — they are coupled (unlike LSTM where they're independent).</td>
+            <td>\(h_t \approx h_{t-1}\): keep old memory, ignore new input completely.</td>
+            <td>\(h_t \approx \tilde{h}_t\): completely overwrite memory with new candidate.</td>
+          </tr>
+          <tr>
+            <td><strong>Reset Gate \(r_t\)</strong></td>
+            <td>Controls how much of the past hidden state to use when computing the candidate \(\tilde{h}_t\).</td>
+            <td>Candidate ignores past: \(\tilde{h}_t = \tanh(W_h [0, x_t])\). Effectively a new fresh start.</td>
+            <td>Candidate uses full past: standard hidden state computation.</td>
+          </tr>
+          <tr>
+            <td><strong>Candidate \(\tilde{h}_t\)</strong></td>
+            <td>New information to potentially write to memory, modulated by how much of the past is relevant.</td>
+            <td colspan="2">Blend of current input and selectively-masked past hidden state.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout insight">
+        <div class="callout-title">🔑 The Convex Combination Update</div>
+        <p>The GRU update \(h_t = (1-z_t) \odot h_{t-1} + z_t \odot \tilde{h}_t\) is a <strong>convex combination</strong> — a weighted average where the weights sum to 1. This is elegant: the update gate \(z_t\) acts as a single dial between "copy the past" (\(z_t=0\)) and "use the new candidate" (\(z_t=1\)). But notice the coupling: if \(z_t = 0.8\) (heavily new), then forgetting is 0.2 — <em>you can't independently control how much to forget and how much to add</em>. LSTM can forget a lot while adding very little — GRU cannot.</p>
+      </div>
+
+      <h3>GRU Parameter Count</h3>
+      <div class="math-block">
+        \[ \text{GRU params} = 3 \times (h \times d + h \times h + h) = 3(hd + h^2 + h) \]
+      </div>
+      <p>GRU has exactly 25% fewer parameters than LSTM for the same hidden dimension — and consequently trains ~33% faster.</p>
+
+      <pre><code><span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+
+gru = nn.GRU(input_size=<span class="num">256</span>, hidden_size=<span class="num">512</span>,
+             num_layers=<span class="num">2</span>, batch_first=<span class="kw">True</span>)
+
+<span class="cm"># GRU from scratch</span>
+<span class="kw">class</span> <span class="cl">GRUCell</span>(nn.Module):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, d, h):
+        <span class="fn">super</span>().__init__()
+        self.Wz = nn.Linear(d+h, h); self.Wr = nn.Linear(d+h, h)
+        self.Wh = nn.Linear(d+h, h)
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x, h_prev):
+        combined = torch.cat([x, h_prev], dim=-<span class="num">1</span>)
+        z = torch.sigmoid(self.Wz(combined))  <span class="cm"># update gate</span>
+        r = torch.sigmoid(self.Wr(combined))  <span class="cm"># reset gate</span>
+        h_cand = torch.tanh(self.Wh(torch.cat([x, r*h_prev], dim=-<span class="num">1</span>)))
+        h_t = (<span class="num">1</span>-z)*h_prev + z*h_cand       <span class="cm"># convex combination</span>
+        <span class="kw">return</span> h_t<span class="lang-tag">python</span></code></pre>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- GRU vs LSTM -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="chapter" id="ch-gru-vs-lstm">
+      <div class="chapter-label">Full Comparison</div>
+      <h2>GRU vs LSTM — Every Dimension Compared</h2>
+
+      <table class="data-table">
+        <thead><tr><th>Dimension</th><th>LSTM</th><th>GRU</th></tr></thead>
+        <tbody>
+          <tr><td><strong>States tracked</strong></td><td>2: Cell state \(C_t\) (long-term) + Hidden state \(h_t\) (output)</td><td>1: Hidden state \(h_t\) serves both purposes</td></tr>
+          <tr><td><strong>Gate count</strong></td><td>3: Forget, Input, Output</td><td>2: Update, Reset</td></tr>
+          <tr><td><strong>Parameters (h=512, d=256)</strong></td><td>\(\approx 2.1M\)</td><td>\(\approx 1.58M\) (25% fewer)</td></tr>
+          <tr><td><strong>Forget vs Input independence</strong></td><td>✅ Independent — can forget a lot while adding very little, or vice versa</td><td>❌ Coupled via update gate — forgetting past and accepting new are inversely linked</td></tr>
+          <tr><td><strong>Training speed</strong></td><td>Slower (more matrix mults per step)</td><td>Faster (~25% fewer ops per cell)</td></tr>
+          <tr><td><strong>Overfitting risk</strong></td><td>Higher on small data (more params)</td><td>Lower — acts as structural regularizer</td></tr>
+          <tr><td><strong>Long-sequence performance</strong></td><td>Generally better — decoupled cell state is a stronger gradient highway</td><td>Slightly worse on very long sequences (&gt;200 steps)</td></tr>
+          <tr><td><strong>Best use case</strong></td><td>Large data, complex long-range dependencies (machine translation, speech recognition)</td><td>Limited compute/data, shorter sequences, faster iteration</td></tr>
+          <tr><td><strong>Empirical winner</strong></td><td>Roughly tied across standard NLP benchmarks (task-dependent)</td><td>Often matches LSTM at 75% the compute cost</td></tr>
+        </tbody>
+      </table>
+
+      <!-- GRU vs LSTM viz -->
+      <div class="viz-container">
+        <div class="viz-title">⚖️ Interactive: GRU vs LSTM — Information Flow Side by Side</div>
+        <canvas id="compCanvas" height="300"></canvas>
+        <div class="viz-controls">
+          <label>Sequence step t: <input type="range" id="compT" min="1" max="8" step="1" value="3"> <span id="compTVal">3</span></label>
+        </div>
+        <p style="margin-top:0.6rem;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-muted)">
+          Left: LSTM dual-state flow. Right: GRU single-state flow. Notice LSTM has a separate \(C_t\) highway.
+        </p>
+      </div>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- BIDIRECTIONAL RNN -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="chapter" id="ch-birnn">
+      <div class="chapter-label">Chapter 6</div>
+      <h2>Bidirectional RNNs — Seeing the Full Context</h2>
+
+      <p>A standard RNN at step \(t\) only sees the past: \(x_1, x_2, \ldots, x_t\). For many NLP tasks, this is insufficient. To classify the sentiment of a sentence, you need to read the whole sentence. To fill a masked word, you need both left and right context.</p>
+      <p>A <strong>Bidirectional RNN</strong> runs two independent RNNs simultaneously: a forward pass (left→right) and a backward pass (right→left). The final representation at each position concatenates both.</p>
+
+      <h3>Full Equations Including \(x_t\)</h3>
+      <p>A common source of confusion: textbooks often omit \(x_t\) from the bi-RNN equations to emphasize the directional contrast. Here are the complete formulas:</p>
+
+      <div class="math-block">
+        <span class="label">Complete Bidirectional RNN Equations</span>
+        \[ \overrightarrow{h}_t = \tanh\!\left(W_{\overrightarrow{h}\overrightarrow{h}}\,\overrightarrow{h}_{t-1} + W_{x\overrightarrow{h}}\,x_t + b_{\overrightarrow{h}}\right) \quad \text{(Forward: processes past + present)} \]
+        \[ \overleftarrow{h}_t = \tanh\!\left(W_{\overleftarrow{h}\overleftarrow{h}}\,\overleftarrow{h}_{t+1} + W_{x\overleftarrow{h}}\,x_t + b_{\overleftarrow{h}}\right) \quad \text{(Backward: processes future + present)} \]
+        \[ h_t = \left[\overrightarrow{h}_t;\,\overleftarrow{h}_t\right] \quad \text{(Concatenation at each position)} \]
+        \[ \hat{y}_t = \text{softmax}(W_g\,h_t + b_g) \]
+      </div>
+
+      <div class="callout warning">
+        <div class="callout-title">⚠️ Why \(x_t\) Disappears in Gradient Proofs</div>
+        <p>When computing \(\frac{\partial h_j}{\partial h_{j-1}}\), the term \(W_{xh} x_t\) is treated as a constant (we differentiate w.r.t. \(h_{j-1}\), not \(x_t\)). So \(x_t\) vanishes from the Jacobian product. This means: <strong>the input sequence has zero effect on the vanishing/exploding gradient problem.</strong> Everything is driven by the spectral radius of \(W_{hh}\). The input just shifts the pre-activation value \(z_t\) — it cannot prevent the multiplicative chain from collapsing or exploding.</p>
+      </div>
+
+      <h3>Why Bi-RNN Cannot Be Used for Autoregressive Generation</h3>
+      <p>The backward pass requires reading the entire sequence before computing \(\overleftarrow{h}_1\). You can't predict the next token during generation because you don't have future tokens yet. Bi-RNNs are encoder models only — they read and encode full sequences (like BERT) but cannot generate text token by token (like GPT).</p>
+
+      <pre><code><span class="cm"># Bidirectional LSTM</span>
+bi_lstm = nn.LSTM(
+    input_size=<span class="num">256</span>, hidden_size=<span class="num">512</span>,
+    num_layers=<span class="num">2</span>,
+    bidirectional=<span class="kw">True</span>,   <span class="cm"># KEY FLAG</span>
+    batch_first=<span class="kw">True</span>
+)
+x = torch.randn(<span class="num">32</span>, <span class="num">100</span>, <span class="num">256</span>)
+h0 = torch.zeros(<span class="num">4</span>, <span class="num">32</span>, <span class="num">512</span>)   <span class="cm"># num_layers * 2 (both directions)</span>
+c0 = torch.zeros(<span class="num">4</span>, <span class="num">32</span>, <span class="num">512</span>)
+out, (hn, cn) = bi_lstm(x, (h0, c0))
+<span class="cm"># out: (32, 100, 1024) — 512*2 because both directions are concatenated</span>
+<span class="cm"># hn: (4, 32, 512) — [fwd_layer1, bkwd_layer1, fwd_layer2, bkwd_layer2]</span><span class="lang-tag">python</span></code></pre>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- DEEP STACKED -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="chapter" id="ch-deep">
+      <div class="chapter-label">Chapter 7</div>
+      <h2>Deep Stacked RNNs & Architecture Variants</h2>
+
+      <h3>Multi-Layer Stacked RNNs</h3>
+      <p>The hidden states of one RNN layer become the input sequence of the next. A depth-\(L\) stacked RNN:</p>
+      <div class="math-block">
+        \[ h_t^{[l]} = \text{RNN}^{[l]}\!\left(h_t^{[l-1]},\, h_{t-1}^{[l]}\right) \quad l = 1, \ldots, L \]
+      </div>
+      <p>Layer 1 processes the raw input sequence. Layer 2 processes the sequence of hidden states from Layer 1. Each layer can learn increasingly abstract temporal patterns (similar to how CNN layers learn increasingly abstract spatial features).</p>
+
+      <h3>Sequence-to-Sequence (Seq2Seq) Models</h3>
+      <p>For tasks like machine translation, where input and output are both sequences of potentially different lengths, we use an Encoder-Decoder architecture:</p>
+      <ul>
+        <li><strong>Encoder:</strong> A stacked RNN that reads the source sentence and compresses it into a fixed-size <em>context vector</em> \(c = h_T^{encoder}\) (the final hidden state).</li>
+        <li><strong>Decoder:</strong> A separate RNN initialized with \(c\), which generates the target sequence token by token autoregressively.</li>
+      </ul>
+
+      <div class="callout warning">
+        <div class="callout-title">⚠️ The Information Bottleneck Problem</div>
+        <p>The context vector \(c\) must encode the <em>entire</em> source sequence into a fixed-size vector (e.g., 512 dimensions). For long sentences, this bottleneck loses critical information from early parts of the sentence. This is why vanilla Seq2Seq models fail on long sequences — and why the <strong>Attention Mechanism</strong> was invented as the fix.</p>
+      </div>
+
+      <table class="data-table">
+        <thead><tr><th>Architecture</th><th>Reads</th><th>Generates</th><th>Use Cases</th></tr></thead>
+        <tbody>
+          <tr><td><strong>One-to-One</strong></td><td>1 input</td><td>1 output</td><td>Standard classification (not really an RNN use case)</td></tr>
+          <tr><td><strong>One-to-Many</strong></td><td>1 input (seed)</td><td>Sequence</td><td>Image captioning, music generation</td></tr>
+          <tr><td><strong>Many-to-One</strong></td><td>Sequence</td><td>1 output</td><td>Sentiment analysis, document classification</td></tr>
+          <tr><td><strong>Many-to-Many (synced)</strong></td><td>Sequence</td><td>Sequence (same length)</td><td>POS tagging, NER, frame-level video labeling</td></tr>
+          <tr><td><strong>Many-to-Many (Seq2Seq)</strong></td><td>Sequence</td><td>Sequence (different length)</td><td>Machine translation, summarization, speech recognition</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <div class="chapter-divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- INTERVIEW REFERENCE -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="chapter" id="ch-interview">
+      <div class="chapter-label">CDC Interview Bank</div>
+      <h2>Rapid-Fire Interview Reference — Sequential Models</h2>
+
+      <div class="qa-block">
+        <div class="qa-q">Explain the vanishing gradient problem in RNNs from first principles. What is the exact mathematical condition?</div>
+        <div class="qa-a">The gradient of the loss w.r.t. the hidden state at step \(k\) requires the product \(\prod_{j=k+1}^{T} W_{hh}^T \cdot \text{diag}(\tanh'(z_j))\). This is the same matrix \(W_{hh}^T\) raised to power \((T-k)\). The fate of this product is determined by the spectral radius \(\rho(W_{hh})\): if \(\rho < 1\) (and \(\tanh'\) is always \(\leq 1\)), the product decays as \(\rho^{T-k} \to 0\) exponentially. Early layers receive gradient ≈ 0 and stop learning. The model can't learn dependencies beyond ~5-10 steps. The exact condition: \(\rho(W_{hh}) \cdot \gamma_\sigma < 1\) where \(\gamma_\sigma\) is the max activation derivative.</div>
+      </div>
+
+      <div class="qa-block">
+        <div class="qa-q">Why doesn't the input \(x_t\) affect the vanishing gradient problem?</div>
+        <div class="qa-a">When computing \(\frac{\partial h_j}{\partial h_{j-1}}\), we differentiate \(\tanh(W_{hh}h_{j-1} + W_{xh}x_j + b)\) with respect to \(h_{j-1}\). The term \(W_{xh}x_j\) is a constant w.r.t. \(h_{j-1}\) — its derivative is zero. So \(x_j\) entirely disappears from the Jacobian. The compounding product only contains \(W_{hh}^T\) and activation derivatives — never \(W_{xh}\) or \(x_t\). The input only shifts the pre-activation \(z_t\), affecting which regime of \(\tanh\) we're in (which changes the magnitude of \(\tanh'\)), but this is a second-order effect compared to the repeated \(W_{hh}\) multiplication.</div>
+      </div>
+
+      <div class="qa-block">
+        <div class="qa-q">How exactly does LSTM solve the vanishing gradient problem? Show the math.</div>
+        <div class="qa-a">The LSTM cell state update is \(C_t = f_t \odot C_{t-1} + i_t \odot \tilde{C}_t\). The gradient of \(C_t\) w.r.t. \(C_{t-1}\) is \(\text{diag}(f_t)\) — just the forget gate values, not a matrix multiplication. Chaining across time: \(\frac{\partial C_t}{\partial C_k} = \prod_{j=k+1}^{t} \text{diag}(f_j)\). If the network learns to keep \(f_t \approx 0.98\) for long-term memories, the product decays as \(0.98^{100} \approx 0.13\) — still meaningful, vs. sigmoid's \(0.25^{100} \approx 10^{-60}\). The critical difference: the forget gate is a <em>learned per-element scalar</em>, not a fixed matrix repeated multiplicatively. The network controls the decay rate by learning the forget gate values.</div>
+      </div>
+
+      <div class="qa-block">
+        <div class="qa-q">What is the fundamental mathematical difference between how GRU and LSTM handle the forget-input relationship?</div>
+        <div class="qa-a">LSTM has independent forget gate \(f_t\) and input gate \(i_t\): the network can forget a lot of old memory while adding very little new information, or vice versa. This independent control is powerful for tasks like subject-verb agreement across long parenthetical phrases. GRU uses a single update gate \(z_t\) in a convex combination: \(h_t = (1-z_t) \odot h_{t-1} + z_t \odot \tilde{h}_t\). Forgetting old memory (\(z_t \approx 1\)) is mathematically coupled to accepting new information — if you forget 80%, you must accept 80% of the new candidate. You cannot forget a lot while updating a little. For most practical tasks this coupling is harmless, but it's a fundamental architectural constraint that can hurt on tasks requiring very selective memory management.</div>
+      </div>
+
+      <div class="qa-block">
+        <div class="qa-q">Why can a Bidirectional RNN not be used for text generation?</div>
+        <div class="qa-a">Autoregressive text generation requires predicting token \(t+1\) having seen only tokens \(1, \ldots, t\) — the future doesn't exist yet. The backward pass of a Bi-RNN processes the sequence right-to-left and requires the entire sequence to be available before computing \(\overleftarrow{h}_1\). At generation time, you're producing tokens one by one — you don't have the future tokens needed to run the backward pass. Bi-RNNs are encoder-only architectures (like BERT's foundation), designed for understanding/encoding full sequences. Uni-directional decoder RNNs (or Transformers with causal masking) are used for generation.</div>
+      </div>
+
+      <div class="qa-block">
+        <div class="qa-q">What are the physical "perfect storm" conditions that cause gradient explosion?</div>
+        <div class="qa-a">Three necessary conditions: (1) <strong>Spectral radius &gt; 1</strong> — usually from standard \(\mathcal{N}(0,1)\) weight initialization where \(\rho(W_{hh}) \approx \sqrt{h}\). For \(h=256\), that's 16. Fix: Orthogonal initialization sets \(\rho = 1\) by construction. (2) <strong>Long sequences</strong> — even \(\rho=1.05\) is harmless at \(T=5\) but catastrophic at \(T=100\): \(1.05^{100} \approx 131\). (3) <strong>High-loss batches</strong> — an outlier sequence that contradicts learned knowledge creates large initial \(\frac{\partial L}{\partial h_T}\), which gets amplified by each backward step. The feedback loop: large gradient → large weight update → larger spectral radius → even larger gradient. Fixes: gradient clipping (safety valve), orthogonal init (prevents the problem starting), L2 regularization (keeps weights small during training).</div>
+      </div>
+
+      <div class="qa-block">
+        <div class="qa-q">If you could only pick one between GRU and LSTM for a new project, how do you decide?</div>
+        <div class="qa-a">The decision matrix: (1) <strong>Dataset size</strong> — if &lt;50K sequences, use GRU. Fewer parameters → less overfitting, faster convergence. (2) <strong>Sequence length</strong> — if sequences routinely exceed 200 steps and the task requires long-range memory (e.g., co-reference resolution across paragraphs), lean toward LSTM. The decoupled cell state is a stronger gradient highway. (3) <strong>Compute budget</strong> — GRU trains 25–30% faster for same hidden dim. If training budget is limited, GRU gets you more experiments. (4) <strong>Task structure</strong> — if you need to independently control "how much to forget" vs "how much to add," LSTM's architectural flexibility matters. For standard tasks (sentiment, NER, language modeling), they're empirically roughly equivalent. My default starting point: GRU first (fast iteration), switch to LSTM if performance plateaus on long-range tasks.</div>
+      </div>
+
+      <div class="qa-block">
+        <div class="qa-q">What is the information bottleneck problem in Seq2Seq models and how does attention solve it?</div>
+        <div class="qa-a">A Seq2Seq encoder compresses an entire variable-length source sequence into one fixed-size vector \(c = h_T\) (typically 512 or 1024 dimensions). For a 50-word sentence, this one vector must encode all semantic, syntactic, and positional information. Early words' information is increasingly diluted by later updates — the RNN effectively forgets them. The decoder must generate an entire translation from this single bottleneck vector. Attention (Bahdanau, 2015) removes the bottleneck: instead of a single \(c\), the decoder has access to all encoder hidden states \(\{h_1^{enc}, \ldots, h_T^{enc}\}\). At each decoder step \(t\), it computes attention scores \(\alpha_{ts} = \text{softmax}(f(h_t^{dec}, h_s^{enc}))\) and uses a weighted sum \(c_t = \sum_s \alpha_{ts} h_s^{enc}\) as the context. The model learns to "attend to" the most relevant source positions at each generation step, completely bypassing the bottleneck.</div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <a href="index.html">◈ CDC ML PREP</a> &nbsp;·&nbsp; Sequential Models — RNNs, LSTMs, GRUs &nbsp;·&nbsp; Based on CS224n Stanford
+</footer>
+
+<script>
+window.addEventListener('scroll',()=>{
+  const h=document.documentElement;
+  document.getElementById('progressBar').style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%';
+});
+
+// ─── RNN UNROLL VIZ ───
+const unrollCanvas=document.getElementById('rnnUnroll');
+const unrollCtx=unrollCanvas.getContext('2d');
+let animStep=-1, animInterval=null;
+
+function drawUnroll(highlight=-1, backStep=-1){
+  const W=unrollCanvas.width=unrollCanvas.offsetWidth; const H=220; unrollCanvas.height=H;
+  unrollCtx.clearRect(0,0,W,H);
+  const T=parseInt(document.getElementById('seqT').value);
+  document.getElementById('seqTVal').textContent=T;
+  const pad=20; const bw=(W-2*pad)/T; const bh=50; const by=H/2-bh/2;
+  const bx=t=>pad+t*bw+bw/2;
+
+  // Draw h0
+  unrollCtx.fillStyle='rgba(94,234,212,0.12)'; unrollCtx.fillRect(pad-15,by,30,bh);
+  unrollCtx.strokeStyle='#2dd4bf'; unrollCtx.lineWidth=1.5; unrollCtx.strokeRect(pad-15,by,30,bh);
+  unrollCtx.fillStyle='#2dd4bf'; unrollCtx.font='10px IBM Plex Mono'; unrollCtx.textAlign='center';
+  unrollCtx.fillText('h₀',pad,H/2+4);
+
+  for(let t=0;t<T;t++){
+    const x=bx(t); const active=t<=highlight;
+    // Cell box
+    unrollCtx.fillStyle=active?'rgba(52,211,153,0.2)':'rgba(52,211,153,0.07)';
+    unrollCtx.fillRect(x-25,by,50,bh);
+    unrollCtx.strokeStyle=active?'#34d399':'#1a4032'; unrollCtx.lineWidth=active?2:1;
+    unrollCtx.strokeRect(x-25,by,50,bh);
+    unrollCtx.fillStyle=active?'#34d399':'#4b6b5a'; unrollCtx.font='10px IBM Plex Mono';
+    unrollCtx.fillText('W',x,H/2);
+    unrollCtx.font='8px IBM Plex Mono';
+    unrollCtx.fillText(`t=${t+1}`,x,H/2+14);
+
+    // x_t arrow (below)
+    unrollCtx.strokeStyle='#60a5fa'; unrollCtx.lineWidth=1.5;
+    unrollCtx.beginPath(); unrollCtx.moveTo(x,H-20); unrollCtx.lineTo(x,by+bh); unrollCtx.stroke();
+    unrollCtx.fillStyle='#60a5fa'; unrollCtx.font='9px IBM Plex Mono';
+    unrollCtx.fillText(`x${t+1}`,x,H-8);
+
+    // h_t arrow (above)
+    unrollCtx.strokeStyle='#4ade80'; unrollCtx.lineWidth=active?2:1;
+    unrollCtx.beginPath(); unrollCtx.moveTo(x,by); unrollCtx.lineTo(x,15); unrollCtx.stroke();
+    unrollCtx.fillStyle='#4ade80'; unrollCtx.font='9px IBM Plex Mono';
+    unrollCtx.fillText(`ŷ${t+1}`,x,12);
+
+    // Horizontal h arrow
+    if(t<T-1){
+      const nx=bx(t+1);
+      unrollCtx.strokeStyle=active?'#f472b6':'#3a2040'; unrollCtx.lineWidth=active?2:1;
+      unrollCtx.beginPath(); unrollCtx.moveTo(x+25,H/2); unrollCtx.lineTo(nx-25,H/2); unrollCtx.stroke();
+    }
+
+    // Backward gradient arrows
+    if(backStep>=0&&t>=T-1-backStep&&t<T){
+      const alpha=1-(T-1-t)*0.15;
+      unrollCtx.strokeStyle=`rgba(251,146,60,${Math.max(0.2,alpha)})`; unrollCtx.lineWidth=2;
+      unrollCtx.setLineDash([4,4]);
+      if(t>0){
+        const px=bx(t-1);
+        unrollCtx.beginPath(); unrollCtx.moveTo(x-25,H/2+5); unrollCtx.lineTo(px+25,H/2+5); unrollCtx.stroke();
+      }
+      unrollCtx.setLineDash([]);
+    }
+  }
+  unrollCtx.textAlign='left';
+}
+
+function animateRNN(){
+  if(animInterval) clearInterval(animInterval);
+  animStep=-1;
+  const T=parseInt(document.getElementById('seqT').value);
+  document.getElementById('animBtn').textContent='⏸ Animating...';
+  animInterval=setInterval(()=>{
+    animStep++;
+    if(animStep<=T+T){
+      if(animStep<=T) drawUnroll(animStep,-1);
+      else drawUnroll(T,animStep-T);
+    } else {
+      clearInterval(animInterval);
+      document.getElementById('animBtn').textContent='▶ Animate Forward Pass';
+    }
+  },400);
+}
+function resetRNN(){
+  if(animInterval) clearInterval(animInterval);
+  animStep=-1; drawUnroll(-1,-1);
+  document.getElementById('animBtn').textContent='▶ Animate Forward Pass';
+}
+document.getElementById('seqT').addEventListener('input',()=>drawUnroll(-1,-1));
+window.addEventListener('resize',()=>drawUnroll(-1,-1));
+setTimeout(()=>drawUnroll(-1,-1),100);
+
+// ─── GRADIENT FLOW VIZ ───
+const gradCanvas=document.getElementById('gradCanvas');
+const gradCtx=gradCanvas.getContext('2d');
+
+function drawGrad(){
+  const W=gradCanvas.width=gradCanvas.offsetWidth; const H=260; gradCanvas.height=H;
+  gradCtx.clearRect(0,0,W,H);
+  const rho=parseFloat(document.getElementById('rhoSlider').value);
+  const T=parseInt(document.getElementById('stepsSlider').value);
+  document.getElementById('rhoVal').textContent=rho.toFixed(2);
+  document.getElementById('stepsVal').textContent=T;
+
+  const pad={l:55,r:20,t:20,b:40}; const cw=W-pad.l-pad.r; const ch=H-pad.t-pad.b;
+  const sx=t=>pad.l+t*cw/T;
+  const vals=Array.from({length:T+1},(_,k)=>Math.min(1000,Math.max(1e-10,Math.pow(rho,k))));
+  const maxV=Math.max(...vals); const minV=Math.min(...vals);
+
+  // Use log scale for display
+  const logMax=Math.log10(Math.max(maxV,1e-3)); const logMin=Math.log10(Math.min(minV,1));
+  const logRange=Math.max(0.1,logMax-logMin);
+  const sy=v=>{
+    const lv=Math.log10(Math.max(1e-10,Math.min(1000,v)));
+    return pad.t+ch*(1-(lv-logMin)/logRange);
+  };
+
+  // Grid
+  gradCtx.strokeStyle='#1a2030'; gradCtx.lineWidth=1;
+  [0.001,0.01,0.1,1,10,100].forEach(v=>{
+    if(v<minV*0.5||v>maxV*2) return;
+    gradCtx.beginPath(); gradCtx.moveTo(pad.l,sy(v)); gradCtx.lineTo(W-pad.r,sy(v)); gradCtx.stroke();
+    gradCtx.fillStyle='#475569'; gradCtx.font='9px IBM Plex Mono'; gradCtx.textAlign='right';
+    gradCtx.fillText(v<0.01?v.toExponential(0):v,pad.l-4,sy(v)+4);
+  });
+
+  // Reference line at 1
+  const y1=sy(1);
+  gradCtx.strokeStyle='rgba(94,234,212,0.4)'; gradCtx.setLineDash([5,5]);
+  gradCtx.beginPath(); gradCtx.moveTo(pad.l,y1); gradCtx.lineTo(W-pad.r,y1); gradCtx.stroke();
+  gradCtx.setLineDash([]);
+  gradCtx.fillStyle='#2dd4bf'; gradCtx.font='9px IBM Plex Mono'; gradCtx.textAlign='right';
+  gradCtx.fillText('=1',pad.l-4,y1+4);
+
+  // Gradient curve
+  const col=rho<0.99?'#60a5fa':rho>1.01?'#f472b6':'#34d399';
+  gradCtx.strokeStyle=col; gradCtx.lineWidth=2.5;
+  gradCtx.beginPath();
+  vals.forEach((v,k)=>{
+    const x=sx(k); const y=sy(v);
+    k===0?gradCtx.moveTo(x,y):gradCtx.lineTo(x,y);
+  });
+  gradCtx.stroke();
+
+  // Points
+  vals.forEach((v,k)=>{
+    gradCtx.beginPath(); gradCtx.arc(sx(k),sy(v),3,0,Math.PI*2);
+    gradCtx.fillStyle=col; gradCtx.fill();
+  });
+
+  // Status label
+  gradCtx.fillStyle=col; gradCtx.font='bold 11px IBM Plex Mono'; gradCtx.textAlign='left';
+  const status=rho<0.99?`Vanishing: ρ^T = ${Math.pow(rho,T).toExponential(2)}`:
+                rho>1.01?`Exploding: ρ^T = ${Math.pow(rho,T).toFixed(1)}`:
+                `Stable: ρ=1, ρ^T = 1.0`;
+  gradCtx.fillText(status,pad.l+10,pad.t+20);
+  gradCtx.textAlign='left';
+  gradCtx.fillStyle='#94a3b8'; gradCtx.font='10px IBM Plex Mono';
+  gradCtx.fillText('Steps (T) →',W-pad.r-80,H-pad.b+14);
+  gradCtx.save(); gradCtx.translate(12,H/2); gradCtx.rotate(-Math.PI/2);
+  gradCtx.fillText('|gradient|',0,0); gradCtx.restore();
+}
+document.getElementById('rhoSlider').addEventListener('input',drawGrad);
+document.getElementById('stepsSlider').addEventListener('input',drawGrad);
+window.addEventListener('resize',drawGrad);
+setTimeout(drawGrad,300);
+
+// ─── LSTM GATES VIZ ───
+const lstmCanvas=document.getElementById('lstmCanvas');
+const lstmCtx=lstmCanvas.getContext('2d');
+let lstmGates=[];
+
+function randomizeLSTM(){
+  const T=10;
+  lstmGates=Array.from({length:T},()=>({
+    f:0.4+Math.random()*0.55, i:Math.random()*0.7,
+    o:0.3+Math.random()*0.65, c:0
+  }));
+  // Compute cell states
+  let c=0;
+  lstmGates.forEach(g=>{
+    c=g.f*c+g.i*(Math.random()*2-1);
+    g.c=Math.tanh(c);
+  });
+  drawLSTM();
+}
+
+function drawLSTM(){
+  const W=lstmCanvas.width=lstmCanvas.offsetWidth; const H=280; lstmCanvas.height=H;
+  lstmCtx.clearRect(0,0,W,H);
+  const t=parseInt(document.getElementById('lstmT').value)-1;
+  document.getElementById('lstmTVal').textContent=t+1;
+  if(!lstmGates.length) randomizeLSTM();
+  const g=lstmGates[t];
+
+  const labels=[['Forget Gate f_t','Delete old memory','#f472b6',g.f],
+                ['Input Gate i_t','Write new info','#60a5fa',g.i],
+                ['Output Gate o_t','Expose to output','#34d399',g.o],
+                ['Cell State |tanh(C_t)|','Long-term memory','#fbbf24',Math.abs(g.c)]];
+  const bw=Math.min((W-60)/labels.length, 100);
+  const maxH=140; const baseY=H-50;
+
+  labels.forEach(([name,desc,col,val],i)=>{
+    const x=30+i*(bw+8)+bw/2; const barH=val*maxH;
+    // Background
+    lstmCtx.fillStyle='rgba(255,255,255,0.04)';
+    lstmCtx.fillRect(x-bw/2+2,baseY-maxH,bw-4,maxH);
+    // Bar
+    lstmCtx.fillStyle=col.replace(')',',0.7)').replace('rgb','rgba').replace('#','');
+    const gradient=lstmCtx.createLinearGradient(0,baseY-barH,0,baseY);
+    gradient.addColorStop(0,col);
+    gradient.addColorStop(1,col+'33');
+    lstmCtx.fillStyle=gradient;
+    lstmCtx.fillRect(x-bw/2+2,baseY-barH,bw-4,barH);
+    lstmCtx.strokeStyle=col; lstmCtx.lineWidth=1.5; lstmCtx.strokeRect(x-bw/2+2,baseY-maxH,bw-4,maxH);
+
+    // Value label
+    lstmCtx.fillStyle='#fff'; lstmCtx.font='bold 11px IBM Plex Mono'; lstmCtx.textAlign='center';
+    lstmCtx.fillText(val.toFixed(2),x,baseY-barH-6);
+    // Gate name
+    lstmCtx.fillStyle=col; lstmCtx.font='9px IBM Plex Mono';
+    lstmCtx.fillText(name.split(' ')[0],x,baseY+14);
+    lstmCtx.fillStyle='#94a3b8'; lstmCtx.font='9px IBM Plex Mono';
+    lstmCtx.fillText(desc,x,baseY+26);
+  });
+
+  lstmCtx.fillStyle='#94a3b8'; lstmCtx.font='10px IBM Plex Mono'; lstmCtx.textAlign='center';
+  lstmCtx.fillText(`Time step t=${t+1} | Gate activations at this step`,W/2,20);
+  lstmCtx.textAlign='left';
+}
+
+document.getElementById('lstmT').addEventListener('input',drawLSTM);
+window.addEventListener('resize',drawLSTM);
+setTimeout(()=>{randomizeLSTM();},500);
+
+// ─── COMPARISON VIZ ───
+const compCanvas=document.getElementById('compCanvas');
+const compCtx=compCanvas.getContext('2d');
+
+function drawComp(){
+  const W=compCanvas.width=compCanvas.offsetWidth; const H=300; compCanvas.height=H;
+  compCtx.clearRect(0,0,W,H);
+  const t=parseInt(document.getElementById('compT').value);
+  document.getElementById('compTVal').textContent=t;
+
+  // LSTM side (left half)
+  const lx=W*0.25; const ly=H/2;
+  // Cell state (horizontal highway)
+  compCtx.strokeStyle='#fbbf24'; compCtx.lineWidth=3;
+  compCtx.beginPath(); compCtx.moveTo(20,ly-40); compCtx.lineTo(W/2-20,ly-40); compCtx.stroke();
+  compCtx.fillStyle='#fbbf24'; compCtx.font='10px IBM Plex Mono'; compCtx.textAlign='left';
+  compCtx.fillText('C_{t-1} → Cell State Highway → C_t',25,ly-45);
+
+  // LSTM boxes
+  ['f_t (forget)','i_t (input)','C̃_t (cand)','o_t (output)'].forEach((name,i)=>{
+    const bx=30+i*55; const by=ly-10;
+    const cols=['#f472b6','#60a5fa','#34d399','#a78bfa'];
+    compCtx.fillStyle=cols[i].replace('#','')+'33'; // quick alpha
+    compCtx.fillStyle=cols[i]+'22';
+    compCtx.fillRect(bx,by,45,20);
+    compCtx.strokeStyle=cols[i]; compCtx.lineWidth=1.5; compCtx.strokeRect(bx,by,45,20);
+    compCtx.fillStyle=cols[i]; compCtx.font='7px IBM Plex Mono'; compCtx.textAlign='center';
+    compCtx.fillText(name,bx+22,by+13);
+    // Connection to highway
+    compCtx.strokeStyle=cols[i]; compCtx.lineWidth=1;
+    compCtx.beginPath(); compCtx.moveTo(bx+22,by); compCtx.lineTo(bx+22,ly-40); compCtx.stroke();
+  });
+  compCtx.fillStyle='#e2e8f0'; compCtx.font='bold 11px IBM Plex Mono'; compCtx.textAlign='center';
+  compCtx.fillText('LSTM',W/4,H-20);
+  compCtx.fillStyle='#94a3b8'; compCtx.font='9px IBM Plex Mono';
+  compCtx.fillText('Dual state: Ct + ht',W/4,H-8);
+
+  // GRU side (right half)
+  const gx=W*0.75; const gy=H/2;
+  compCtx.strokeStyle='#34d399'; compCtx.lineWidth=3;
+  compCtx.beginPath(); compCtx.moveTo(W/2+20,gy); compCtx.lineTo(W-20,gy); compCtx.stroke();
+  compCtx.fillStyle='#34d399'; compCtx.font='10px IBM Plex Mono'; compCtx.textAlign='left';
+  compCtx.fillText('h_{t-1} → Single Hidden State → h_t',W/2+25,gy-8);
+
+  // GRU boxes
+  ['z_t (update)','r_t (reset)','h̃_t (cand)'].forEach((name,i)=>{
+    const bx=W/2+30+i*65; const by=gy+20;
+    const cols=['#60a5fa','#f472b6','#34d399'];
+    compCtx.fillStyle=cols[i]+'22';
+    compCtx.fillRect(bx,by,55,20);
+    compCtx.strokeStyle=cols[i]; compCtx.lineWidth=1.5; compCtx.strokeRect(bx,by,55,20);
+    compCtx.fillStyle=cols[i]; compCtx.font='7px IBM Plex Mono'; compCtx.textAlign='center';
+    compCtx.fillText(name,bx+27,by+13);
+    compCtx.strokeStyle=cols[i]; compCtx.lineWidth=1;
+    compCtx.beginPath(); compCtx.moveTo(bx+27,by); compCtx.lineTo(bx+27,gy); compCtx.stroke();
+  });
+  compCtx.fillStyle='#e2e8f0'; compCtx.font='bold 11px IBM Plex Mono'; compCtx.textAlign='center';
+  compCtx.fillText('GRU',W*0.75,H-20);
+  compCtx.fillStyle='#94a3b8'; compCtx.font='9px IBM Plex Mono';
+  compCtx.fillText('Single state: ht only',W*0.75,H-8);
+
+  // Divider
+  compCtx.strokeStyle='#1a2030'; compCtx.lineWidth=2;
+  compCtx.beginPath(); compCtx.moveTo(W/2,10); compCtx.lineTo(W/2,H-10); compCtx.stroke();
+
+  compCtx.textAlign='left';
+}
+document.getElementById('compT').addEventListener('input',drawComp);
+window.addEventListener('resize',drawComp);
+setTimeout(drawComp,600);
+</script>
+<script>
+MathJax={tex:{inlineMath:[['\\(','\\)'],['$','$']],displayMath:[['\\[','\\]'],['$$','$$']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre']}};
+</script>
+</body>
+</html>
