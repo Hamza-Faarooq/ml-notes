@@ -1,87 +1,166 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CDC ML Prep — IIT KGP Interview Mastery</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #080c10;
-    --bg2: #0d1117;
-    --card: #111820;
-    --border: #1e2d3d;
+    /* Global Smooth Transitions */
+    --theme-transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                        border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                        color 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                        box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* Dynamic Brand Accent Palette */
     --accent: #00d4ff;
     --accent2: #ff6b35;
     --accent3: #7c3aed;
     --green: #10b981;
-    --text: #e2e8f0;
-    --muted: #64748b;
     --gold: #f59e0b;
+    --card-shadow-rgb: 0, 0, 0;
+
+    /* Dark Theme Variables (Default) */
+    --bg: #06090e;
+    --bg2: #0b0f17;
+    --card: #0d131c;
+    --border: #1e2d3d;
+    --text: #f1f5f9;
+    --muted: #94a3b8;
+    --grid-opacity: 0.03;
+    --orb-opacity: 0.06;
+    --toggle-bg: #1e2d3d;
   }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html[data-theme="light"] {
+    /* Light Theme Variables */
+    --bg: #f8fafc;
+    --bg2: #f1f5f9;
+    --card: #ffffff;
+    --border: #cbd5e1;
+    --text: #0f172a;
+    --muted: #475569;
+    --grid-opacity: 0.05;
+    --orb-opacity: 0.04;
+    --toggle-bg: #cbd5e1;
+    --card-shadow-rgb: 148, 163, 184;
+    --accent: #0099cc;
+    --accent3: #6d28d9;
+  }
+
+  * { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+  }
+
   body {
-    background: var(--bg);
+    background-color: var(--bg);
     color: var(--text);
     font-family: 'DM Sans', sans-serif;
     overflow-x: hidden;
+    transition: var(--theme-transition);
   }
 
-  /* Animated grid background */
+  /* Structural Animated Matrix Background */
   body::before {
     content: '';
     position: fixed;
     inset: 0;
     background-image:
-      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+      linear-gradient(rgba(0, 212, 255, var(--grid-opacity)) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 212, 255, var(--grid-opacity)) 1px, transparent 1px);
     background-size: 50px 50px;
     pointer-events: none;
     z-index: 0;
+    transition: var(--theme-transition);
   }
 
-  /* Glow orbs */
+  /* Atmospheric Fluid Glow Orbs */
   .orb1 {
     position: fixed; width: 600px; height: 600px;
-    background: radial-gradient(circle, rgba(0,212,255,0.06) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(0, 212, 255, var(--orb-opacity)) 0%, transparent 70%);
     top: -200px; left: -100px; pointer-events: none; z-index: 0;
-    animation: orbFloat 8s ease-in-out infinite;
+    animation: orbFloat 12s ease-in-out infinite;
+    transition: var(--theme-transition);
   }
   .orb2 {
     position: fixed; width: 500px; height: 500px;
-    background: radial-gradient(circle, rgba(124,58,237,0.06) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(124, 58, 237, var(--orb-opacity)) 0%, transparent 70%);
     bottom: -100px; right: -100px; pointer-events: none; z-index: 0;
-    animation: orbFloat 10s ease-in-out infinite reverse;
+    animation: orbFloat 14s ease-in-out infinite reverse;
+    transition: var(--theme-transition);
   }
   @keyframes orbFloat {
-    0%,100% { transform: translate(0,0); }
-    50% { transform: translate(30px, -30px); }
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(40px, -40px) scale(1.05); }
+  }
+
+  /* FIXED CONTROLS BAR */
+  .top-controls {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  /* THEME SWITCH BUTTON STYLE */
+  .theme-toggle-btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    transition: var(--theme-transition);
+    box-shadow: 0 4px 12px rgba(var(--card-shadow-rgb), 0.1);
+  }
+  .theme-toggle-btn:hover {
+    border-color: var(--accent);
+    transform: translateY(-1px);
+  }
+  .theme-toggle-btn svg {
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
   }
 
   /* HEADER */
   header {
     position: relative; z-index: 10;
-    padding: 60px 40px 40px;
+    padding: 90px 40px 40px;
     max-width: 1200px; margin: 0 auto;
     text-align: center;
   }
   .badge {
     display: inline-block;
-    background: rgba(0,212,255,0.1);
-    border: 1px solid rgba(0,212,255,0.3);
+    background: rgba(0, 212, 255, 0.08);
+    border: 1px solid rgba(0, 212, 255, 0.25);
     color: var(--accent);
     font-family: 'JetBrains Mono', monospace;
     font-size: 11px; letter-spacing: 2px;
-    padding: 6px 16px; border-radius: 20px;
-    margin-bottom: 24px;
-    animation: fadeDown 0.6s ease;
+    padding: 6px 18px; border-radius: 20px;
+    margin-bottom: 28px;
+    font-weight: 500;
+    animation: fadeDown 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   }
   h1 {
     font-family: 'Playfair Display', serif;
-    font-size: clamp(42px, 7vw, 80px);
+    font-size: clamp(38px, 6.5vw, 76px);
     font-weight: 900;
-    line-height: 1.1;
-    animation: fadeDown 0.7s ease;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    animation: fadeDown 0.7s cubic-bezier(0.16, 1, 0.3, 1);
   }
   h1 .highlight {
     background: linear-gradient(135deg, var(--accent), var(--accent3));
@@ -89,37 +168,42 @@
     -webkit-text-fill-color: transparent;
   }
   .subtitle {
-    margin-top: 20px;
-    font-size: 18px;
+    margin-top: 24px;
+    font-size: 17px;
     color: var(--muted);
-    max-width: 600px;
+    max-width: 680px;
     margin-left: auto; margin-right: auto;
-    line-height: 1.6;
-    animation: fadeDown 0.8s ease;
+    line-height: 1.7;
+    animation: fadeDown 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   /* STATS BAR */
   .stats-bar {
     position: relative; z-index: 10;
-    display: flex; justify-content: center; gap: 40px;
+    display: flex; justify-content: center; gap: 60px;
     flex-wrap: wrap;
     padding: 30px 40px;
     border-top: 1px solid var(--border);
     border-bottom: 1px solid var(--border);
-    margin: 40px 0;
-    background: rgba(13,17,23,0.8);
-    animation: fadeUp 1s ease;
+    margin: 50px 0;
+    background: rgba(var(--card-shadow-rgb), 0.03);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: var(--theme-transition);
   }
   .stat { text-align: center; }
   .stat-num {
     font-family: 'Playfair Display', serif;
-    font-size: 32px; font-weight: 900;
+    font-size: 36px; font-weight: 900;
     color: var(--accent);
+    line-height: 1;
   }
   .stat-label {
-    font-size: 12px; letter-spacing: 1px;
+    font-size: 11px; letter-spacing: 1.5px;
     text-transform: uppercase; color: var(--muted);
-    margin-top: 4px;
+    margin-top: 6px;
+    font-family: 'JetBrains Mono', monospace;
   }
 
   /* TOPICS GRID */
@@ -132,97 +216,119 @@
     font-family: 'JetBrains Mono', monospace;
     font-size: 12px; letter-spacing: 3px;
     color: var(--muted); text-transform: uppercase;
-    margin-bottom: 32px;
-    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 40px;
+    display: flex; align-items: center; gap: 16px;
   }
   .section-title::after {
     content: ''; flex: 1;
     height: 1px; background: var(--border);
+    transition: var(--theme-transition);
   }
 
   .topics-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 24px;
   }
 
   .topic-card {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 28px;
+    border-radius: 20px;
+    padding: 32px;
     cursor: pointer;
     text-decoration: none;
     color: inherit;
-    display: block;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     position: relative;
     overflow: hidden;
-    transition: all 0.3s ease;
-    animation: fadeUp 0.6s ease backwards;
+    transition: var(--theme-transition);
+    box-shadow: 0 10px 30px rgba(var(--card-shadow-rgb), 0.05);
+    animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
   }
   .topic-card::before {
     content: '';
     position: absolute; inset: 0;
-    background: linear-gradient(135deg, transparent, rgba(255,255,255,0.02));
+    background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.015));
     opacity: 0; transition: opacity 0.3s;
   }
   .topic-card:hover {
     border-color: var(--card-accent, var(--accent));
-    transform: translateY(-4px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4),
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15),
                 0 0 0 1px var(--card-accent, var(--accent)),
-                0 0 30px rgba(0,212,255,0.1);
+                0 10px 30px rgba(0, 212, 255, 0.08);
+  }
+  html[data-theme="light"] .topic-card:hover {
+    box-shadow: 0 20px 40px rgba(var(--card-shadow-rgb), 0.15),
+                0 0 0 1px var(--card-accent, var(--accent));
   }
   .topic-card:hover::before { opacity: 1; }
 
   .card-header {
     display: flex; align-items: flex-start;
-    justify-content: space-between; margin-bottom: 16px;
+    justify-content: space-between; margin-bottom: 20px;
   }
   .card-icon {
-    font-size: 32px; line-height: 1;
+    font-size: 34px; line-height: 1;
   }
   .card-num {
     font-family: 'JetBrains Mono', monospace;
     font-size: 11px; color: var(--muted);
-    background: rgba(255,255,255,0.05);
-    padding: 4px 8px; border-radius: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 4px 10px; border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  html[data-theme="light"] .card-num {
+    background: rgba(0, 0, 0, 0.03);
+    border-color: rgba(0, 0, 0, 0.02);
   }
   .card-title {
     font-family: 'Playfair Display', serif;
-    font-size: 22px; font-weight: 700;
-    margin-bottom: 8px; line-height: 1.2;
+    font-size: 24px; font-weight: 700;
+    margin-bottom: 12px; line-height: 1.25;
   }
   .card-desc {
     font-size: 14px; color: var(--muted);
-    line-height: 1.6; margin-bottom: 16px;
+    line-height: 1.65; margin-bottom: 24px;
   }
   .card-tags {
-    display: flex; flex-wrap: wrap; gap: 6px;
-    margin-bottom: 20px;
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-bottom: 24px;
   }
   .tag {
     font-size: 11px; font-family: 'JetBrains Mono', monospace;
-    padding: 3px 10px; border-radius: 20px;
+    padding: 4px 12px; border-radius: 20px;
     border: 1px solid var(--border);
     color: var(--muted);
+    background: rgba(var(--card-shadow-rgb), 0.01);
+    transition: var(--theme-transition);
   }
   .card-footer {
     display: flex; align-items: center; justify-content: space-between;
+    margin-top: auto;
+    padding-top: 12px;
   }
   .card-status {
-    font-size: 12px; letter-spacing: 1px;
+    font-size: 11px; letter-spacing: 1px;
     text-transform: uppercase;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
   .status-ready { color: var(--green); }
   .status-soon { color: var(--gold); }
   .card-arrow {
-    width: 32px; height: 32px;
+    width: 36px; height: 36px;
     border: 1px solid var(--border);
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     font-size: 14px;
-    transition: all 0.3s;
+    transition: var(--theme-transition);
   }
   .topic-card:hover .card-arrow {
     background: var(--card-accent, var(--accent));
@@ -231,7 +337,7 @@
     transform: translateX(4px);
   }
 
-  /* Color variants */
+  /* High Quality Visual Indicators (Color Accents) */
   .c1 { --card-accent: #00d4ff; }
   .c2 { --card-accent: #10b981; }
   .c3 { --card-accent: #f59e0b; }
@@ -242,23 +348,24 @@
   .c8 { --card-accent: #84cc16; }
   .c9 { --card-accent: #a78bfa; }
   .c10 { --card-accent: #fb923c; }
+  .c11 { --card-accent: #14b8a6; }
+  .c12 { --card-accent: #ef4444; }
 
   .card-accent-bar {
     position: absolute; top: 0; left: 0; right: 0;
-    height: 3px;
+    height: 4px;
     background: var(--card-accent, var(--accent));
-    border-radius: 16px 16px 0 0;
-    opacity: 0; transition: opacity 0.3s;
+    border-radius: 20px 20px 0 0;
+    opacity: 0.4; transition: opacity 0.3s;
   }
   .topic-card:hover .card-accent-bar { opacity: 1; }
 
   /* FEATURED CARD */
   .topic-card.featured {
     grid-column: span 2;
-    background: linear-gradient(135deg, #0d1117, #111820);
-    border-color: rgba(0,212,255,0.3);
+    background: linear-gradient(135deg, var(--card), var(--bg2));
   }
-  @media (max-width: 800px) {
+  @media (max-width: 880px) {
     .topic-card.featured { grid-column: span 1; }
   }
 
@@ -270,73 +377,96 @@
   }
   .howto-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px;
   }
   .howto-step {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 24px;
+    border-radius: 16px;
+    padding: 32px;
     text-align: center;
+    transition: var(--theme-transition);
+  }
+  .howto-step:hover {
+    border-color: var(--accent);
   }
   .step-num {
     font-family: 'Playfair Display', serif;
-    font-size: 40px; font-weight: 900;
+    font-size: 44px; font-weight: 900;
     color: var(--border);
     line-height: 1;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
+    transition: var(--theme-transition);
+  }
+  .howto-step:hover .step-num {
+    color: var(--accent);
   }
   .step-title {
-    font-size: 15px; font-weight: 500;
-    margin-bottom: 8px;
+    font-size: 16px; font-weight: 600;
+    margin-bottom: 10px;
   }
-  .step-desc { font-size: 13px; color: var(--muted); }
+  .step-desc { font-size: 13.5px; color: var(--muted); line-height: 1.6; }
 
   /* FOOTER */
   footer {
     position: relative; z-index: 10;
     border-top: 1px solid var(--border);
-    padding: 30px 40px;
+    padding: 40px;
     text-align: center;
     font-size: 13px; color: var(--muted);
     font-family: 'JetBrains Mono', monospace;
+    transition: var(--theme-transition);
   }
-  footer a { color: var(--accent); text-decoration: none; }
+  footer a { color: var(--accent); text-decoration: none; font-weight: 500; }
+  footer a:hover { text-decoration: underline; }
 
+  /* Animations Architecture */
   @keyframes fadeDown {
-    from { opacity: 0; transform: translateY(-20px); }
+    from { opacity: 0; transform: translateY(-16px); }
     to { opacity: 1; transform: translateY(0); }
   }
   @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
+    from { opacity: 0; transform: translateY(16px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
-  /* Stagger cards */
-  .topic-card:nth-child(1) { animation-delay: 0.1s; }
-  .topic-card:nth-child(2) { animation-delay: 0.15s; }
-  .topic-card:nth-child(3) { animation-delay: 0.2s; }
-  .topic-card:nth-child(4) { animation-delay: 0.25s; }
-  .topic-card:nth-child(5) { animation-delay: 0.3s; }
-  .topic-card:nth-child(6) { animation-delay: 0.35s; }
-  .topic-card:nth-child(7) { animation-delay: 0.4s; }
-  .topic-card:nth-child(8) { animation-delay: 0.45s; }
-  .topic-card:nth-child(9) { animation-delay: 0.5s; }
-  .topic-card:nth-child(10) { animation-delay: 0.55s; }
+  /* Card Entry Pipeline Staggering */
+  .topic-card:nth-child(1) { animation-delay: 0.05s; }
+  .topic-card:nth-child(2) { animation-delay: 0.10s; }
+  .topic-card:nth-child(3) { animation-delay: 0.15s; }
+  .topic-card:nth-child(4) { animation-delay: 0.20s; }
+  .topic-card:nth-child(5) { animation-delay: 0.25s; }
+  .topic-card:nth-child(6) { animation-delay: 0.30s; }
+  .topic-card:nth-child(7) { animation-delay: 0.35s; }
+  .topic-card:nth-child(8) { animation-delay: 0.40s; }
+  .topic-card:nth-child(9) { animation-delay: 0.45s; }
+  .topic-card:nth-child(10) { animation-delay: 0.50s; }
+  .topic-card:nth-child(11) { animation-delay: 0.55s; }
+  .topic-card:nth-child(12) { animation-delay: 0.60s; }
 
-  /* Responsive */
+  /* Responsive Design Adaptability */
   @media (max-width: 600px) {
-    header { padding: 40px 20px 20px; }
-    .section { padding: 20px 20px 60px; }
-    .stats-bar { gap: 20px; padding: 20px; }
+    header { padding: 60px 20px 20px; }
+    .section { padding: 10px 20px 60px; }
+    .stats-bar { gap: 24px 40px; padding: 24px; margin: 32px 0; }
     .howto, footer { padding-left: 20px; padding-right: 20px; }
+    .top-controls { top: 16px; right: 16px; }
   }
 </style>
 </head>
 <body>
 <div class="orb1"></div>
 <div class="orb2"></div>
+
+<div class="top-controls">
+  <button class="theme-toggle-btn" id="themeToggle" aria-label="Toggle structural interface theme">
+    <svg id="themeToggleIcon" viewBox="0 0 24 24">
+      <!-- Generated via JS vector manipulation -->
+    </svg>
+    <span id="themeToggleText">Theme</span>
+  </button>
+</div>
 
 <header>
   <div class="badge">// IIT KGP · CDC PLACEMENT PREP · ML ROLES</div>
@@ -346,7 +476,7 @@
 
 <div class="stats-bar">
   <div class="stat">
-    <div class="stat-num">10</div>
+    <div class="stat-num">12</div>
     <div class="stat-label">Topic Modules</div>
   </div>
   <div class="stat">
@@ -374,13 +504,15 @@
         <div class="card-icon">📐</div>
         <div class="card-num">01</div>
       </div>
-      <div class="card-title">Supervised Learning</div>
-      <div class="card-desc">Linear & Logistic Regression, Generalized Linear Models, GDA, Naive Bayes, SVMs, KNN — with full mathematical derivations.</div>
-      <div class="card-tags">
-        <span class="tag">Regression</span>
-        <span class="tag">Classification</span>
-        <span class="tag">MLE</span>
-        <span class="tag">Kernels</span>
+      <div>
+        <div class="card-title">Supervised Learning</div>
+        <div class="card-desc">Linear & Logistic Regression, Generalized Linear Models, GDA, Naive Bayes, SVMs, KNN — with full mathematical derivations.</div>
+        <div class="card-tags">
+          <span class="tag">Regression</span>
+          <span class="tag">Classification</span>
+          <span class="tag">MLE</span>
+          <span class="tag">Kernels</span>
+        </div>
       </div>
       <div class="card-footer">
         <span class="card-status status-ready">● Ready</span>
@@ -395,12 +527,14 @@
         <div class="card-icon">⚙️</div>
         <div class="card-num">02</div>
       </div>
-      <div class="card-title">Classical & Theoretical ML</div>
-      <div class="card-desc">Bias-Variance tradeoff, Regularization (L1/L2), Cross-Validation, Ensemble methods — the mathematical foundations of model design.</div>
-      <div class="card-tags">
-        <span class="tag">Bias-Variance</span>
-        <span class="tag">Regularization</span>
-        <span class="tag">Ensembles</span>
+      <div>
+        <div class="card-title">Classical & Theoretical ML</div>
+        <div class="card-desc">Bias-Variance tradeoff, Regularization (L1/L2), Cross-Validation, Ensemble methods — the mathematical foundations of model design.</div>
+        <div class="card-tags">
+          <span class="tag">Bias-Variance</span>
+          <span class="tag">Regularization</span>
+          <span class="tag">Ensembles</span>
+        </div>
       </div>
       <div class="card-footer">
         <span class="card-status status-ready">● Ready</span>
@@ -415,12 +549,14 @@
         <div class="card-icon">🔭</div>
         <div class="card-num">03</div>
       </div>
-      <div class="card-title">Unsupervised Learning</div>
-      <div class="card-desc">K-Means, DBSCAN, Hierarchical Clustering, PCA with SVD proof, t-SNE, UMAP, Anomaly Detection, GMMs.</div>
-      <div class="card-tags">
-        <span class="tag">Clustering</span>
-        <span class="tag">PCA/SVD</span>
-        <span class="tag">Dimensionality</span>
+      <div>
+        <div class="card-title">Unsupervised Learning</div>
+        <div class="card-desc">K-Means, DBSCAN, Hierarchical Clustering, PCA with SVD proof, t-SNE, UMAP, Anomaly Detection, GMMs.</div>
+        <div class="card-tags">
+          <span class="tag">Clustering</span>
+          <span class="tag">PCA/SVD</span>
+          <span class="tag">Dimensionality</span>
+        </div>
       </div>
       <div class="card-footer">
         <span class="card-status status-ready">● Ready</span>
@@ -428,20 +564,21 @@
       </div>
     </a>
 
-    <!-- 04 Feature Engineering -->
+    <!-- 04 Feature Engineering - READY -->
     <a href="feature.html" class="topic-card c4">
       <div class="card-accent-bar"></div>
       <div class="card-header">
         <div class="card-icon">📊</div>
         <div class="card-num">04</div>
       </div>
-      <div class="card-title">Feature Engineering</div>
-      <div class="card-desc">Missing values, Outlier handling, Scaling, Normalization, Standardization, Encoding
-</div>
-      <div class="card-tags">
-        <span class="tag">Normalization</span>
-        <span class="tag">Encoding Data</span>
-        <span class="tag">Outlier & Missing Value Handling</span>
+      <div>
+        <div class="card-title">Feature Engineering</div>
+        <div class="card-desc">Missing values, Outlier handling, Scaling, Normalization, Standardization, Encoding.</div>
+        <div class="card-tags">
+          <span class="tag">Normalization</span>
+          <span class="tag">Encoding Data</span>
+          <span class="tag">Outlier & Missing Value Handling</span>
+        </div>
       </div>
       <div class="card-footer">
         <span class="card-status status-ready">● Ready</span>
@@ -449,84 +586,65 @@
       </div>
     </a>
 
-
-<!-- 05 Pytorch -->
+    <!-- 05 Introduction to PyTorch - READY -->
     <a href="deeo-learning.html" class="topic-card c5">
       <div class="card-accent-bar"></div>
       <div class="card-header">
         <div class="card-icon">🧠</div>
         <div class="card-num">05</div>
       </div>
-      <div class="card-title">Introduction to PyTorch</div>
-      <div class="card-desc">Tensors, Autograd, Dataloaders, Custom datasets, Model classes, Training loops, GPU training.</div>
-      <div class="card-tags">
-        <span class="tag">Tensors</span>
-        <span class="tag">Training Loops</span>
-        <span class="tag">GPU</span>
+      <div>
+        <div class="card-title">Introduction to PyTorch</div>
+        <div class="card-desc">Tensors, Autograd, Dataloaders, Custom datasets, Model classes, Training loops, GPU training.</div>
+        <div class="card-tags">
+          <span class="tag">Tensors</span>
+          <span class="tag">Training Loops</span>
+          <span class="tag">GPU</span>
+        </div>
       </div>
       <div class="card-footer">
-        <span class="card-status status-ready"> ● Ready </span>
+        <span class="card-status status-ready">● Ready</span>
         <div class="card-arrow">→</div>
       </div>
     </a>
 
-    
-    <!-- 06 Neural Networks & Deep Learning -->
+    <!-- 06 Neural Networks & Deep Learning - READY -->
     <a href="deeo-learning.html" class="topic-card c6">
       <div class="card-accent-bar"></div>
       <div class="card-header">
         <div class="card-icon">🧠</div>
         <div class="card-num">06</div>
       </div>
-      <div class="card-title">Neural Networks & Deep Learning</div>
-      <div class="card-desc">Backpropagation, Activation Functions, Optimizers (Adam, SGD), Batch Norm, Dropout, CNNs, RNNs, LSTMs.</div>
-      <div class="card-tags">
-        <span class="tag">Backprop</span>
-        <span class="tag">Optimizers</span>
-        <span class="tag">CNN/RNN</span>
+      <div>
+        <div class="card-title">Neural Networks & Deep Learning</div>
+        <div class="card-desc">Backpropagation, Activation Functions, Optimizers (Adam, SGD), Batch Norm, Dropout, CNNs, RNNs, LSTMs.</div>
+        <div class="card-tags">
+          <span class="tag">Backprop</span>
+          <span class="tag">Optimizers</span>
+          <span class="tag">CNN/RNN</span>
+        </div>
       </div>
       <div class="card-footer">
-        <span class="card-status status-ready"> ● Ready </span>
+        <span class="card-status status-ready">● Ready</span>
         <div class="card-arrow">→</div>
       </div>
     </a>
 
- <!-- 07 Sequence Models -->
+    <!-- 07 Sequence Models - READY -->
     <a href="sequential-models.html" class="topic-card c7">
       <div class="card-accent-bar"></div>
       <div class="card-header">
         <div class="card-icon">🧠</div>
         <div class="card-num">07</div>
       </div>
-      <div class="card-title">Sequential Models</div>
-      <div class="card-desc">Backpropagation in Time, RNNs, GRUs, LSTMs.</div>
-      <div class="card-tags">
-        <span class="tag">Backprop</span>
-        <span class="tag">RNN</span>
-        <span class="tag">GRU</span>
-      </div>
-      <div class="card-footer">
-        <span class="card-status status-ready"> ● Ready </span>
-        <div class="card-arrow">→</div>
-      </div>
-    </a>
-
-
-
-    
-    <!-- 08 NLP -->
-    <a href="nlp.html" class="topic-card c8">
-      <div class="card-accent-bar"></div>
-      <div class="card-header">
-        <div class="card-icon">💬</div>
-        <div class="card-num">08</div>
-      </div>
-      <div class="card-title">Natural Language Processing & Large Language Models</div>
-      <div class="card-desc">Tokenization, TF-IDF, Word2Vec, GloVe, BERT embeddings, Named Entity Recognition, Sentiment Analysis, Attention mechanism, Transformer architecture, GPT/BERT families, In-Context Learning, Chain-of-Thought.</div>
-      <div class="card-tags">
-        <span class="tag">Embeddings</span>
-        <span class="tag">Transformers</span>
-        <span class="tag">BERT</span>
+      <div>
+        <div class="card-title">Sequential Models</div>
+        <div class="card-desc">Backpropagation in Time, RNNs, GRUs, LSTMs.</div>
+        <div class="card-tags">
+          <span class="tag">Backprop</span>
+          <span class="tag">RNN</span>
+          <span class="tag">GRU</span>
+        </div>
       </div>
       <div class="card-footer">
         <span class="card-status status-ready">● Ready</span>
@@ -534,20 +652,44 @@
       </div>
     </a>
 
+    <!-- 08 NLP & LLMs - READY (FEATURED EXTENSION) -->
+    <a href="nlp.html" class="topic-card c8 featured">
+      <div class="card-accent-bar"></div>
+      <div class="card-header">
+        <div class="card-icon">💬</div>
+        <div class="card-num">08</div>
+      </div>
+      <div>
+        <div class="card-title">Natural Language Processing & Large Language Models</div>
+        <div class="card-desc">Tokenization, TF-IDF, Word2Vec, GloVe, BERT embeddings, Named Entity Recognition, Sentiment Analysis, Attention mechanism, Transformer architecture, GPT/BERT families, In-Context Learning, Chain-of-Thought.</div>
+        <div class="card-tags">
+          <span class="tag">Embeddings</span>
+          <span class="tag">Transformers</span>
+          <span class="tag">BERT</span>
+          <span class="tag">Attention Systems</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="card-status status-ready">● Ready</span>
+        <div class="card-arrow">→</div>
+      </div>
+    </a>
 
-     <!-- 09 RAGs and beyond -->
+    <!-- 09 RAGs and Beyond - READY -->
     <a href="advanced-llm.html" class="topic-card c9">
       <div class="card-accent-bar"></div>
       <div class="card-header">
         <div class="card-icon">🚀</div>
         <div class="card-num">09</div>
       </div>
-      <div class="card-title">RAGs and Beyond</div>
-      <div class="card-desc"> RLHF, RAG systems, Fine-tuning (LoRA, QLoRA), Prompt Engineering, Agents, Tool Use, LLM evaluation frameworks.</div>
-      <div class="card-tags">
-        <span class="tag">RAG</span>
-        <span class="tag">LoRA</span>
-        <span class="tag">Agents</span>
+      <div>
+        <div class="card-title">RAGs and Beyond</div>
+        <div class="card-desc">RLHF, RAG systems, Fine-tuning (LoRA, QLoRA), Prompt Engineering, Agents, Tool Use, LLM evaluation frameworks.</div>
+        <div class="card-tags">
+          <span class="tag">RAG</span>
+          <span class="tag">LoRA</span>
+          <span class="tag">Agents</span>
+        </div>
       </div>
       <div class="card-footer">
         <span class="card-status status-ready">● Ready</span>
@@ -555,20 +697,21 @@
       </div>
     </a>
 
-    
-    <!-- 10 Advanced LLMs -->
+    <!-- 10 Advanced LLMs - READY -->
     <a href="llms.html" class="topic-card c10">
       <div class="card-accent-bar"></div>
       <div class="card-header">
         <div class="card-icon">⚡</div>
         <div class="card-num">10</div>
       </div>
-      <div class="card-title">Advanced LLMs</div>
-      <div class="card-desc">Read if you love LLMs </div>
-      <div class="card-tags">
-        <span class="tag">Agentic LLMs </span>
-        <span class="tag">Multimodal</span>
-        <span class="tag">Model merging</span>
+      <div>
+        <div class="card-title">Advanced LLMs</div>
+        <div class="card-desc">Read if you love LLMs. Focused on sophisticated production architectures, performance mechanics, and optimization boundaries.</div>
+        <div class="card-tags">
+          <span class="tag">Agentic LLMs</span>
+          <span class="tag">Multimodal</span>
+          <span class="tag">Model merging</span>
+        </div>
       </div>
       <div class="card-footer">
         <span class="card-status status-ready">● Ready</span>
@@ -576,21 +719,21 @@
       </div>
     </a>
 
-
-
-    <!-- 11 MLOps -->
+    <!-- 11 MLOps - SOON -->
     <a href="mlops.html" class="topic-card c11">
       <div class="card-accent-bar"></div>
       <div class="card-header">
         <div class="card-icon">🏗️</div>
         <div class="card-num">11</div>
       </div>
-      <div class="card-title">MLOps</div>
-      <div class="card-desc">Model deployment, CI/CD for ML, Feature Stores, Model Monitoring, A/B Testing, MLflow, Kubeflow pipelines.</div>
-      <div class="card-tags">
-        <span class="tag">Deployment</span>
-        <span class="tag">Monitoring</span>
-        <span class="tag">Pipelines</span>
+      <div>
+        <div class="card-title">MLOps</div>
+        <div class="card-desc">Model deployment, CI/CD for ML, Feature Stores, Model Monitoring, A/B Testing, MLflow, Kubeflow pipelines.</div>
+        <div class="card-tags">
+          <span class="tag">Deployment</span>
+          <span class="tag">Monitoring</span>
+          <span class="tag">Pipelines</span>
+        </div>
       </div>
       <div class="card-footer">
         <span class="card-status status-soon">◌ Coming Soon</span>
@@ -598,19 +741,21 @@
       </div>
     </a>
 
-    <!-- 12 LLMOps -->
+    <!-- 12 LLMOps - SOON -->
     <a href="llmops.html" class="topic-card c12">
       <div class="card-accent-bar"></div>
       <div class="card-header">
         <div class="card-icon">🔧</div>
         <div class="card-num">12</div>
       </div>
-      <div class="card-title">LLMOps</div>
-      <div class="card-desc">Production LLM systems, Guardrails, Latency optimization, Token budgeting, Observability, Vector DB at scale.</div>
-      <div class="card-tags">
-        <span class="tag">Production</span>
-        <span class="tag">Guardrails</span>
-        <span class="tag">VectorDB</span>
+      <div>
+        <div class="card-title">LLMOps</div>
+        <div class="card-desc">Production LLM systems, Guardrails, Latency optimization, Token budgeting, Observability, Vector DB at scale.</div>
+        <div class="card-tags">
+          <span class="tag">Production</span>
+          <span class="tag">Guardrails</span>
+          <span class="tag">VectorDB</span>
+        </div>
       </div>
       <div class="card-footer">
         <span class="card-status status-soon">◌ Coming Soon</span>
@@ -648,8 +793,46 @@
 </div>
 
 <footer>
-  Built for CDC Placements · IIT Kharagpur &nbsp;|&nbsp; <a href="https://hamza-faarooq.github.io/">← Back to Portfolio</a> &nbsp;|&nbsp; Muhammad Hamza 
+  Built for CDC Placements · IIT Kharagpur &nbsp;|&nbsp; <a href="https://hamza-faarooq.github.io/">← Back to Portfolio</a> &nbsp;|&nbsp; Muhammad Hamza
 </footer>
 
+<script>
+  // Architectural Vector Path Constants for Theme Button UI
+  const sunPath = `<path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41zM5.99 16.95l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.39.39-1.03 0-1.41s-1.02-.39-1.41 0z"/>`;
+  const moonPath = `<path d="M12.3 2a10 10 0 0 0-1.9 14 10 10 0 0 0 14-1.9 1 1 0 0 0-1-1.3 8 8 0 1 1-9.8-9.8 1 1 0 0 0-1.3-1z"/>`;
+
+  const themeToggle = document.getElementById('themeToggle');
+  const themeToggleIcon = document.getElementById('themeToggleIcon');
+  const themeToggleText = document.getElementById('themeToggleText');
+
+  // Application Preference Pipeline
+  function initializeInterfaceTheme() {
+    const savedTheme = localStorage.getItem('global-ui-theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateToggleControlUI(savedTheme);
+  }
+
+  function updateToggleControlUI(theme) {
+    if (theme === 'light') {
+      themeToggleIcon.innerHTML = moonPath;
+      themeToggleText.textContent = 'Dark Mode';
+    } else {
+      themeToggleIcon.innerHTML = sunPath;
+      themeToggleText.textContent = 'Light Mode';
+    }
+  }
+
+  themeToggle.addEventListener('click', () => {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const targetTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    document.documentElement.setAttribute('data-theme', targetTheme);
+    localStorage.setItem('global-ui-theme', targetTheme);
+    updateToggleControlUI(targetTheme);
+  });
+
+  // Execute on load
+  initializeInterfaceTheme();
+</script>
 </body>
 </html>
