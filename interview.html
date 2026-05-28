@@ -1,0 +1,2505 @@
+
+
+
+ResNet
+
+EfficientNet
+
+Vision Transformer
+
+Tasks:
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ML/AI Interview Prep — Deep Question Bank</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg2: #12121a;
+    --bg3: #1a1a26;
+    --bg4: #22223a;
+    --surface: #1e1e30;
+    --surface2: #252540;
+    --border: rgba(130,100,255,0.18);
+    --border2: rgba(130,100,255,0.35);
+    --accent: #8264ff;
+    --accent2: #b49aff;
+    --accent3: #6ee7ff;
+    --accent4: #ff7eb3;
+    --accent5: #7eff9e;
+    --text: #f0eeff;
+    --text2: #b8aedd;
+    --text3: #7a6fa8;
+    --code-bg: #0e0e1c;
+    --tag-bg: rgba(130,100,255,0.12);
+    --answered: rgba(126,255,158,0.08);
+    --answered-border: rgba(126,255,158,0.3);
+  }
+  .light {
+    --bg: #fafaf8;
+    --bg2: #f2f0fa;
+    --bg3: #eceaf6;
+    --bg4: #e0ddf0;
+    --surface: #ffffff;
+    --surface2: #f5f3ff;
+    --border: rgba(100,80,200,0.12);
+    --border2: rgba(100,80,200,0.28);
+    --accent: #5c3dd8;
+    --accent2: #7c5ce8;
+    --accent3: #0097b8;
+    --accent4: #cc3377;
+    --accent5: #1a9e40;
+    --text: #1a1530;
+    --text2: #4a3d7a;
+    --text3: #8880aa;
+    --code-bg: #f0eeff;
+    --tag-bg: rgba(92,61,216,0.07);
+    --answered: rgba(26,158,64,0.06);
+    --answered-border: rgba(26,158,64,0.3);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Lora', Georgia, serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    transition: background 0.3s, color 0.3s;
+  }
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 60px;
+    backdrop-filter: blur(10px);
+  }
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 1.1rem;
+    color: var(--accent2);
+    letter-spacing: -0.02em;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .logo span { color: var(--accent3); }
+  .nav-right { display: flex; align-items: center; gap: 1rem; }
+  .theme-btn {
+    background: var(--surface); border: 1px solid var(--border2);
+    color: var(--text2); padding: 0.4rem 1rem;
+    border-radius: 20px; cursor: pointer; font-size: 0.82rem;
+    font-family: 'Syne', sans-serif; font-weight: 600;
+    transition: all 0.2s;
+  }
+  .theme-btn:hover { background: var(--accent); color: white; }
+  .stats-bar {
+    font-family: 'Syne', sans-serif; font-size: 0.78rem;
+    color: var(--text3); display: flex; gap: 1.2rem;
+  }
+  .stats-bar b { color: var(--accent2); font-weight: 600; }
+
+  /* LAYOUT */
+  .container { display: flex; min-height: calc(100vh - 60px); }
+  /* SIDEBAR */
+  .sidebar {
+    width: 280px; min-width: 260px; max-width: 300px;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    padding: 1.5rem 1rem;
+    position: sticky; top: 60px; height: calc(100vh - 60px);
+    overflow-y: auto; flex-shrink: 0;
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+  .sidebar-title {
+    font-family: 'Syne', sans-serif; font-size: 0.7rem;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--text3); margin-bottom: 0.8rem;
+    padding: 0 0.5rem;
+  }
+  .section-link {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.45rem 0.7rem; border-radius: 8px; margin-bottom: 2px;
+    cursor: pointer; font-family: 'Syne', sans-serif; font-size: 0.78rem;
+    font-weight: 600; color: var(--text2);
+    transition: all 0.15s; text-decoration: none; border: none; background: none;
+    width: 100%; text-align: left;
+  }
+  .section-link:hover { background: var(--tag-bg); color: var(--accent2); }
+  .section-link.active { background: var(--accent); color: white; }
+  .section-link .badge {
+    font-size: 0.65rem; background: var(--bg4); padding: 2px 6px;
+    border-radius: 10px; color: var(--text3); font-weight: 400;
+  }
+  .section-link.active .badge { background: rgba(255,255,255,0.2); color: white; }
+  .progress-mini {
+    height: 2px; background: var(--bg4); border-radius: 2px;
+    margin: 0.3rem 0.7rem 0.8rem;
+  }
+  .progress-mini-fill {
+    height: 100%; background: var(--accent5); border-radius: 2px;
+    transition: width 0.4s;
+  }
+
+  /* MAIN */
+  main { flex: 1; padding: 2rem 3rem; max-width: 900px; overflow-y: auto; }
+  .section { margin-bottom: 4rem; }
+  .section-header {
+    display: flex; align-items: flex-start; gap: 1rem;
+    margin-bottom: 2rem; padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-icon {
+    width: 48px; height: 48px; border-radius: 12px;
+    background: var(--tag-bg); border: 1px solid var(--border2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; flex-shrink: 0;
+  }
+  .section-meta { flex: 1; }
+  .section-title {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 1.6rem; color: var(--text);
+    letter-spacing: -0.03em; margin-bottom: 0.3rem;
+  }
+  .section-subtitle {
+    font-size: 0.85rem; color: var(--text3); font-style: italic;
+  }
+  .section-num {
+    font-family: 'Syne', sans-serif; font-size: 0.7rem;
+    font-weight: 700; color: var(--accent); text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* QUESTION CARD */
+  .q-card {
+    border: 1px solid var(--border);
+    border-radius: 12px; margin-bottom: 1.2rem;
+    overflow: hidden; transition: border-color 0.2s;
+    background: var(--surface);
+  }
+  .q-card:hover { border-color: var(--border2); }
+  .q-card.answered { border-color: var(--answered-border); background: var(--answered); }
+  .q-header {
+    padding: 1.1rem 1.4rem; cursor: pointer;
+    display: flex; align-items: flex-start; gap: 1rem;
+    user-select: none;
+  }
+  .q-num {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;
+    color: var(--accent); font-weight: 500; min-width: 28px;
+    margin-top: 2px;
+  }
+  .q-text {
+    flex: 1; font-family: 'Syne', sans-serif; font-weight: 600;
+    font-size: 0.93rem; color: var(--text); line-height: 1.4;
+  }
+  .q-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.4rem; }
+  .q-tag {
+    font-size: 0.65rem; font-family: 'Syne', sans-serif; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    padding: 2px 7px; border-radius: 4px;
+    background: var(--tag-bg); color: var(--accent2);
+  }
+  .q-tag.hard { background: rgba(255,100,100,0.1); color: #ff8080; }
+  .q-tag.medium { background: rgba(255,190,60,0.1); color: #ffcc50; }
+  .q-tag.easy { background: rgba(100,230,130,0.1); color: var(--accent5); }
+  .q-chevron {
+    color: var(--text3); font-size: 1.1rem; transition: transform 0.2s;
+    flex-shrink: 0; margin-top: 2px;
+  }
+  .q-card.open .q-chevron { transform: rotate(180deg); }
+  .q-mark {
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 1.5px solid var(--border2); cursor: pointer;
+    flex-shrink: 0; margin-top: 2px; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; color: transparent;
+  }
+  .q-card.answered .q-mark {
+    background: var(--accent5); border-color: var(--accent5); color: white;
+  }
+
+  /* ANSWER */
+  .q-answer {
+    display: none; padding: 0 1.4rem 1.4rem;
+    border-top: 1px solid var(--border);
+    padding-top: 1.2rem;
+  }
+  .q-card.open .q-answer { display: block; }
+  .ans-block { margin-bottom: 1.4rem; }
+  .ans-label {
+    font-family: 'Syne', sans-serif; font-size: 0.65rem;
+    font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--accent3); margin-bottom: 0.5rem;
+    display: flex; align-items: center; gap: 0.4rem;
+  }
+  .ans-label::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+  p.ans { 
+    font-size: 0.9rem; line-height: 1.85; color: var(--text2); 
+    margin-bottom: 0.7rem;
+  }
+  p.ans:last-child { margin-bottom: 0; }
+  code {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+    background: var(--code-bg); color: var(--accent3);
+    padding: 1px 5px; border-radius: 4px;
+  }
+  pre {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 1rem 1.2rem; overflow-x: auto;
+    margin: 0.8rem 0; font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem; line-height: 1.6; color: var(--accent3);
+  }
+  .math-block {
+    background: var(--code-bg); border-left: 3px solid var(--accent);
+    padding: 0.8rem 1.2rem; margin: 0.8rem 0;
+    border-radius: 0 8px 8px 0; font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem; color: var(--accent2); line-height: 1.8;
+  }
+  ul.ans-list {
+    list-style: none; padding: 0; margin: 0.4rem 0;
+  }
+  ul.ans-list li {
+    font-size: 0.88rem; line-height: 1.75; color: var(--text2);
+    padding: 0.2rem 0 0.2rem 1.2rem; position: relative;
+  }
+  ul.ans-list li::before {
+    content: '→'; position: absolute; left: 0;
+    color: var(--accent); font-size: 0.8rem;
+  }
+  .callout {
+    background: var(--surface2); border: 1px solid var(--border2);
+    border-left: 3px solid var(--accent4);
+    padding: 0.8rem 1.1rem; border-radius: 0 8px 8px 0;
+    margin: 0.8rem 0; font-size: 0.85rem; color: var(--text2);
+    line-height: 1.7;
+  }
+  .callout.tip { border-left-color: var(--accent5); }
+  .callout.warning { border-left-color: #ffaa44; }
+
+  /* SEARCH BAR */
+  .search-wrap {
+    padding: 1.5rem 3rem 0;
+    max-width: 900px;
+  }
+  .search-input-wrap {
+    display: flex; align-items: center; gap: 0.8rem;
+    background: var(--surface); border: 1px solid var(--border2);
+    border-radius: 10px; padding: 0.6rem 1rem;
+    margin-bottom: 1rem;
+  }
+  .search-input-wrap svg { color: var(--text3); flex-shrink: 0; }
+  #search-input {
+    background: none; border: none; outline: none;
+    font-family: 'Syne', sans-serif; font-size: 0.9rem;
+    color: var(--text); flex: 1;
+  }
+  #search-input::placeholder { color: var(--text3); }
+  .filter-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
+  .filter-btn {
+    font-family: 'Syne', sans-serif; font-size: 0.75rem; font-weight: 600;
+    padding: 0.3rem 0.8rem; border-radius: 20px; cursor: pointer;
+    border: 1px solid var(--border2); background: none; color: var(--text2);
+    transition: all 0.15s;
+  }
+  .filter-btn:hover, .filter-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+  /* HERO */
+  .hero {
+    padding: 3rem 3rem 1rem;
+    max-width: 900px;
+  }
+  .hero-title {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 2.4rem; letter-spacing: -0.04em;
+    line-height: 1.1; margin-bottom: 0.8rem;
+  }
+  .hero-title .hl1 { color: var(--accent2); }
+  .hero-title .hl2 { color: var(--accent3); }
+  .hero-desc { font-size: 0.92rem; color: var(--text2); max-width: 600px; line-height: 1.7; margin-bottom: 1.5rem; }
+  .hero-chips { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2rem; }
+  .hero-chip {
+    font-family: 'Syne', sans-serif; font-size: 0.72rem; font-weight: 700;
+    padding: 0.3rem 0.8rem; border-radius: 20px; letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .chip-ml { background: rgba(130,100,255,0.12); color: var(--accent2); }
+  .chip-dl { background: rgba(110,231,255,0.1); color: var(--accent3); }
+  .chip-nlp { background: rgba(255,126,179,0.1); color: var(--accent4); }
+  .chip-ds { background: rgba(126,255,158,0.1); color: var(--accent5); }
+  .hero-stats {
+    display: flex; gap: 2rem; margin-bottom: 0;
+  }
+  .hero-stat { }
+  .hero-stat-num {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.8rem;
+    color: var(--accent2); letter-spacing: -0.04em;
+  }
+  .hero-stat-label { font-size: 0.78rem; color: var(--text3); margin-top: 0.1rem; }
+  .divider { height: 1px; background: var(--border); margin: 1.5rem 0; }
+
+  @media (max-width: 900px) {
+    main { padding: 1.5rem 1.2rem; }
+    .hero { padding: 2rem 1.2rem 0.5rem; }
+    .search-wrap { padding: 1rem 1.2rem 0; }
+    .sidebar { display: none; }
+  }
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">ML<span>Prep</span> &nbsp;<span style="color:var(--text3);font-weight:400;font-size:0.8rem;">Interview Question Bank</span></div>
+  <div class="nav-right">
+    <div class="stats-bar">
+      <span><b id="total-q">0</b> questions</span>
+      <span><b id="done-q">0</b> reviewed</span>
+    </div>
+    <button class="theme-btn" onclick="toggleTheme()">☀ Light</button>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-title">
+    <span class="hl1">Deep Dive</span> Interview Prep<br>
+    for <span class="hl2">ML / AI Engineers</span>
+  </div>
+  <p class="hero-desc">
+    Comprehensive, in-depth questions and answers covering theory, math, intuition, and implementation — for ML Engineer, AI Engineer, Data Scientist, and Research Engineer roles. Curated for 4th-year undergrads and early-career professionals.
+  </p>
+  <div class="hero-chips">
+    <span class="hero-chip chip-ml">Core ML</span>
+    <span class="hero-chip chip-dl">Deep Learning</span>
+    <span class="hero-chip chip-nlp">NLP & LLMs</span>
+    <span class="hero-chip chip-ds">Model Eval</span>
+    <span class="hero-chip chip-ml">Feature Engineering</span>
+    <span class="hero-chip chip-dl">CNNs & Vision</span>
+    <span class="hero-chip chip-nlp">Transformers</span>
+    <span class="hero-chip chip-ds">PyTorch</span>
+    <span class="hero-chip chip-ml">Unsupervised</span>
+    <span class="hero-chip chip-dl">Optimization</span>
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="hero-stat-num" id="h-total">0</div><div class="hero-stat-label">Total Questions</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">10</div><div class="hero-stat-label">Topic Sections</div></div>
+    <div class="hero-stat"><div class="hero-stat-num" id="h-done">0</div><div class="hero-stat-label">Reviewed</div></div>
+  </div>
+  <div class="divider"></div>
+</div>
+
+<div class="search-wrap">
+  <div class="search-input-wrap">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="search-input" placeholder="Search questions across all topics…" oninput="searchQuestions(this.value)">
+  </div>
+  <div class="filter-row" id="filter-row">
+    <button class="filter-btn active" onclick="filterDiff('all',this)">All</button>
+    <button class="filter-btn" onclick="filterDiff('hard',this)">Hard</button>
+    <button class="filter-btn" onclick="filterDiff('medium',this)">Medium</button>
+    <button class="filter-btn" onclick="filterDiff('easy',this)">Easy</button>
+    <button class="filter-btn" style="margin-left:auto" onclick="expandAll()">Expand All</button>
+    <button class="filter-btn" onclick="collapseAll()">Collapse All</button>
+  </div>
+</div>
+
+<div class="container">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-title">Sections</div>
+    <!-- filled by JS -->
+  </aside>
+  <main id="main-content">
+    <!-- filled by JS -->
+  </main>
+</div>
+
+<script>
+const SECTIONS = [
+  {
+    id: "supervised",
+    icon: "📐",
+    title: "Supervised Learning",
+    subtitle: "Regression, Classification, Trees, SVMs, Ensembles",
+    color: "chip-ml",
+    questions: [
+      {
+        q: "Derive the closed-form solution for Linear Regression (OLS). What are its assumptions, and what happens when they are violated?",
+        tags: ["hard","math","regression"],
+        answer: {
+          intuition: "Linear regression finds the best-fit hyperplane by minimizing the sum of squared residuals. The 'closed-form' means we can directly compute the optimal weights with one matrix equation — no iteration needed.",
+          math: `The model: ŷ = Xβ, Loss (RSS): L = ||y - Xβ||²
+
+Expand: L = (y - Xβ)ᵀ(y - Xβ) = yᵀy - 2βᵀXᵀy + βᵀXᵀXβ
+
+Taking gradient w.r.t. β and setting to zero:
+∂L/∂β = -2Xᵀy + 2XᵀXβ = 0
+
+Closed-form solution:
+β̂ = (XᵀX)⁻¹Xᵀy
+
+This is the Ordinary Least Squares (OLS) estimator.`,
+          theory: `OLS Assumptions (Gauss-Markov):
+1. Linearity: y = Xβ + ε (relationship is linear in parameters)
+2. No perfect multicollinearity: XᵀX must be invertible (full column rank)
+3. Exogeneity: E[ε|X] = 0 (errors uncorrelated with features)
+4. Homoscedasticity: Var(ε|X) = σ²I (constant error variance)
+5. No autocorrelation: Cov(εᵢ, εⱼ) = 0 for i ≠ j
+
+When violated:
+- Multicollinearity → XᵀX is near-singular, β̂ becomes unstable/high-variance. Fix: Ridge regression, drop correlated features.
+- Heteroscedasticity → OLS is unbiased but inefficient. Fix: Weighted Least Squares (WLS), robust standard errors.
+- Autocorrelation → in time series, ε_t correlates with ε_{t-1}. Fix: GLS, or include lagged terms.
+- Non-linearity → model is misspecified. Fix: polynomial features, kernel methods, neural nets.`,
+          practical: "In production, (XᵀX)⁻¹ is never computed explicitly — use numpy's lstsq (which uses SVD decomposition for numerical stability). For large-scale, use SGD. Always check condition number of XᵀX to detect multicollinearity."
+        }
+      },
+      {
+        q: "What is Ridge Regression and Lasso? Derive their update rules and explain the geometric intuition behind why Lasso produces sparse solutions while Ridge does not.",
+        tags: ["hard","math","regularization"],
+        answer: {
+          intuition: "Both Ridge and Lasso add a penalty on the magnitude of β to prevent overfitting. The shape of the constraint region — a sphere for Ridge, a diamond for Lasso — determines whether the optimal solution lands on a corner (sparse) or edge (not sparse).",
+          math: `Ridge (L2 regularization):
+L_ridge = ||y - Xβ||² + λ||β||²
+
+Solution: β̂_ridge = (XᵀX + λI)⁻¹Xᵀy
+
+The λI term makes XᵀX always invertible — Ridge always has a unique solution even with multicollinearity!
+
+Lasso (L1 regularization):
+L_lasso = ||y - Xβ||² + λ||β||₁
+
+No closed-form. Solution via coordinate descent:
+For each j:
+  β_j ← S(βⱼ^OLS, λ/2)
+  where S(z, γ) = sign(z)·max(|z| - γ, 0)  [soft-thresholding]
+
+This sets small coefficients exactly to zero.`,
+          theory: `Geometric Intuition:
+Think of it as constrained optimization: minimize RSS subject to ||β|| ≤ t.
+
+Ridge: constraint region is a sphere. The RSS ellipses (contours) almost never intersect the sphere exactly at an axis — so β_j usually ≠ 0. Coefficients are shrunk toward zero but rarely zero.
+
+Lasso: constraint region is a diamond (L1 ball). The RSS ellipses frequently intersect at corners of the diamond (where one coordinate = 0), because corners are 'pointy'. This produces exact zeros → feature selection.
+
+Elastic Net combines both:
+L = ||y - Xβ||² + λ₁||β||₁ + λ₂||β||²
+Benefits: grouped selection (correlated features together like Ridge) + sparsity (like Lasso).`,
+          practical: "Use Ridge when you believe all features matter but want to reduce their magnitude (multicollinearity scenarios). Use Lasso when you expect a sparse model (feature selection). Use ElasticNet when features are correlated groups. In sklearn: Ridge(alpha=λ), Lasso(alpha=λ). Tune λ via cross-validation."
+        }
+      },
+      {
+        q: "Explain the complete derivation of Logistic Regression — the model, the cost function (cross-entropy), and the gradient descent update rule.",
+        tags: ["hard","math","classification"],
+        answer: {
+          intuition: "Logistic regression models the probability of a class. Instead of fitting a line to binary labels (which fails), we use the sigmoid function to squash a linear combination of features into [0,1], then interpret it as probability.",
+          math: `Model:
+P(y=1|x) = σ(wᵀx + b) = 1 / (1 + e^{-wᵀx})
+
+The sigmoid: σ(z) = 1/(1+e^{-z})
+
+Loss Function (Negative Log-Likelihood = Binary Cross-Entropy):
+L = -1/n Σᵢ [yᵢ log(σ(wᵀxᵢ)) + (1-yᵢ) log(1-σ(wᵀxᵢ))]
+
+Why this loss? Maximum Likelihood Estimation.
+If P(yᵢ=1) = p̂ᵢ, the likelihood is:
+∏ᵢ p̂ᵢ^yᵢ (1-p̂ᵢ)^{1-yᵢ}
+
+Taking negative log gives cross-entropy.
+
+Gradient:
+∂L/∂w = 1/n Xᵀ(σ(Xw) - y)
+
+Beautifully simple! The gradient is the difference between predicted probabilities and true labels.
+
+Update (Gradient Descent):
+w ← w - η · 1/n Xᵀ(σ(Xw) - y)`,
+          theory: `Why sigmoid? The log-odds (logit) is linear:
+log[P(y=1)/(1-P(y=1))] = wᵀx
+
+This is the canonical link function for Bernoulli outcomes. Inverting the logit gives the sigmoid.
+
+Why cross-entropy instead of MSE for classification?
+MSE loss for logistic regression is non-convex (multiple local minima). Cross-entropy is convex → guaranteed global minimum.
+
+Decision boundary: wᵀx = 0 → P(y=1) = 0.5. The boundary is a hyperplane in feature space.
+
+Multi-class: use Softmax (generalization of sigmoid) + Categorical Cross-Entropy.
+P(y=k|x) = e^{wₖᵀx} / Σⱼ e^{wⱼᵀx}`,
+          practical: "Logistic regression is your baseline classifier. It's fast, interpretable, and gives calibrated probabilities. sklearn's LogisticRegression uses L2 regularization by default (C=1/λ). For highly imbalanced data, use class_weight='balanced'. For multinomial, set multi_class='multinomial'."
+        }
+      },
+      {
+        q: "How does a Decision Tree split? Explain Information Gain, Gini Impurity, and when to use each. What is the role of tree depth in bias-variance tradeoff?",
+        tags: ["medium","trees","classification"],
+        answer: {
+          intuition: "A decision tree recursively splits the data by asking yes/no questions on features to create pure leaf nodes (where one class dominates). The key question is: which feature, and at what threshold, gives the most useful split?",
+          math: `Entropy of a node with class proportions p₁, p₂, ..., pₖ:
+H(S) = -Σₖ pₖ log₂(pₖ)
+
+Information Gain for split on feature A:
+IG(S, A) = H(S) - Σᵥ |Sᵥ|/|S| H(Sᵥ)
+
+We pick the feature A that maximizes IG.
+
+Gini Impurity:
+Gini(S) = 1 - Σₖ pₖ²
+
+Gini split criterion:
+ΔGini = Gini(S) - Σᵥ |Sᵥ|/|S| Gini(Sᵥ)
+
+For regression trees: use variance reduction:
+ΔVar = Var(S) - Σᵥ |Sᵥ|/|S| Var(Sᵥ)`,
+          theory: `Information Gain vs Gini:
+- Gini: computationally faster (no log computation), tends to produce similar trees. sklearn uses Gini by default.
+- Information Gain (Entropy): theoretically grounded in information theory. Can favor features with many categories (use Gain Ratio to fix).
+
+Tree Depth and Bias-Variance:
+- Shallow tree (small depth): high bias, low variance — underfits, misses complex patterns.
+- Deep tree (large depth): low bias, high variance — memorizes training data, overfits.
+- Optimal depth: found via cross-validation or pruning (cost-complexity pruning: minimize L + α·leaves).
+
+Other hyperparameters: min_samples_split, min_samples_leaf, max_features, max_leaf_nodes — all control complexity.
+
+Decision trees are piecewise constant: they create rectangular decision regions in feature space. Not great for smooth boundaries — that's why ensembles help.`,
+          practical: "Decision trees are rarely used alone in practice — they're the base learner for Random Forests and Gradient Boosting. For interpretability, keep max_depth=3-5 and visualize with sklearn.tree.plot_tree or dtreeviz. Always prune or set depth limits."
+        }
+      },
+      {
+        q: "Explain how Random Forest works. What is bagging? What is OOB error? Why does averaging trees reduce variance?",
+        tags: ["medium","ensemble","random-forest"],
+        answer: {
+          intuition: "Random Forest builds many decorrelated decision trees on random subsets of data and features, then averages their predictions. 'Wisdom of crowds' — many imperfect but diverse models average out to something better.",
+          math: `Bagging (Bootstrap Aggregating):
+1. Draw n bootstrap samples (with replacement) from training data.
+2. Train one tree on each sample.
+3. Final prediction: majority vote (classification) or mean (regression).
+
+Why variance reduction?
+If each tree has variance σ² and pairwise correlation ρ, then the variance of the average of B trees is:
+Var(ȳ) = ρσ² + (1-ρ)σ²/B
+
+As B→∞: Var(ȳ) → ρσ²
+
+Key insight: you can't reduce variance below ρσ². This is why RF introduces extra randomness (random feature subsets) to reduce ρ (decorrelate trees).
+
+Feature subsampling: at each split, consider only m random features (default m = √p for classification, p/3 for regression).
+
+OOB (Out-of-Bag) Error:
+Each tree is trained on ~63.2% of data (bootstrap). The remaining ~36.8% are "out-of-bag" samples.
+Evaluate each sample using only trees that didn't see it.
+OOB error ≈ cross-validation error, computed for free!`,
+          theory: `Feature Importance:
+Mean Decrease in Impurity (MDI): sum the impurity decrease at each node split by a feature, averaged across trees.
+Mean Decrease in Accuracy (MDA/Permutation importance): permute a feature, measure how much test accuracy drops.
+
+Limitations of MDI: biased toward high-cardinality features. Use MDA (permutation importance) for reliable estimates.
+
+RF vs single tree: RF trades interpretability for accuracy. RF vs Gradient Boosting: RF is faster to train and less prone to overfitting, but often slightly less accurate.
+
+Number of trees: performance plateaus after ~200-500 trees. More trees = more computation but no harm (unlike gradient boosting where more trees = more overfit risk).`,
+          practical: "sklearn's RandomForestClassifier/Regressor. n_estimators=100-500, max_features='sqrt'. For large datasets, use n_jobs=-1. Feature importances via .feature_importances_ (but prefer permutation_importance for unbiased estimates). RF handles missing values poorly — impute first."
+        }
+      },
+      {
+        q: "Derive the SVM optimization problem. Explain the kernel trick, and give examples of common kernels. When would you choose SVM over logistic regression?",
+        tags: ["hard","math","svm"],
+        answer: {
+          intuition: "SVM finds the hyperplane with the maximum margin between classes. Instead of just any separating hyperplane, we want the one that is farthest from the nearest training points (support vectors). More margin = more generalization.",
+          math: `Hard-margin SVM (linearly separable):
+Primal problem:
+  minimize  1/2 ||w||²
+  subject to  yᵢ(wᵀxᵢ + b) ≥ 1  for all i
+
+The margin width = 2/||w||. Maximizing margin ↔ minimizing ||w||².
+
+Soft-margin SVM (with slack ξᵢ):
+  minimize  1/2 ||w||² + C Σᵢ ξᵢ
+  subject to  yᵢ(wᵀxᵢ + b) ≥ 1 - ξᵢ,  ξᵢ ≥ 0
+
+C controls the bias-variance tradeoff: large C → fewer margin violations but risk overfit.
+
+Dual Problem (via Lagrangians):
+  maximize  Σᵢ αᵢ - 1/2 Σᵢ Σⱼ αᵢαⱼ yᵢyⱼ xᵢᵀxⱼ
+  subject to  Σᵢ αᵢyᵢ = 0,  0 ≤ αᵢ ≤ C
+
+Prediction: f(x) = sign(Σᵢ αᵢ yᵢ K(xᵢ, x) + b)
+
+Key: data appears only as dot products xᵢᵀxⱼ → replace with kernel K(xᵢ,xⱼ)!`,
+          theory: `The Kernel Trick:
+Instead of explicitly mapping to high-dimensional space φ(x), use:
+K(xᵢ, xⱼ) = φ(xᵢ)ᵀφ(xⱼ)
+
+Common Kernels:
+1. Linear: K(x,z) = xᵀz  (use when data is linearly separable or p >> n)
+2. Polynomial: K(x,z) = (xᵀz + c)^d
+3. RBF/Gaussian: K(x,z) = exp(-γ||x-z||²)  [most popular, infinite-dimensional]
+4. Sigmoid: K(x,z) = tanh(αxᵀz + c)
+
+RBF kernel intuition: measures similarity via Euclidean distance. γ controls how 'wide' the Gaussians are. Large γ → tight, complex boundary. Small γ → smooth boundary.
+
+SVM vs Logistic Regression:
+Choose SVM when: high-dimensional sparse data (text), small datasets, clear margin exists.
+Choose LR when: need probability outputs, large datasets, interpretability matters.
+In practice (sklearn): SVMs scale poorly (O(n²) to O(n³)) — use LinearSVC or logistic regression for large n.`,
+          practical: "For RBF kernel, always scale features first (SVM is not scale-invariant). Grid search over C and γ. Kernel SVMs don't work well with >100K samples — use LinearSVC or kernel approximation (sklearn's RBFSampler + linear classifier)."
+        }
+      },
+      {
+        q: "Explain XGBoost from first principles — gradient boosting, the objective function, and key improvements over vanilla gradient boosting.",
+        tags: ["hard","ensemble","xgboost"],
+        answer: {
+          intuition: "XGBoost is gradient boosting done right — it builds trees sequentially, each correcting the residuals of the previous ensemble. Think of it as gradient descent in function space: each new tree is a step in the direction that reduces the loss.",
+          math: `Gradient Boosting Framework:
+Ensemble at step t: F_t(x) = F_{t-1}(x) + η·h_t(x)
+where h_t is a new tree that best reduces the loss.
+
+The key: h_t should be in the direction of negative gradient:
+rᵢ = -∂L(yᵢ, F_{t-1}(xᵢ)) / ∂F_{t-1}(xᵢ)
+
+So we fit h_t to pseudo-residuals rᵢ.
+
+XGBoost Objective (at step t):
+L̃^(t) = Σᵢ [gᵢ fₜ(xᵢ) + 1/2 hᵢ fₜ(xᵢ)²] + Ω(fₜ)
+
+where:
+  gᵢ = ∂L(yᵢ, ŷᵢ^{t-1})/∂ŷᵢ  (first derivative / gradient)
+  hᵢ = ∂²L(yᵢ, ŷᵢ^{t-1})/∂ŷᵢ²  (second derivative / Hessian)
+  Ω(f) = γT + 1/2 λ||w||²  (regularization: T=num_leaves, w=leaf weights)
+
+Optimal leaf weight for leaf j:
+wⱼ* = -Gⱼ/(Hⱼ + λ)  where Gⱼ=Σᵢ∈j gᵢ, Hⱼ=Σᵢ∈j hᵢ
+
+Split gain:
+Gain = 1/2 [GL²/(HL+λ) + GR²/(HR+λ) - (GL+GR)²/(HL+HR+λ)] - γ`,
+          theory: `XGBoost Improvements over vanilla GBDT:
+1. Second-order gradients: uses both gradient + Hessian → faster convergence
+2. Regularization: L1 (α) and L2 (λ) on leaf weights → less overfitting
+3. Tree pruning: uses γ threshold — only splits that increase gain ≥ γ
+4. Sparsity-aware: handles missing values via learned default directions
+5. Column subsampling: like Random Forest, reduces correlation
+6. Approximate greedy algorithm: bucket candidate split points for efficiency
+7. Cache-aware access: optimized memory layout for speed
+8. System optimizations: parallel tree construction, out-of-core computation
+
+XGBoost vs LightGBM vs CatBoost:
+- LightGBM: leaf-wise growth (vs level-wise in XGB) → faster, but easier to overfit on small data. Uses GOSS and EFB for speed.
+- CatBoost: handles categorical features natively with ordered target statistics (no data leakage). Often better on cat-heavy datasets.`,
+          practical: "XGBoost hyperparameters: n_estimators (100-2000), max_depth (3-8), learning_rate (0.01-0.3), subsample (0.6-0.9), colsample_bytree (0.5-0.9). Always use early stopping: early_stopping_rounds=50 with eval_set. For imbalanced: scale_pos_weight=neg_count/pos_count. Use DMatrix for maximum speed."
+        }
+      },
+      {
+        q: "What is KNN? How does the choice of K affect bias and variance? What are its computational drawbacks and how are they addressed?",
+        tags: ["easy","knn","lazy-learning"],
+        answer: {
+          intuition: "KNN is the simplest 'learning' algorithm: to classify a new point, find its K nearest training neighbors and take a majority vote. No explicit model is learned — the training data IS the model.",
+          math: `KNN Prediction:
+  ŷ = argmax_c Σᵢ∈N_K(x) I(yᵢ = c)
+
+Where N_K(x) is the set of K nearest neighbors of x.
+
+Common distance metrics:
+  Euclidean: d(x,z) = sqrt(Σⱼ (xⱼ-zⱼ)²)
+  Manhattan: d(x,z) = Σⱼ |xⱼ-zⱼ|
+  Minkowski: d(x,z) = (Σⱼ |xⱼ-zⱼ|^p)^{1/p}  [generalizes both]
+
+For regression: ŷ = 1/K Σᵢ∈N_K(x) yᵢ`,
+          theory: `K and Bias-Variance:
+- K=1: zero training error, high variance (sensitive to noise), low bias
+- K=N: predict the global mean, high bias, zero variance
+- Optimal K: found via cross-validation; typically K=sqrt(n)
+
+Curse of dimensionality: In high dimensions, nearest neighbors are no longer 'near'. The ratio of distances between nearest and farthest neighbor approaches 1 as d → ∞. KNN degrades rapidly above ~20 features.
+
+Computational complexity:
+- Training: O(1) — just store data
+- Prediction: O(n·d) per query — must compute distance to all training points
+- This is prohibitive for large n or real-time inference`,
+          practical: "Optimizations: KD-trees work well for d<20 (build time O(n log n), query O(log n)). Ball trees handle higher dimensions. Approximate Nearest Neighbors (ANN): FAISS (Facebook), Annoy (Spotify), HNSW — enable sub-linear query time. Always normalize features before KNN (distance is scale-sensitive). KNN is surprisingly competitive for low-d, small datasets."
+        }
+      },
+      {
+        q: "Explain Naive Bayes — the conditional independence assumption, the math, and when it works despite the assumption being almost always false.",
+        tags: ["medium","probabilistic","classification"],
+        answer: {
+          intuition: "Naive Bayes is a probabilistic classifier using Bayes' theorem, with the 'naive' assumption that all features are conditionally independent given the class. Despite this rarely being true, it works remarkably well for text classification.",
+          math: `Bayes' Theorem:
+  P(y|x) ∝ P(y) · P(x|y)
+
+Naive independence assumption:
+  P(x₁,...,xₚ|y) = ∏ⱼ P(xⱼ|y)
+
+Classifier:
+  ŷ = argmax_y P(y) · ∏ⱼ P(xⱼ|y)
+
+In log space (avoids underflow):
+  ŷ = argmax_y [log P(y) + Σⱼ log P(xⱼ|y)]
+
+Gaussian Naive Bayes (continuous features):
+  P(xⱼ|y=k) = N(xⱼ; μⱼₖ, σ²ⱼₖ)
+
+Multinomial Naive Bayes (discrete counts, NLP):
+  P(xⱼ|y=k) = θⱼₖ^xⱼ  [MLE: θⱼₖ = count(feature j, class k) / count(class k)]
+
+Laplace smoothing (avoid zero probability):
+  θⱼₖ = (count(j,k) + α) / (count(k) + αV)  where V = vocab size`,
+          theory: `Why does it work despite the assumption?
+1. Decision boundary: for classification, we only need argmax, not calibrated P(y|x). The relative ranking of probabilities often survives violated independence.
+2. Zero-one loss robustness: Friedman showed that Naive Bayes needs less than half the features to get 30% error compared to perfect Bayes classifier — because errors in probability estimates partially cancel.
+3. High-dimensional advantage: with many features, NB is robust because no single feature dominates.
+
+Naive Bayes variants:
+- Gaussian NB: assumes Gaussian distribution per feature — works for real-valued features
+- Multinomial NB: word counts in text classification
+- Bernoulli NB: binary feature presence/absence
+- Complement NB: better for imbalanced text (often outperforms standard MNB)`,
+          practical: "Naive Bayes is your first baseline for text classification. It's lightning fast (O(nd) training, O(d) prediction), works well with small training data, and handles thousands of features. sklearn: GaussianNB, MultinomialNB, BernoulliNB. Always use Laplace smoothing (alpha=1). Main weakness: can't model feature interactions."
+        }
+      },
+    ]
+  },
+  {
+    id: "evaluation",
+    icon: "📊",
+    title: "Model Evaluation & Metrics",
+    subtitle: "Regression metrics, classification metrics, overfitting, cross-validation",
+    questions: [
+      {
+        q: "Explain Precision, Recall, F1, ROC-AUC, and PR-AUC. When would you choose PR-AUC over ROC-AUC? Give the formulas and confusion matrix definitions.",
+        tags: ["medium","metrics","classification"],
+        answer: {
+          intuition: "Accuracy can be misleading — a model that always predicts 'negative' in a 99% negative dataset achieves 99% accuracy! We need metrics that tell us about the quality of positive predictions.",
+          math: `From the confusion matrix (TP, FP, TN, FN):
+
+Precision = TP / (TP + FP)   [of predicted positives, how many are real?]
+Recall    = TP / (TP + FN)   [of real positives, how many did we find?]
+F1        = 2·(Precision·Recall) / (Precision+Recall)   [harmonic mean]
+Fβ        = (1+β²)·(Precision·Recall) / (β²·Precision + Recall)
+
+ROC curve: TPR vs FPR at varying thresholds
+  TPR (Sensitivity) = TP/(TP+FN) = Recall
+  FPR = FP/(FP+TN)
+
+AUC-ROC = probability that model ranks a random positive higher than a random negative
+AUC-ROC = P(score(pos) > score(neg))
+
+PR Curve: Precision vs Recall at varying thresholds
+AUC-PR (Average Precision) = Σₙ (Rₙ - Rₙ₋₁)·Pₙ`,
+          theory: `ROC-AUC vs PR-AUC:
+ROC-AUC is misleading for imbalanced datasets because FPR has TN in the denominator — and when negatives dominate, even a bad model has low FPR.
+
+PR-AUC is better when:
+- Classes are imbalanced (fraud detection, medical diagnosis)
+- False positives are costly
+- You care about performance on the minority class
+
+Example: 1% positive class, model that randomly scores everyone:
+- ROC-AUC ≈ 0.5 (looks bad)
+- AUC-PR ≈ 0.01 (baseline is prevalence)
+A good model's AUC-PR is much higher than 0.01.
+
+MCC (Matthews Correlation Coefficient) — often the best single metric for imbalanced:
+MCC = (TP·TN - FP·FN) / sqrt((TP+FP)(TP+FN)(TN+FP)(TN+FN))
+Ranges from -1 to +1, accounts for all four confusion matrix values.`,
+          practical: "In sklearn: classification_report gives P/R/F1, roc_auc_score for ROC-AUC, average_precision_score for PR-AUC. For fraud/medical: always report PR-AUC. Threshold selection: use F1-optimal threshold or precision-recall tradeoff based on business cost. Never just use default 0.5 threshold."
+        }
+      },
+      {
+        q: "Explain the Bias-Variance Tradeoff mathematically. How does model complexity affect each, and what are practical strategies to manage it?",
+        tags: ["hard","math","bias-variance"],
+        answer: {
+          intuition: "Imagine repeatedly training your model on different samples from the same distribution. Bias is how wrong you are on average. Variance is how much your predictions fluctuate. You can't minimize both simultaneously with finite data.",
+          math: `Expected generalization error decomposition:
+E[(y - f̂(x))²] = Bias[f̂(x)]² + Var[f̂(x)] + σ²ₑ
+
+Where:
+  Bias[f̂(x)] = E[f̂(x)] - f(x)   [systematic error — wrong on average]
+  Var[f̂(x)] = E[(f̂(x) - E[f̂(x)])²]   [sensitivity to training set]
+  σ²ₑ = irreducible noise
+
+For Linear Regression specifically:
+  Bias = X(XᵀX)⁻¹Xᵀf - f  [0 if true model is linear = unbiased]
+  Var = σ²X(XᵀX)⁻¹Xᵀ
+
+Ridge Regression:
+  Bias increases by: λ(XᵀX + λI)⁻¹Xᵀf ≠ 0
+  Variance decreases by: σ²X(XᵀX + λI)⁻²Xᵀ ≤ OLS variance
+
+This is the bias-variance tradeoff in regularization!`,
+          theory: `Complexity and B-V:
+- High capacity model (deep tree, high-degree polynomial): memorizes data → low bias, high variance → overfitting
+- Low capacity model (shallow tree, linear): misses patterns → high bias, low variance → underfitting
+
+Diagnosing:
+- High bias: train error ≈ val error, both high → model too simple
+- High variance: train error << val error → model too complex
+
+Practical strategies:
+Reduce variance: regularization (L1/L2), dropout, bagging, early stopping, data augmentation, reduce model size
+Reduce bias: more features, larger model, polynomial features, remove regularization, longer training
+The sweet spot: cross-validation to pick model complexity
+
+Modern observation: 'Double descent' — in deep learning, extreme over-parameterization can reduce test error again (interpolating threshold). Classical B-V tradeoff applies up to this threshold.`,
+          practical: "Use learning curves (train/val error vs training size) to diagnose. If both errors are high with more data → high bias. If gap between train and val stays large → high variance. Tools: sklearn's learning_curve, validation_curve."
+        }
+      },
+      {
+        q: "Explain k-fold Cross-Validation, Leave-One-Out CV, and Stratified k-fold. When does each fail? What is data leakage and how do you prevent it in CV pipelines?",
+        tags: ["medium","cv","methodology"],
+        answer: {
+          intuition: "Cross-validation estimates how well a model generalizes by training and evaluating on different splits of data. It gives a more reliable estimate than a single train/test split, especially with limited data.",
+          math: `k-Fold CV:
+1. Split data into k equal folds
+2. For i=1 to k: train on k-1 folds, evaluate on fold i
+3. CV score = mean of k evaluation scores
+4. SE = std of scores / sqrt(k)
+
+Bias-Variance of CV:
+LOO (k=n): nearly unbiased estimate but high variance, expensive (n models)
+5-fold/10-fold: balanced — lower variance than LOO, slight bias
+Rule of thumb: 10-fold is standard. 5-fold for large datasets.
+
+Stratified k-fold: ensures each fold has same class proportions as the full dataset.
+Critical for imbalanced datasets.`,
+          theory: `Data Leakage — the most dangerous CV mistake:
+Leakage occurs when information from the test/validation set influences the model during training.
+
+Examples:
+1. Scaling before split: compute mean/std on all data → test statistics leak into training
+2. Feature selection before split: selecting features based on all data → overly optimistic estimates
+3. Target encoding before split: target stats computed on all data include test targets
+4. Time series: future data leaks into past predictions (must use temporal splits)
+
+Correct approach: use sklearn Pipelines!
+Pipeline([
+  ('scaler', StandardScaler()),
+  ('model', LogisticRegression())
+])
+cv_scores = cross_val_score(pipeline, X, y, cv=5)
+
+The pipeline is fit only on training folds — no leakage.
+
+Other CV variants:
+- RepeatedKFold: repeat k-fold multiple times with different splits → more stable estimate
+- GroupKFold: ensure samples from same group (e.g., same patient) never span train/val
+- TimeSeriesSplit: for time series — always validate on future data`,
+          practical: "Use sklearn's cross_val_score with Pipeline. For time series: TimeSeriesSplit, never shuffle. For grouped data (same user in train & test → leakage): GroupKFold. Nested CV: outer loop for model selection, inner loop for hyperparameter tuning — gives unbiased performance estimate."
+        }
+      },
+      {
+        q: "What are MAE, MSE, RMSE, MAPE, and R²? When does each fail, and what is the difference between R² and Adjusted R²?",
+        tags: ["easy","regression","metrics"],
+        answer: {
+          intuition: "Regression metrics quantify how far predictions are from true values. Each has strengths and weaknesses depending on your data distribution and business goals.",
+          math: `MAE = 1/n Σᵢ |yᵢ - ŷᵢ|     [mean absolute error, robust to outliers]
+MSE = 1/n Σᵢ (yᵢ - ŷᵢ)²   [mean squared error, penalizes outliers heavily]
+RMSE = sqrt(MSE)             [same units as y, most common]
+MAPE = 1/n Σᵢ |yᵢ-ŷᵢ|/|yᵢ| × 100%  [relative error, scale-free]
+
+R² (coefficient of determination):
+R² = 1 - SS_res/SS_tot
+   = 1 - Σ(yᵢ-ŷᵢ)² / Σ(yᵢ-ȳ)²
+
+Ranges: (-∞, 1]. R²=1: perfect fit. R²=0: model = mean. R²<0: worse than mean.
+
+Adjusted R²:
+R²_adj = 1 - (1-R²)(n-1)/(n-p-1)
+where p = number of features, n = samples
+
+Penalizes for adding useless features — R² can only increase as you add features (even random ones), but Adjusted R² will decrease if the feature doesn't help.`,
+          theory: `Failure cases:
+- MAE: insensitive to large errors — bad when outliers matter a lot (financial risk)
+- MSE/RMSE: heavily influenced by outliers. A single huge error dominates.
+- MAPE: undefined when yᵢ=0, asymmetric (10% error means different things for over/under prediction), fails for near-zero targets
+- R²: misleading for non-linear relationships, sensitive to outliers, doesn't indicate prediction error magnitude, increases with more features (use Adjusted R²)
+
+Better alternatives:
+- Huber loss: quadratic for small errors, linear for large (robust to outliers)
+- SMAPE: symmetric MAPE
+- MSLE: log(y) scale — good for predictions spanning orders of magnitude
+- Tweedie deviance: for zero-inflated outcomes (insurance claims)`,
+          practical: "For production: choose metric matching your business objective. Delivery time estimation → MAPE (relative error matters). House price prediction → RMSE (large errors are very bad). Demand forecasting with zeros → MSLE. Always report multiple metrics. R² is fine for reporting fit quality but use RMSE for comparing models."
+        }
+      },
+    ]
+  },
+  {
+    id: "feature-eng",
+    icon: "⚙️",
+    title: "Feature Engineering",
+    subtitle: "Missing values, encoding, scaling, selection, extraction",
+    questions: [
+      {
+        q: "Explain strategies for handling missing data. What are MCAR, MAR, and MNAR? When is imputation appropriate and when does it introduce bias?",
+        tags: ["medium","missing-data","preprocessing"],
+        answer: {
+          intuition: "Missing data is almost universal in real-world datasets. How you handle it can make or break your model. The key question is: why is the data missing? The mechanism determines the right strategy.",
+          math: `Missing Data Mechanisms:
+
+MCAR (Missing Completely At Random):
+P(missing | X_obs, X_mis) = P(missing)
+Missingness has no relation to any variable. E.g., random equipment failure.
+→ Can safely drop rows (unbiased, but loses data). Simple imputation works.
+
+MAR (Missing At Random):
+P(missing | X_obs, X_mis) = P(missing | X_obs)
+Missingness depends only on observed variables. E.g., older patients less likely to report weight, age is observed.
+→ Imputation conditional on observed variables works.
+
+MNAR (Missing Not At Random):
+P(missing | X_obs, X_mis) ≠ P(missing | X_obs)
+Missingness depends on the missing value itself. E.g., high earners less likely to report income.
+→ Most dangerous! Simple imputation introduces bias. Need domain knowledge.`,
+          theory: `Imputation Strategies:
+1. Mean/Median/Mode imputation: simple, fast. Mean: good for normal distributions, MCAR only. Median: robust to outliers.
+2. Hot-deck: replace with a random observed value from similar records.
+3. MICE (Multiple Imputation by Chained Equations): models each missing feature as a function of others. Iterates until convergence. Gold standard for complex missingness. sklearn: IterativeImputer.
+4. KNN imputation: replace with weighted average of K nearest non-missing neighbors. sklearn: KNNImputer.
+5. Indicator feature: add binary column "was_missing" — the missingness pattern itself can be informative (especially for MNAR).
+6. Model-based: train a predictive model (e.g., RF) to predict missing values.
+
+Common mistakes:
+- Mean imputing before train/val split → leaks validation stats
+- Not adding missing indicator for MNAR → model can't learn the pattern
+- Imputing target variable (never do this)`,
+          practical: "In production pipelines: use sklearn Pipeline with SimpleImputer (mean/median) or KNNImputer. Always add missing indicators for MNAR features. For tree-based models (RF, XGBoost, LightGBM): they handle missing values natively — just pass NaN. For neural nets and SVMs: must impute. Log missing value rates in your feature monitoring."
+        }
+      },
+      {
+        q: "Compare one-hot encoding, label encoding, target encoding, and embeddings. When does each work, and what problems can target encoding cause?",
+        tags: ["medium","encoding","categorical"],
+        answer: {
+          intuition: "Converting categorical features to numbers for ML models requires care. The encoding choice affects what patterns the model can learn, computational cost, and whether you introduce information leakage.",
+          math: `One-Hot Encoding (OHE):
+Category with k values → k binary columns
+Gender=['M','F'] → [1,0] or [0,1]
+Problem: k-1 dummy variable is sufficient (dummy variable trap with intercept)
+Dimensionality: 1 column → k columns
+
+Label Encoding:
+Assigns integer: Red=0, Green=1, Blue=2
+Problem: implies ordinal order. Model may learn Red < Green < Blue which is meaningless.
+Only valid for ordinal categories or tree-based models.
+
+Target Encoding (Mean Encoding):
+Replace category with mean target value:
+encoded(c) = mean(y | category = c)
+Problem: leakage! If computed on the full dataset including validation.
+
+Proper target encoding (leave-one-out / cross-fold):
+For sample i: encoded(cᵢ) = (Σⱼ≠ᵢ,catⱼ=cᵢ yⱼ) / (count(cᵢ) - 1)
+
+With smoothing (to handle rare categories):
+encoded(c) = (count(c)·mean(y|c) + k·global_mean) / (count(c) + k)`,
+          theory: `When to use each:
+OHE: nominal categories, linear/logistic regression, neural nets, SVMs. Problematic for high cardinality (100+ categories → very sparse, high-dimensional).
+
+Label Encoding: only for ordinal features (cold/warm/hot), or tree-based models (trees don't care about ordinality — they split on ranges).
+
+Target Encoding: high cardinality categoricals (zip codes, product IDs), tree-based models. Must use cross-fold encoding to prevent leakage. Category Encoders library handles this.
+
+Frequency Encoding: replace with count/frequency of that category. Preserves no target info but handles cardinality.
+
+Embeddings (learned): for very high cardinality (user IDs, item IDs) in neural networks. Learn a dense low-dimensional representation. E.g., embedding_dim ≈ min(50, (n_categories+1)//2) as a rule of thumb.
+
+Binary Encoding: convert label encoding to binary → only log₂(k) columns. Good middle ground.`,
+          practical: "sklearn's OneHotEncoder with handle_unknown='ignore' for unseen categories. For target encoding: use category_encoders library (TargetEncoder, LeaveOneOutEncoder, CatBoostEncoder). CatBoost has built-in ordered target encoding. For neural nets with categoricals: use Embedding layers (PyTorch nn.Embedding)."
+        }
+      },
+      {
+        q: "Explain the difference between normalization and standardization. When does each matter? What is the effect of scaling on different algorithms?",
+        tags: ["easy","scaling","preprocessing"],
+        answer: {
+          intuition: "Feature scaling ensures features are on comparable scales so that models don't treat a feature with range [0, 1000] as inherently more important than one with range [0, 1]. Different algorithms are affected very differently.",
+          math: `Min-Max Normalization (scaling to [0,1]):
+  x_scaled = (x - x_min) / (x_max - x_min)
+
+Robust to outliers? No — min and max are affected by outliers.
+
+Standardization (Z-score normalization):
+  x_scaled = (x - μ) / σ
+
+Result: mean=0, std=1. Not bounded.
+Robust to outliers? Somewhat — mean and std still affected.
+
+Robust Scaling:
+  x_scaled = (x - median) / IQR
+Uses median and interquartile range → robust to outliers.
+
+Max Absolute Scaling:
+  x_scaled = x / max(|x|)
+Scales to [-1, 1]. Preserves zero entries → good for sparse data.`,
+          theory: `Effect by Algorithm:
+
+Sensitive to scaling (must scale):
+- Linear/Logistic Regression: regularization penalizes large weights, which is biased if features have different scales
+- SVM: kernel distances are scale-dependent
+- KNN: Euclidean distance is scale-dependent
+- PCA: variance calculation is scale-dependent
+- Neural Networks: gradient magnitudes affected by feature scales (gradient clipping can help but scaling is better)
+- K-Means: same as KNN
+
+Scale-invariant (scaling doesn't matter):
+- Decision Trees: split on thresholds, rank order is preserved
+- Random Forests
+- Gradient Boosting (XGBoost, LightGBM)
+- Naive Bayes
+
+Key rule: fit scaler ONLY on training data, then transform train and test.
+scaler.fit(X_train) → scaler.transform(X_train), scaler.transform(X_test)
+Never fit on combined train+test (leakage).`,
+          practical: "sklearn scalers: StandardScaler (default choice), MinMaxScaler (when you know bounded range like images 0-255), RobustScaler (when outliers exist). Always include in Pipeline. For neural nets: standardization is usually sufficient; some use per-channel normalization for images."
+        }
+      },
+    ]
+  },
+  {
+    id: "deep-learning",
+    icon: "🧠",
+    title: "Deep Learning Fundamentals",
+    subtitle: "Neural networks, backprop, activations, optimization, regularization",
+    questions: [
+      {
+        q: "Derive backpropagation from first principles using the chain rule. Explain the vanishing/exploding gradient problem and solutions.",
+        tags: ["hard","math","backprop"],
+        answer: {
+          intuition: "Backpropagation is simply the chain rule applied to compute gradients of a loss w.r.t. all parameters. It works backwards through the network, reusing intermediate computations efficiently.",
+          math: `Forward Pass (layer l with weights Wˡ, bias bˡ):
+  zˡ = Wˡ aˡ⁻¹ + bˡ
+  aˡ = σ(zˡ)
+
+Output layer gradient (MSE loss, L layers):
+  δᴸ = ∂L/∂zᴸ = (aᴸ - y) ⊙ σ'(zᴸ)
+
+Backpropagate through hidden layers (chain rule):
+  δˡ = (Wˡ⁺¹)ᵀ δˡ⁺¹ ⊙ σ'(zˡ)
+
+Parameter gradients:
+  ∂L/∂Wˡ = δˡ (aˡ⁻¹)ᵀ
+  ∂L/∂bˡ = δˡ
+
+Note: gradients flow backwards through Wᵀ and element-wise σ'.
+
+Computational Graph view:
+For node z = f(x,y): ∂L/∂x = ∂L/∂z · ∂z/∂x [local gradient × upstream gradient]
+This is the key insight: each node only needs its local gradient.`,
+          theory: `Vanishing Gradients:
+With sigmoid/tanh activations: σ'(z) ≤ 0.25 (sigmoid) or ≤ 1 (tanh).
+After L layers: ||∂L/∂W¹|| ≈ Π_l σ'ˡ × ||upstream|| → exponentially small if σ'<1.
+Effect: early layers learn very slowly or not at all.
+
+Exploding Gradients:
+If ||Wˡ|| > 1 and many layers: gradient magnitudes grow exponentially.
+Effect: parameters become NaN, training diverges.
+
+Solutions:
+
+Vanishing:
+1. ReLU activation: σ'(z) = 1 for z>0 (no squashing in positive region)
+2. Residual connections (ResNet): gradient highway that bypasses layers — ∂L/∂xˡ gets a direct path
+3. Batch normalization: stabilizes activations and gradients
+4. Better initialization (Xavier/He): keeps gradient variance constant across layers
+5. LSTM gates: designed to preserve long-range gradients
+
+Exploding:
+1. Gradient clipping: if ||g|| > threshold: g ← g × threshold/||g||
+2. Weight regularization (L2)
+3. Careful initialization`,
+          practical: "In PyTorch: gradients are computed automatically via autograd. Debug with torch.autograd.gradcheck. Monitor gradient norms during training: log ||∇W||. For RNNs: always use gradient clipping (clip_grad_norm_(params, max_norm=1.0)). For deep networks: use ResNet-style skip connections."
+        }
+      },
+      {
+        q: "Compare all major activation functions: Sigmoid, Tanh, ReLU, Leaky ReLU, ELU, GELU, Swish. Give formulas, derivatives, and when to use each.",
+        tags: ["medium","activations","neural-nets"],
+        answer: {
+          intuition: "Activation functions introduce non-linearity, allowing networks to model complex functions. The choice affects gradient flow, training speed, and final performance.",
+          math: `Sigmoid: σ(x) = 1/(1+e⁻ˣ)
+  Range: (0,1)   Derivative: σ(x)(1-σ(x)) ≤ 0.25
+  Problem: saturates → vanishing gradients. Not zero-centered.
+
+Tanh: tanh(x) = (eˣ-e⁻ˣ)/(eˣ+e⁻ˣ)
+  Range: (-1,1)   Derivative: 1-tanh²(x) ≤ 1
+  Better than sigmoid (zero-centered) but still saturates.
+
+ReLU: f(x) = max(0, x)
+  Derivative: 1 if x>0, 0 if x<0
+  Pros: no saturation for x>0, fast compute, sparse activations
+  Problem: "Dying ReLU" — if x<0 always, neuron outputs 0, gradient=0, never updates.
+
+Leaky ReLU: f(x) = x if x>0, αx if x<0  (α≈0.01)
+  Fixes dying ReLU by allowing small negative gradient.
+
+ELU: f(x) = x if x>0, α(eˣ-1) if x<0
+  Smooth, negative values push mean activation toward zero (self-normalizing property).
+
+GELU: x·Φ(x) where Φ is standard normal CDF
+  ≈ x·σ(1.702x) [approximation]
+  Stochastic interpretation: "gate" x by probability it's positive under N(0,1).
+  Used in: BERT, GPT, most modern transformers.
+
+Swish: x·σ(βx)  (β=1 is common, or learned)
+  Smooth, non-monotonic. Outperforms ReLU on deep networks.`,
+          theory: `Dead ReLU analysis:
+During training, if a neuron's pre-activation is always negative (e.g., after a large gradient update), it receives zero gradient forever → stuck. Mitigation: lower learning rate, Leaky ReLU, careful initialization.
+
+Why GELU works so well for Transformers:
+Unlike ReLU which hard-gates (0 or 1), GELU softly gates — it's stochastic regularization baked into the activation. The smooth curve around 0 allows richer gradient flow for near-zero activations. Empirically outperforms ReLU/ELU on NLP tasks.
+
+Dying ReLU vs Exploding activations:
+The 'sweet zone' for activations is roughly x ∈ [-3, 3]. Outside: either dead (ReLU) or saturated (sigmoid/tanh). Batch normalization keeps pre-activations in this range.`,
+          practical: "Default choices: Hidden layers → ReLU (simple, fast) or GELU (for transformers). Output: sigmoid (binary classification), softmax (multiclass), linear (regression). Never use sigmoid/tanh in hidden layers of deep networks. For very deep networks: GELU or Swish outperforms ReLU empirically."
+        }
+      },
+      {
+        q: "Explain Adam optimizer from first principles — derive the update rule, explain the bias correction, and compare with SGD, RMSProp, and SGD with momentum.",
+        tags: ["hard","math","optimization"],
+        answer: {
+          intuition: "Adam ('Adaptive Moment Estimation') adapts the learning rate for each parameter individually, using estimates of the first moment (mean) and second moment (variance) of gradients. It combines the best of momentum and RMSProp.",
+          math: `SGD: θ ← θ - η·g
+
+SGD with Momentum:
+  m ← β₁m + (1-β₁)g
+  θ ← θ - η·m
+Momentum accumulates velocity in consistent gradient directions.
+
+RMSProp:
+  v ← β₂v + (1-β₂)g²
+  θ ← θ - η·g/√(v+ε)
+Divides by RMS of recent gradients → large gradient directions get smaller updates.
+
+Adam (combines both):
+  m ← β₁m + (1-β₁)g        [1st moment: mean]
+  v ← β₂v + (1-β₂)g²       [2nd moment: uncentered variance]
+  
+Bias correction (critical at initialization — m,v start at 0):
+  m̂ = m/(1-β₁ᵗ)
+  v̂ = v/(1-β₂ᵗ)
+  
+Update:
+  θ ← θ - η·m̂/√(v̂+ε)
+
+Defaults: η=0.001, β₁=0.9, β₂=0.999, ε=1e-8
+
+Why bias correction?
+At t=1: m = 0.1g, m̂ = 0.1g/0.1 = g. Without correction, step is 10× too small.`,
+          theory: `When to use what:
+Adam: good default for most NLP/vision tasks. Fast convergence. Sometimes worse generalization than SGD.
+SGD + Momentum + LR schedule (e.g., cosine annealing): better final test accuracy for image classification (ResNet, VGG training). Requires more tuning.
+AdamW: Adam with decoupled weight decay. In original Adam, L2 regularization and weight decay are NOT equivalent. AdamW fixes this — use AdamW for training large models (BERT, GPT, ViT).
+Adagrad: good for sparse data (text), but lr shrinks to zero over time.
+RAdam (Rectified Adam): fixes variance in early training without bias correction heuristic.
+
+Learning Rate Scheduling with Adam:
+Linear warmup + cosine decay is standard for transformers.
+Warmup: prevent large updates early when model is random.
+Cosine: slowly reduce lr → fine-grained convergence.`,
+          practical: "PyTorch: torch.optim.AdamW(params, lr=1e-4, weight_decay=0.01). For transformers: use AdamW with linear warmup. For CNNs on image tasks: try SGD + momentum + cosine LR schedule (often better final accuracy). Monitor gradient norms and parameter update ratios (should be ~0.001 relative to parameter magnitude)."
+        }
+      },
+      {
+        q: "Explain Batch Normalization — the forward pass math, why it helps, and what happens during inference. Also explain Layer Normalization and when to prefer it.",
+        tags: ["hard","normalization","training"],
+        answer: {
+          intuition: "Batch Normalization normalizes activations within each mini-batch. This addresses internal covariate shift — as parameters change, the distribution of activations changes, making optimization harder. BN re-centers and re-scales, stabilizing training.",
+          math: `BatchNorm Forward Pass (training):
+For a mini-batch B = {x₁,...,xₘ} for one feature dimension:
+
+μ_B = 1/m Σᵢ xᵢ           [batch mean]
+σ²_B = 1/m Σᵢ (xᵢ - μ_B)²  [batch variance]
+x̂ᵢ = (xᵢ - μ_B)/√(σ²_B + ε)  [normalize]
+yᵢ = γx̂ᵢ + β              [scale and shift with learned γ,β]
+
+Gradients (for backprop):
+∂L/∂γ = Σᵢ ∂L/∂yᵢ · x̂ᵢ
+∂L/∂β = Σᵢ ∂L/∂yᵢ
+∂L/∂xᵢ = (tricky — involves batch statistics, non-trivial chain rule)
+
+Inference:
+Use running statistics (exponential moving averages of μ_B, σ²_B during training):
+μ_running = 0.9·μ_running + 0.1·μ_B
+ŷ = γ·(x - μ_running)/√(σ²_running + ε) + β`,
+          theory: `Why BN helps:
+1. Smooths the loss landscape: reduces sensitivity to initialization and lr
+2. Allows higher learning rates (less risk of exploding gradients)
+3. Slight regularization: each sample is normalized relative to its batch peers (noise from batch sampling acts like dropout)
+4. Reduces internal covariate shift: downstream layers see consistent input distributions
+
+BN problems:
+- Small batch size: batch statistics are noisy → instability. Fails for batch_size=1.
+- RNNs/sequence models: batch is across different positions → doesn't make sense.
+
+Layer Normalization (LN):
+Normalizes across feature dimension for a single sample (not across batch):
+μ = 1/H Σⱼ xⱼ  (H = feature dimension)
+x̂ⱼ = (xⱼ - μ)/√(σ² + ε)
+
+Advantages:
+- Works with any batch size (including 1)
+- Works for sequences (each position normalized independently)
+- Standard for Transformers (BERT, GPT use LN)
+
+Group Normalization: normalize within groups of channels — good for small batches in detection/segmentation.
+Instance Normalization: normalize each sample, each channel separately — used in style transfer.`,
+          practical: "In PyTorch: nn.BatchNorm1d/2d/3d (for FC layers, conv 2D, conv 3D). Call model.eval() during inference — this switches BN to use running stats. nn.LayerNorm([dim]) for transformers. BN goes between linear/conv and activation (or sometimes after — debated). For very small batches (<8): use GroupNorm or LayerNorm."
+        }
+      },
+      {
+        q: "Explain Dropout, weight initialization (Xavier/He), and early stopping — the math behind each and their role in preventing overfitting.",
+        tags: ["medium","regularization","overfitting"],
+        answer: {
+          intuition: "Dropout randomly zeros activations during training, forcing the network to learn redundant representations. Weight initialization sets the starting point for optimization, crucial for avoiding vanishing/exploding activations. Early stopping uses held-out data as a stopping criterion.",
+          math: `Dropout:
+Training: each neuron output set to 0 with probability p (e.g., 0.5).
+Scale by 1/(1-p) to maintain expected activation magnitude.
+Inference: no dropout, use all neurons.
+
+Why it works (ensemble interpretation):
+Dropout training ≈ training an exponential number of thinned networks (2^n for n neurons) and averaging them at test time. Each forward pass uses a different subnetwork → implicit ensemble.
+
+Xavier Initialization (Glorot, 2010):
+For sigmoid/tanh:
+  W ~ U[-√(6/(nᵢₙ+nₒᵤₜ)), +√(6/(nᵢₙ+nₒᵤₜ))]
+Or Gaussian: W ~ N(0, 2/(nᵢₙ+nₒᵤₜ))
+
+Derivation goal: keep Var(output) = Var(input) → prevents shrinking/blowing up.
+For a linear neuron: Var(Wᵢxᵢ) = nᵢₙ·Var(W)·Var(x)
+Set = 1: Var(W) = 1/nᵢₙ
+
+He Initialization (He et al., 2015) for ReLU:
+  W ~ N(0, 2/nᵢₙ)
+
+ReLU zeros half the inputs → effective fan-in halved → double the variance.
+
+Early Stopping:
+Monitor validation loss every epoch.
+Stop when val loss doesn't improve for 'patience' epochs.
+Best model = weights at minimum validation loss.`,
+          theory: `Dropout variants:
+- Standard dropout: drop neurons in FC layers (p=0.5 common)
+- Spatial dropout (for CNNs): drop entire feature maps (p=0.1-0.2)
+- DropPath / Stochastic Depth: drop entire layers
+- Monte Carlo Dropout: use dropout at inference for uncertainty estimation (Gal & Ghahramani, 2016)
+
+Initialization insights:
+- All-zeros: symmetry breaking fails — all neurons learn the same thing
+- Too large: activations saturate (sigmoid/tanh), gradients vanish
+- Too small: activations collapse to 0, gradients vanish
+- Xavier keeps variance constant for linear/tanh. He compensates for ReLU's halving.
+- For Transformers: use normal distribution with small std (e.g., std=0.02)
+
+Early Stopping as regularization:
+Theoretically equivalent to L2 regularization for linear models (Goodfellow et al.). Stopping early keeps weights small (before they can grow to fit noise).`,
+          practical: "PyTorch: nn.Dropout(p=0.5) after FC layers, nn.Dropout2d(p=0.1) after conv layers. Weight init: nn.init.kaiming_normal_(layer.weight, mode='fan_in', nonlinearity='relu') for ReLU layers. Early stopping: use torch's ModelCheckpoint or implement manually (save state dict at best val loss). Monitor both train and val loss — divergence = overfitting."
+        }
+      },
+    ]
+  },
+  {
+    id: "cnn",
+    icon: "👁️",
+    title: "CNNs & Computer Vision",
+    subtitle: "Convolutions, pooling, architectures, detection, segmentation",
+    questions: [
+      {
+        q: "Explain the convolution operation mathematically. What are receptive field, stride, padding, and how do you compute output dimensions? Why are convolutions better than fully connected layers for images?",
+        tags: ["hard","math","cnn"],
+        answer: {
+          intuition: "A convolution filter slides across an image, computing dot products at each position. It learns to detect local patterns (edges, textures, shapes) regardless of where they appear — this is translation equivariance.",
+          math: `Discrete 2D Convolution:
+(I * K)[i,j] = Σₘ Σₙ I[i+m, j+n] · K[m,n]
+
+(Note: in ML 'convolution' is usually cross-correlation — no kernel flipping)
+
+Output dimensions:
+  H_out = ⌊(H_in + 2P - K) / S⌋ + 1
+  W_out = ⌊(W_in + 2P - K) / S⌋ + 1
+
+Where K=kernel size, P=padding, S=stride.
+
+Example: 32×32 input, 5×5 kernel, P=0, S=1:
+  H_out = (32 + 0 - 5)/1 + 1 = 28
+
+With 'same' padding (output = input size):
+  P = (K-1)/2  (for K odd, S=1)
+
+Number of parameters in conv layer:
+  (K² × C_in + 1) × C_out
+  vs FC layer: (H_in × W_in × C_in) × (H_out × W_out × C_out)
+
+Example: 64 filters, 3×3 kernel, 64 input channels:
+  Conv: (9×64+1)×64 = 36,928 params
+  Equivalent FC: might be millions!`,
+          theory: `Why conv > FC for images:
+1. Parameter sharing: same filter applied at all positions. One edge detector works everywhere.
+2. Translation equivariance: moving an object in input shifts its features in output by the same amount.
+3. Local connectivity: each output depends only on a local receptive field — captures local spatial structure.
+
+Receptive Field:
+The region of the input that influences one output unit.
+After L conv layers with kernel K: RF grows linearly: RF = L(K-1) + 1.
+With stride: RF = (K-1)·Sᴸ + 1 (approximately exponential with strides/pooling).
+
+Dilated convolutions: skip pixels with dilation rate d.
+RF grows as: RF = K + (K-1)(d-1) per layer. Exponential RF growth without reducing resolution.
+
+Depthwise separable convolutions (MobileNet):
+Standard: K² × C_in × C_out params
+Depthwise separable: K² × C_in + C_in × C_out = K²·C_in + C_in·C_out
+Ratio: K²·C_in·C_out / (K²·C_in + C_in·C_out) ≈ K² speedup for large C_out.`,
+          practical: "PyTorch: nn.Conv2d(in_channels, out_channels, kernel_size, stride=1, padding=1). Use padding='same' to auto-compute same padding. After conv: usually BatchNorm → activation → pool. Inspect feature maps: register forward hooks. For debugging: check input/output shapes at each layer with a dummy forward pass."
+        }
+      },
+      {
+        q: "Explain ResNet's residual connections. Why do they solve the degradation problem, and what is the gradient highway property? How does this differ from DenseNet?",
+        tags: ["hard","architecture","resnet"],
+        answer: {
+          intuition: "Deeper networks should theoretically be at least as good as shallow ones (just add identity layers). In practice, plain deep networks degrade — training error increases with depth. ResNet fixes this by allowing layers to learn residuals rather than the full transformation.",
+          math: `Plain network: y = H(x)  [learn complete transformation]
+
+ResNet residual block: y = H(x) + x = F(x, {Wᵢ}) + x
+Where F is the residual (difference from identity).
+
+If the optimal function is close to identity, learning F≈0 is easier than learning H≈I.
+
+Gradient flow analysis:
+Loss L, output at layer l: xˡ
+In plain networks: ∂L/∂xˡ = ∂L/∂xᴸ · Πₜ ∂xᵗ/∂xᵗ⁻¹
+
+In ResNet: xˡ⁺¹ = xˡ + F(xˡ, Wˡ)
+∂xᴸ/∂xˡ = 1 + ∂/∂xˡ Σₜ₌ₗᴸ F(xˡ, Wˡ)
+
+The '1' term: direct gradient path from any layer to any earlier layer!
+∂L/∂xˡ = ∂L/∂xᴸ · (1 + ...) ≥ ∂L/∂xᴸ
+
+This prevents vanishing gradients through depth!
+
+Bottleneck block (ResNet-50+):
+1×1 → 3×3 → 1×1 conv
+First 1×1 reduces channels (e.g., 256→64), 3×3 does spatial mixing, last 1×1 expands back.`,
+          theory: `Degradation problem:
+In plain networks (no skip connections), stacking more layers worsens training error — not just test error. This is not overfitting (both train and test degrade). Why? Exploding/vanishing gradients make optimization difficult with many layers.
+
+ResNet vs DenseNet:
+ResNet: xˡ⁺¹ = xˡ + F(xˡ)  [add previous output]
+DenseNet: xˡ = [x₀, x₁, ..., xˡ⁻¹] + F([x₀,...,xˡ⁻¹])  [concatenate ALL previous outputs]
+
+DenseNet advantages:
+- Feature reuse: all feature maps available throughout
+- Implicit deep supervision: gradients reach all layers
+- Fewer parameters (no redundant feature relearning)
+
+DenseNet disadvantages:
+- Memory intensive (must store all intermediate activations)
+- Concatenation grows channels quadratically
+
+Both use skip connections but differently: ResNet adds (element-wise), DenseNet concatenates.`,
+          practical: "ResNet-50 is a standard backbone for vision tasks. Load pretrained: torchvision.models.resnet50(pretrained=True). Fine-tune: freeze early layers, retrain later layers + head. When to use DenseNet: limited data, need memory efficiency at inference (DenseNet-121/169 used in medical imaging). ResNeXt: group convolutions inside residual blocks — often better than vanilla ResNet."
+        }
+      },
+    ]
+  },
+  {
+    id: "nlp",
+    icon: "📝",
+    title: "NLP Fundamentals",
+    subtitle: "Text preprocessing, TF-IDF, Word2Vec, attention mechanism",
+    questions: [
+      {
+        q: "Derive TF-IDF from first principles. What problem does it solve that term frequency alone doesn't? How does it compare to BM25?",
+        tags: ["medium","nlp","text-features"],
+        answer: {
+          intuition: "Term Frequency counts how often a word appears in a document. But the word 'the' appears everywhere — it's useless for distinguishing documents. IDF down-weights terms that appear in many documents, amplifying rare but meaningful terms.",
+          math: `Term Frequency:
+TF(t, d) = count(t in d) / |d|   [relative frequency]
+Or raw count: TF(t, d) = count(t in d)
+Or log: TF(t, d) = 1 + log(count(t in d)) if count > 0
+
+Inverse Document Frequency:
+IDF(t, D) = log(N / df(t))
+Where N = total documents, df(t) = documents containing term t
+
+With smoothing (avoid log(0)):
+IDF(t, D) = log((1 + N) / (1 + df(t))) + 1
+
+TF-IDF:
+TFIDF(t, d, D) = TF(t, d) × IDF(t, D)
+
+Final representation: document → vector in term space
+Each dimension = TF-IDF score for that term`,
+          theory: `Problem TF-IDF solves:
+Raw TF: "the", "a", "is" dominate all documents → useless for similarity.
+TF-IDF: rare terms (appear in few documents) get high IDF → high TF-IDF even with few occurrences. Common terms (appear everywhere) get IDF≈0.
+
+BM25 (Best Match 25, Okapi BM25):
+IDF_BM25(t) = log((N - df(t) + 0.5)/(df(t) + 0.5) + 1)
+BM25(t,d) = IDF_BM25(t) · f(t,d)·(k₁+1) / (f(t,d) + k₁·(1-b+b·|d|/avgdl))
+
+Parameters: k₁∈[1.2,2.0] (tf saturation), b=0.75 (length normalization)
+BM25 improvements over TF-IDF:
+1. Saturating TF: beyond ~5 occurrences, term frequency contribution plateaus (log TF has no ceiling)
+2. Document length normalization: short documents with one occurrence ≠ long documents with one occurrence
+3. State-of-the-art for lexical search. Used in Elasticsearch, Solr.`,
+          practical: "sklearn: TfidfVectorizer (handles TF-IDF pipeline including tokenization). Parameters: max_features, min_df, max_df, ngram_range=(1,2) for bigrams. For search: use BM25 (rank_bm25 library). Modern: replace TF-IDF with sentence embeddings (sentence-transformers) for semantic search. TF-IDF remains useful for interpretability and keyword extraction."
+        }
+      },
+      {
+        q: "Explain Word2Vec (Skip-gram and CBOW) architectures. Derive the training objective and explain negative sampling. Why does Word2Vec produce meaningful vector algebra (king - man + woman ≈ queen)?",
+        tags: ["hard","embeddings","nlp"],
+        answer: {
+          intuition: "Word2Vec learns that words appearing in similar contexts are similar. It trains a shallow neural network to predict context from a word (Skip-gram) or vice versa. The embeddings are a byproduct — they encode semantic meaning because similar-context words get similar representations.",
+          math: `Skip-gram objective:
+Maximize: J = 1/T Σₜ Σ_{-c≤j≤c,j≠0} log P(wₜ₊ⱼ | wₜ)
+
+where P(wₒ|wᵢ) = softmax: exp(v'ᵤₒᵀ vᵤᵢ) / Σₙ exp(v'ₙᵀ vᵤᵢ)
+
+Two embedding matrices: vᵤ (input/center), v' (output/context)
+
+CBOW: predict center word from context
+P(wₜ | wₜ₋ₑ,...,wₜ₊ₑ) = softmax(v'ₜᵀ (mean of context embeddings))
+
+Problem: softmax over entire vocabulary (V=100K+) → O(V) per step → too slow!
+
+Negative Sampling (NEG):
+Replace softmax with binary classification: is (w, c) a real pair?
+J_NEG = log σ(v'ₑᵀ vᵤ) + Σₖ E_{wₙ~Pₙ}[log σ(-v'ₙᵀ vᵤ)]
+
+Sample k=5-20 negative words from noise distribution Pₙ(w) ∝ f(w)^(3/4)
+(3/4 power: somewhat uniform-izes distribution, helps rare words)
+Training: O(k) instead of O(V) per step!`,
+          theory: `Why does vector algebra work?
+"king - man + woman ≈ queen"
+
+During training, "king" and "queen" appear in similar contexts to many words, but differ systematically in gender-related contexts.
+
+The difference vector (king - man) captures the "royalty" direction in embedding space.
+The difference vector (king - queen) captures the "gender" direction.
+
+These directions are linearly consistent because the model learns to represent co-occurrence statistics — which have additive structure (PMI of word pairs has additive properties: PMI(king,context) - PMI(man,context) ≈ PMI(queen,context) - PMI(woman,context)).
+
+Formally: Word2Vec embeddings are implicitly factorizing the shifted PMI (Pointwise Mutual Information) matrix: WₒWᵢᵀ ≈ PMI(w,c) - log k (Levy & Goldberg, 2014).
+
+GloVe (Global Vectors): makes this explicit — directly factorize the co-occurrence matrix log(Xᵢⱼ) = wᵢᵀw̃ⱼ + bᵢ + b̃ⱼ.`,
+          practical: "Gensim: Word2Vec(sentences, vector_size=300, window=5, min_count=5, sg=1, negative=15, epochs=10). For most applications: use pretrained embeddings (GloVe 300d, FastText). FastText advantage: represents words as sum of character n-gram embeddings → handles OOV words. Modern standard: sentence-transformers (BERT-based), not Word2Vec."
+        }
+      },
+      {
+        q: "Explain the Attention Mechanism from scratch. Derive Scaled Dot-Product Attention mathematically and explain why the scaling factor √dₖ is necessary.",
+        tags: ["hard","math","attention","transformers"],
+        answer: {
+          intuition: "Attention allows a model to focus on relevant parts of the input when producing each output. Instead of a fixed-size context vector (RNN bottleneck), attention dynamically computes a weighted sum of all input representations based on how relevant each is to the current output position.",
+          math: `Scaled Dot-Product Attention:
+Attention(Q, K, V) = softmax(QKᵀ/√dₖ) · V
+
+Q (Queries): what we're looking for
+K (Keys): what each position offers to queries
+V (Values): the actual information to aggregate
+
+Step by step:
+1. Compatibility scores: e_ij = qᵢᵀkⱼ / √dₖ   [dot product of query i with key j]
+2. Attention weights: α_ij = exp(e_ij) / Σⱼ exp(e_ij)   [softmax over keys]
+3. Output: oᵢ = Σⱼ α_ij · vⱼ   [weighted sum of values]
+
+In matrix form:
+  Scores = QKᵀ / √dₖ   [shape: seq_len × seq_len]
+  Attention = softmax(Scores, dim=-1)
+  Output = Attention · V
+
+Why √dₖ scaling?
+Without scaling: for large dₖ, dot products grow like O(dₖ).
+Example: random Q,K ~ N(0,1), dim=64:
+  E[qᵢᵀkⱼ] = 0, Var[qᵢᵀkⱼ] = dₖ → std = √dₖ ≈ 8
+
+After softmax: large values dominate → sparse attention (most weight on one token) → vanishing gradients into softmax.
+Dividing by √dₖ keeps variance ≈ 1 → better-distributed attention.`,
+          theory: `Original Bahdanau Attention (additive):
+e_ij = vᵀ tanh(W_q·q_i + W_k·k_j)
+
+Scaled dot-product is faster (matrix multiply) and works just as well.
+
+Self-attention vs Cross-attention:
+Self-attention: Q, K, V all from same sequence (Transformer encoder)
+Cross-attention: Q from decoder, K/V from encoder (seq2seq)
+
+Masking:
+Causal mask (decoder): mask future tokens with -∞ before softmax → ensures autoregressive property
+Padding mask: mask pad tokens → they don't influence attention weights
+
+Complexity:
+Time: O(n²d) per layer [n=seq_len, d=dim] — quadratic in sequence length!
+Memory: O(n²) for attention matrix — bottleneck for long sequences
+
+This is why long-context models (100K+ tokens) need efficient attention:
+- Flash Attention: compute attention in tiles, never materialize full n×n matrix
+- Linear Attention: approximate softmax attention in O(n) — usually worse quality`,
+          practical: "PyTorch: nn.MultiheadAttention(embed_dim, num_heads). Or implement manually: Q=xWQ, K=xWK, V=xWV → scale → mask → softmax → matmul with V. For long sequences: use FlashAttention (pip install flash-attn). Attention visualization: extract attention weights, plot heatmaps to interpret which tokens attend to which."
+        }
+      },
+    ]
+  },
+  {
+    id: "transformers",
+    icon: "🤖",
+    title: "Transformers & LLMs",
+    subtitle: "Full transformer architecture, pretraining, fine-tuning, RLHF, LoRA, RAG",
+    questions: [
+      {
+        q: "Describe the complete Transformer architecture (Vaswani et al., 2017) — every component, why each exists, and how encoder and decoder differ.",
+        tags: ["hard","architecture","transformers"],
+        answer: {
+          intuition: "The Transformer replaces recurrence (RNN) with pure attention. The key insight: we can process all positions in parallel and use self-attention to model dependencies between any two positions regardless of distance — solving RNN's long-range dependency problem.",
+          math: `Transformer Encoder (one layer):
+
+Input: X ∈ ℝⁿˣᵈ (n tokens, d dimensions)
+
+1. Multi-Head Self-Attention:
+   head_i = Attention(XW_i^Q, XW_i^K, XW_i^V)
+   MultiHead = Concat(head_1,...,head_h) W^O
+   Each W_i^Q, W_i^K, W_i^V ∈ ℝᵈˣ⁽ᵈ/ʰ⁾
+
+2. Add & Norm (Pre-LN variant, more stable):
+   x = x + MultiHead(LayerNorm(x))
+
+3. Feed-Forward Network:
+   FFN(x) = max(0, xW₁ + b₁)W₂ + b₂
+   W₁ ∈ ℝᵈˣ⁴ᵈ, W₂ ∈ ℝ⁴ᵈˣᵈ  [4× expansion]
+
+4. Add & Norm:
+   x = x + FFN(LayerNorm(x))
+
+Transformer Decoder adds:
+- Masked self-attention (causal mask)
+- Cross-attention over encoder output
+- Same FFN + LayerNorm
+
+Positional Encoding (original):
+PE(pos, 2i) = sin(pos / 10000^{2i/d})
+PE(pos, 2i+1) = cos(pos / 10000^{2i/d})`,
+          theory: `Why each component:
+Multi-head attention: h attention heads = h different representation subspaces. Heads can specialize (one attends to syntax, another to semantics).
+
+FFN: attention mixes information across positions but keeps them in the same space. FFN applies the same non-linear transformation to each position independently — the "processing" step after "mixing".
+
+LayerNorm: stabilizes training (before attention/FFN → Pre-LN variant is more stable).
+
+Residual connections: gradient highway, allows deep stacking.
+
+Positional encoding: attention is permutation-equivariant — without PE, "dog bites man" = "man bites dog". PE injects position information.
+
+Encoder vs Decoder vs Encoder-Decoder:
+- Encoder only (BERT): bidirectional context, good for understanding tasks (classification, NER, QA)
+- Decoder only (GPT): autoregressive, causal attention, good for generation
+- Encoder-Decoder (T5, original Transformer): seq2seq, best for translation, summarization
+
+Modern LLMs (GPT-3/4, Llama) are decoder-only. Scale (n_layers, d_model, n_heads, training data) is the primary driver of capability.`,
+          practical: "Implement from scratch for understanding: ~150 lines of PyTorch. For production: use HuggingFace transformers. Key config params: d_model (hidden dim, e.g., 768 for BERT-base), n_heads (12), n_layers (12), ffn_dim (4×d_model=3072). GPT-3: n_layers=96, d_model=12288. Modern RoPE (rotary position embedding) replaces sinusoidal PE — better for long contexts."
+        }
+      },
+      {
+        q: "Explain LoRA (Low-Rank Adaptation) for fine-tuning LLMs — the mathematical formulation, why low-rank works, and how it compares to full fine-tuning and prefix tuning.",
+        tags: ["hard","math","lora","finetuning"],
+        answer: {
+          intuition: "Full fine-tuning of a 7B parameter model requires 7B gradient updates and optimizer states — prohibitive. LoRA observes that the weight update matrix ΔW during fine-tuning has low intrinsic rank, so we can represent it as a product of two small matrices, reducing trainable parameters by 1000×.",
+          math: `LoRA formulation:
+For a pretrained weight matrix W₀ ∈ ℝᵐˣⁿ,
+instead of learning W₀ + ΔW directly:
+
+ΔW = BA  where B ∈ ℝᵐˣʳ, A ∈ ℝʳˣⁿ, rank r << min(m,n)
+
+Forward pass (no inference overhead!):
+h = W₀x + ΔWx = W₀x + BAx = (W₀ + BA)x
+
+After training, merge: W_merged = W₀ + BA
+→ inference identical to original model!
+
+Initialization:
+A ~ N(0, σ²)   [random]
+B = 0            [so ΔW = 0 at start → stable training]
+
+Scaling:
+ΔWx = (α/r)BAx  where α is a hyperparameter
+Effectively: if you double r but want same magnitude, set α=r (common: α=2r or α=r).
+
+Parameter count:
+Original W: m×n parameters
+LoRA: r×(m+n) parameters
+Compression ratio: mn / r(m+n) ≈ min(m,n)/r
+
+For W ∈ ℝ⁴⁰⁹⁶ˣ⁴⁰⁹⁶, r=8:
+Original: 16.8M, LoRA: 65K = 258× compression!`,
+          theory: `Why low-rank works:
+Hypothesis: during task-specific fine-tuning, the model doesn't need to explore all of parameter space — the "task-relevant" subspace is low-dimensional.
+
+Evidence: Aghajanyan et al. (2020) showed pretrained models have very low "intrinsic dimensionality" for specific tasks — you can fine-tune effectively in a 200-dimensional subspace for some tasks!
+
+Which matrices to apply LoRA to?
+Original paper: Q, V matrices in attention. Subsequent work: apply to all: Q, K, V, O, up_proj, down_proj → better results. Common: apply to all linear layers with target_modules="all-linear".
+
+LoRA vs other PEFT methods:
+Full fine-tuning: best performance, huge memory/compute cost, catastrophic forgetting
+LoRA: near-FT performance with tiny memory footprint, adapters stored separately
+QLoRA: LoRA on quantized (4-bit) base model → 4× memory reduction. Fine-tune 65B LLaMA on single 48GB GPU!
+Prefix Tuning: add soft trainable tokens to input — struggles with very small rank. Less interpretable.
+Adapters: insert small FF layers — adds inference latency.
+IA3: scales activations — fewer parameters than LoRA but sometimes worse.`,
+          practical: "HuggingFace PEFT: from peft import LoraConfig, get_peft_model. Key args: r (4-16 typical), lora_alpha (16-32), target_modules=['q_proj','v_proj'], lora_dropout=0.05. For instruction tuning: combine with SFTTrainer (TRL library). QLoRA: load_in_4bit=True + BitsAndBytesConfig, then apply LoRA. Typical: fine-tune 7B model on single 24GB GPU with QLoRA."
+        }
+      },
+      {
+        q: "Explain Retrieval-Augmented Generation (RAG) — the architecture, why it's needed, and the key failure modes. What is the difference between naive RAG, advanced RAG, and modular RAG?",
+        tags: ["medium","rag","llm","production"],
+        answer: {
+          intuition: "LLMs have static knowledge (training cutoff) and can hallucinate facts. RAG retrieves relevant documents from a knowledge base at query time and conditions the LLM on them. It's like giving the model an open-book exam instead of closed-book.",
+          math: `RAG Formulation:
+Let q = user query, D = document corpus, G = LLM generator.
+
+Retrieval: R(q) → {d₁,...,dₖ}  [top-k docs by similarity]
+Generation: P(answer | q, d₁,...,dₖ) = G(prompt(q, R(q)))
+
+Similarity in embedding space:
+score(q, dᵢ) = sim(Embed(q), Embed(dᵢ))
+Where sim = cosine similarity or dot product.
+
+Indexing pipeline:
+  Documents → chunking → embedding → vector index (FAISS/Chroma/Weaviate)
+
+Query pipeline:
+  Query → embed → ANN search → retrieve k chunks → LLM prompt → answer`,
+          theory: `Naive RAG:
+1. Index: chunk docs (fixed size, ~512 tokens), embed each, store in vector DB.
+2. Retrieve: embed query, find top-k similar chunks.
+3. Generate: stuff chunks into context window, prompt LLM.
+Failures: irrelevant chunks, chunking splits important context, poor retrieval = poor generation.
+
+Advanced RAG (pre/post retrieval improvements):
+Pre-retrieval: query expansion (HyDE: generate hypothetical document, embed it), query rewriting, sub-question decomposition.
+Post-retrieval: re-ranking (cross-encoder scores all retrieved docs), contextual compression (remove irrelevant parts).
+
+Key metrics:
+Context Relevance: is retrieved content relevant to query?
+Answer Faithfulness: does generated answer stay grounded in retrieved content?
+Answer Relevance: does the answer actually address the query?
+
+RAG vs Fine-tuning:
+RAG: dynamic, updatable knowledge, traceable sources, good for factual QA.
+Fine-tuning: bakes knowledge into weights, faster inference, better for style/domain adaptation.
+Best: combine both — fine-tune for task style + RAG for knowledge.
+
+Chunking strategies:
+Fixed-size: simple but cuts sentences/paragraphs mid-thought.
+Sentence/paragraph: semantic boundaries.
+Hierarchical: multiple levels (sentence → paragraph → section) — retrieve at right granularity.
+Semantic: split on topic change (uses embedding similarity).`,
+          practical: "LangChain/LlamaIndex for RAG pipelines. Vector DBs: Chroma (local), Pinecone (cloud), Weaviate, pgvector (PostgreSQL). Embeddings: text-embedding-ada-002 (OpenAI), sentence-transformers/all-MiniLM-L6-v2 (open-source). Chunk size: 256-512 tokens, overlap 50-100 tokens. For production: evaluate with RAGAS framework (context_recall, faithfulness, answer_relevancy)."
+        }
+      },
+      {
+        q: "Explain RLHF (Reinforcement Learning from Human Feedback). How is the reward model trained, and what is the PPO update? What are its limitations and alternatives (DPO, RLAIF)?",
+        tags: ["hard","rlhf","alignment","llm"],
+        answer: {
+          intuition: "LLMs trained purely on next-token prediction produce text that looks like internet data — including unhelpful, toxic, or dishonest outputs. RLHF fine-tunes LLMs to follow instructions and be helpful/harmless by training on human preferences, then optimizing via RL.",
+          math: `Phase 1: Supervised Fine-Tuning (SFT):
+  Fine-tune pretrained LLM on (prompt, demonstration) pairs → π_SFT
+
+Phase 2: Reward Model Training:
+  For each prompt x, collect (y_w, y_l): preferred and rejected completions.
+  Train RM r_φ(x, y) using Bradley-Terry preference model:
+  
+  P(y_w ≻ y_l | x) = σ(r_φ(x,y_w) - r_φ(x,y_l))
+  
+  Loss: -log P(y_w ≻ y_l | x) = -log σ(r_φ(x,y_w) - r_φ(x,y_l))
+
+Phase 3: RL Fine-tuning with PPO:
+  Maximize:
+  J(π_θ) = E_{x~D, y~π_θ}[r_φ(x,y)] - β·KL[π_θ(y|x) || π_SFT(y|x)]
+  
+  The KL term prevents π_θ from deviating too far from SFT (reward hacking prevention).
+  β controls this regularization.
+  
+  PPO clip objective:
+  L_CLIP = E[min(r_t·A_t, clip(r_t, 1-ε, 1+ε)·A_t)]
+  where r_t = π_θ(aₜ|sₜ)/π_old(aₜ|sₜ)`,
+          theory: `RLHF Limitations:
+1. Human feedback is expensive, noisy, and inconsistent
+2. Reward hacking: model finds outputs that maximize reward without being actually helpful
+3. Reward model errors compound (wrong RM → policy trained to exploit RM errors)
+4. PPO is unstable, requires many hyperparameter choices
+5. Mode collapse: KL penalty too high → policy barely moves from SFT
+
+DPO (Direct Preference Optimization, Rafailov 2023):
+Skip the reward model entirely! Directly optimize policy on preferences.
+The key insight: the optimal RLHF policy has a closed form in terms of reward:
+π*(y|x) ∝ π_SFT(y|x)·exp(r*(x,y)/β)
+
+DPO loss:
+L_DPO = -log σ(β·log[π_θ(y_w|x)/π_ref(y_w|x)] - β·log[π_θ(y_l|x)/π_ref(y_l|x)])
+
+Advantages: no RM, stable training, competitive results.
+
+RLAIF (Constitutional AI, Anthropic): use another AI to provide feedback instead of humans. More scalable, used in Claude.
+
+ORPO: combines SFT and DPO in one loss, no reference model needed.`,
+          practical: "TRL library (HuggingFace): PPOTrainer, DPOTrainer, RewardTrainer. DPO is now preferred over PPO for most use cases — simpler, more stable, no need for RM. Dataset format: {'prompt': ..., 'chosen': ..., 'rejected': ...}. For alignment at scale: RLAIF/Constitutional AI. Monitor: reward score, KL divergence from reference, win rate on evaluation prompts."
+        }
+      },
+    ]
+  },
+  {
+    id: "rnn-seq",
+    icon: "🔄",
+    title: "RNNs, LSTMs & Sequence Models",
+    subtitle: "Recurrent networks, vanishing gradients, LSTM gates, GRU",
+    questions: [
+      {
+        q: "Explain LSTM — the complete forward pass equations for all four gates. Why does the cell state solve the vanishing gradient problem? How does GRU simplify LSTM?",
+        tags: ["hard","math","lstm","rnn"],
+        answer: {
+          intuition: "RNNs can theoretically remember long-range dependencies, but in practice gradients vanish through many time steps. LSTM introduces a cell state — a 'memory highway' that information flows through with only multiplicative gates — making long-range gradient flow possible.",
+          math: `LSTM Forward Pass at timestep t:
+
+Forget Gate:   fₜ = σ(Wf[hₜ₋₁, xₜ] + bf)   [what to erase from memory]
+Input Gate:    iₜ = σ(Wi[hₜ₋₁, xₜ] + bi)    [what new info to store]
+Candidate:     C̃ₜ = tanh(Wc[hₜ₋₁, xₜ] + bc)  [candidate values to add]
+Output Gate:   oₜ = σ(Wo[hₜ₋₁, xₜ] + bo)    [what to output]
+
+Cell state update:
+  Cₜ = fₜ ⊙ Cₜ₋₁ + iₜ ⊙ C̃ₜ
+  [forget some old + add some new]
+
+Hidden state:
+  hₜ = oₜ ⊙ tanh(Cₜ)
+
+GRU (Gated Recurrent Unit):
+  zₜ = σ(Wz[hₜ₋₁, xₜ])   [update gate: blend old/new]
+  rₜ = σ(Wr[hₜ₋₁, xₜ])   [reset gate: forget past]
+  h̃ₜ = tanh(W[rₜ⊙hₜ₋₁, xₜ])
+  hₜ = (1-zₜ)⊙hₜ₋₁ + zₜ⊙h̃ₜ
+
+GRU merges cell state and hidden state into one hₜ.
+2 gates vs 4 → fewer parameters, faster.`,
+          theory: `Why LSTM solves vanishing gradients:
+Vanilla RNN: hₜ = tanh(Whₜ₋₁ + Uxₜ)
+Gradient: ∂L/∂hₜ₋ₖ = ∂L/∂hₜ · Π_{i=t-k}^{t} ∂hᵢ/∂hᵢ₋₁
+Each step multiplies by W·diag(tanh'(·)) — if eigenvalues < 1, exponential decay!
+
+LSTM cell state gradient:
+∂Cₜ/∂Cₜ₋₁ = fₜ   [element-wise, not matrix multiply]
+
+If forget gate ≈ 1 (model says "don't forget"): gradient flows back unimpeded!
+If forget gate ≈ 0 (model says "forget"): gradient is cut — intentional forgetting.
+
+The gating mechanism makes gradient flow adaptive and selective vs always-decaying RNN.
+
+LSTM vs GRU:
+GRU: ~67% of LSTM parameters, similar performance in practice, better for smaller datasets or shorter sequences.
+LSTM: more expressive, better for very long sequences (separate cell and hidden state).
+
+When to use (if at all):
+2024: For most tasks, Transformers dominate. But:
+- Streaming inference (process one token at time, O(1) memory): LSTM/GRU win
+- Resource-constrained: GRU is efficient
+- Temporal signal processing: LSTM/GRU + attention still competitive`,
+          practical: "PyTorch: nn.LSTM(input_size, hidden_size, num_layers, batch_first=True). Returns: output (all hidden states), (hₙ, cₙ) (final hidden and cell state). For bidirectional: bidirectional=True. Always use gradient clipping with RNNs (clip_grad_norm_(params, 5.0)). Pack padded sequences for variable-length: nn.utils.rnn.pack_padded_sequence."
+        }
+      },
+    ]
+  },
+  {
+    id: "unsupervised",
+    icon: "🔮",
+    title: "Unsupervised Learning",
+    subtitle: "K-means, hierarchical clustering, DBSCAN, PCA, t-SNE, UMAP",
+    questions: [
+      {
+        q: "Derive the K-means algorithm from an EM perspective. What objective does it optimize, what are convergence guarantees, and what are its key limitations?",
+        tags: ["hard","math","clustering"],
+        answer: {
+          intuition: "K-means partitions data into K clusters by minimizing within-cluster variance. It alternates between assigning points to nearest centroids and updating centroids — a special case of EM (Expectation-Maximization) with hard assignments.",
+          math: `Objective (minimize inertia/WCSS):
+J(C, μ) = Σₖ Σᵢ∈Cₖ ||xᵢ - μₖ||²
+
+Algorithm:
+E-step (hard assignment):
+  cᵢ ← argminₖ ||xᵢ - μₖ||²
+
+M-step (centroid update):
+  μₖ ← 1/|Cₖ| Σᵢ∈Cₖ xᵢ
+
+This decreases J at each step (can be proved):
+- E-step: reassigning decreases ||xᵢ - μₖ||² by construction
+- M-step: mean minimizes sum of squared deviations → J decreases
+
+Convergence: guaranteed to converge (assignments are finite → finite states → must terminate), but to local minimum.
+
+K-means++ initialization:
+1. Choose first centroid uniformly at random
+2. Choose next centroid with probability ∝ d(x, nearest_centroid)²
+3. Repeat until K centroids chosen
+Guarantees expected inertia ≤ O(log K) × optimal, dramatically reduces bad initializations.`,
+          theory: `Key limitations:
+1. Need to specify K in advance — use Elbow Method (plot inertia vs K, look for 'elbow') or Silhouette Score.
+2. Sensitive to initialization → use k-means++ or run multiple times (n_init=10).
+3. Assumes spherical, equally-sized clusters — fails for elongated, unequal, or non-convex clusters.
+4. Sensitive to outliers — outliers pull centroids.
+5. Scale-sensitive — must standardize features.
+6. Only minimizes L2 distance — K-medoids (uses actual data points as centers) more robust to outliers.
+
+Silhouette Score:
+s(i) = (b(i) - a(i)) / max(a(i), b(i))
+a(i) = avg distance to same-cluster points
+b(i) = avg distance to nearest other-cluster points
+Range: [-1, +1]. Higher = better clustering.`,
+          practical: "sklearn: KMeans(n_clusters=K, init='k-means++', n_init=10). MiniBatchKMeans for large datasets. Choose K: Elbow (KneeLocator), Silhouette (silhouette_score), Gap Statistic (compare to random). For non-spherical clusters: DBSCAN, GMM, or Spectral Clustering. Alternatives: K-medoids (sklearn-extra), Agglomerative Clustering."
+        }
+      },
+      {
+        q: "Derive PCA from scratch — the variance maximization and minimum reconstruction error perspectives. How many components to keep? What is the relationship to SVD?",
+        tags: ["hard","math","pca","dimensionality-reduction"],
+        answer: {
+          intuition: "PCA finds directions (principal components) of maximum variance in data. It rotates the coordinate system to align axes with these high-variance directions, then discards low-variance (low-information) dimensions.",
+          math: `Variance Maximization Perspective:
+Find unit vector w₁ that maximizes projected variance:
+  max_{w: ||w||=1} Var(Xw) = max wᵀ Cov(X) w
+
+Cov(X) = 1/n XᵀX (if X is zero-mean)
+
+Solution via Lagrangian:
+L = wᵀΣw - λ(wᵀw - 1)
+∂L/∂w = 2Σw - 2λw = 0
+→ Σw = λw   [eigenvector equation!]
+
+w₁ = eigenvector of Σ with largest eigenvalue λ₁
+w₂ = eigenvector with second largest eigenvalue λ₂, etc.
+
+Minimum Reconstruction Error Perspective:
+min ||X - XWWᵀ||²_F  [find W that best approximates X]
+→ Same solution! PCA minimizes reconstruction error and maximizes variance simultaneously.
+
+PCA via SVD (numerically stable):
+X = UΣVᵀ   [X ∈ ℝⁿˣᵈ]
+Principal components = columns of V (right singular vectors)
+Projected data = XV = UΣ  (scores)
+Explained variance: λₖ ∝ σₖ²
+
+Use svd instead of eigendecomposition of XᵀX: numerically stable, works even when XᵀX is not well-conditioned.`,
+          theory: `How many components?
+Explained Variance Ratio: EVR_k = λₖ / Σⱼ λⱼ
+Cumulative: keep components until Σ EVR_k ≥ 0.95 (or 0.99 for lossless)
+Scree plot: plot eigenvalues, look for elbow.
+
+PCA Assumptions:
+- Linear relationships (PCA captures only linear structure)
+- Important variance is in top principal components (may not hold for complex data)
+- Features should be on the same scale (standardize first!)
+
+PCA vs ICA vs t-SNE vs UMAP:
+PCA: linear, maximizes variance, orthogonal components, fast
+ICA: finds statistically independent components (useful for blind source separation)
+t-SNE: non-linear, preserves local structure, good for visualization only (not for downstream ML)
+UMAP: non-linear, preserves both local and global structure, faster than t-SNE, can be used for downstream ML
+
+Kernel PCA: apply kernel trick to PCA → non-linear dimensionality reduction in feature space.`,
+          practical: "sklearn: PCA(n_components=0.95) [keeps components explaining 95% variance] or PCA(n_components=50). TruncatedSVD for sparse matrices (text features). IncrementalPCA for large datasets. Always standardize before PCA (StandardScaler). Pitfall: don't apply PCA to categorical or ordinal features — only continuous."
+        }
+      },
+      {
+        q: "Explain DBSCAN. How does it work, what parameters does it have, and when should you choose it over K-means? What is the curse of dimensionality for DBSCAN?",
+        tags: ["medium","clustering","dbscan"],
+        answer: {
+          intuition: "DBSCAN (Density-Based Spatial Clustering) groups points that are densely packed together and marks points in sparse regions as outliers. Unlike K-means, it can find arbitrarily shaped clusters and doesn't require specifying K.",
+          math: `Core concepts:
+ε (epsilon): neighborhood radius
+MinPts: minimum points to form a dense region
+
+Definitions:
+- Core point: has ≥ MinPts points within ε-neighborhood
+- Border point: in ε-neighborhood of a core point but < MinPts neighbors
+- Noise point: not core, not border → outlier
+
+Algorithm:
+For each unvisited point p:
+  1. Find all ε-neighbors N(p)
+  2. If |N(p)| < MinPts: mark as NOISE
+  3. Else: start new cluster, add all density-reachable points
+
+Density-reachable: chain of core points connecting p to q where each consecutive pair within ε.
+
+Complexity: O(n log n) with spatial index (KD-tree), O(n²) naive.
+
+Parameter guidance:
+- MinPts = 2×dim (rule of thumb)
+- ε: use k-distance plot (plot sorted distances to MinPts-th neighbor) — look for 'knee'`,
+          theory: `When DBSCAN > K-means:
+1. Don't know K in advance
+2. Clusters are non-convex (ring-shaped, elongated)
+3. Want automatic outlier detection (noise points = outliers!)
+4. Clusters have varying density (use HDBSCAN)
+
+When K-means > DBSCAN:
+1. Large high-dimensional datasets (DBSCAN needs density, which fails in high dim)
+2. Know K, clusters are roughly spherical
+3. Need probabilistic cluster membership (use GMM)
+
+Curse of dimensionality for DBSCAN:
+In high dimensions (d>20), the concept of 'nearest neighbor' breaks down — all points become equidistant. No value of ε cleanly separates dense from sparse regions. Distances between all pairs converge to the same value. DBSCAN effectively fails.
+
+HDBSCAN (Hierarchical DBSCAN): automatically selects ε by finding persistent clusters across all ε values. More robust, handles varying density. Recommended over DBSCAN in practice.`,
+          practical: "sklearn: DBSCAN(eps=0.5, min_samples=5). For auto-eps: plot kneighbors sorted distances (NearestNeighbors with n_neighbors=MinPts). HDBSCAN (better): hdbscan library or sklearn 1.3+. For high-dimensional clustering: reduce with UMAP first, then DBSCAN/HDBSCAN — this is the standard workflow for single-cell RNA-seq analysis in bioinformatics."
+        }
+      },
+    ]
+  },
+  {
+    id: "pytorch",
+    icon: "🔥",
+    title: "PyTorch & Production ML",
+    subtitle: "Autograd, custom datasets, training loops, GPU, distributed, optimization",
+    questions: [
+      {
+        q: "Explain PyTorch's autograd system — computational graph, forward/backward pass, gradient accumulation. How does requires_grad, detach(), and no_grad() work?",
+        tags: ["hard","pytorch","autograd"],
+        answer: {
+          intuition: "PyTorch builds a dynamic computational graph during the forward pass, recording operations on tensors. The backward pass traverses this graph in reverse, applying the chain rule to compute gradients. This is 'define-by-run' — the graph is created fresh each forward pass.",
+          math: `Dynamic Computational Graph:
+Every operation on a requires_grad=True tensor creates a Function node.
+x → [MulBackward] → [AddBackward] → loss
+
+loss.backward() triggers:
+1. Start with ∂loss/∂loss = 1
+2. Traverse graph backward, calling each Function's backward method
+3. Accumulate gradients in tensor.grad
+
+Example:
+x = torch.tensor(2.0, requires_grad=True)
+y = x**2 + 3*x   # y = 4 + 6 = 10
+y.backward()
+print(x.grad)    # dy/dx = 2x + 3 = 7 ✓
+
+Gradient accumulation (simulate large batch):
+optimizer.zero_grad()
+for i, (x, y) in enumerate(loader):
+    loss = model(x, y) / accum_steps
+    loss.backward()  # gradients accumulate in .grad
+    if (i+1) % accum_steps == 0:
+        optimizer.step()
+        optimizer.zero_grad()`,
+          theory: `requires_grad, detach(), no_grad():
+
+requires_grad=True: tensor participates in autograd. All downstream operations tracked.
+requires_grad=False (default): not tracked. Faster, less memory.
+
+tensor.detach(): creates new tensor sharing data but with requires_grad=False. Stops gradient flow.
+Use cases: 
+- Extracting features for non-differentiable operations
+- Target networks in RL (prevent gradient into target)
+- Plotting/logging tensor values
+
+torch.no_grad(): context manager — all operations inside don't track gradients.
+with torch.no_grad():
+    predictions = model(x)  # no graph built → 2× faster, 50% less memory
+
+Use for: inference, evaluation, computing metrics.
+
+Memory and common bugs:
+- Storing loss in list: loss_history.append(loss) stores the whole computation graph! Use loss.item() or loss.detach().
+- Calling backward() twice: second call fails (graph freed). Use retain_graph=True (rarely needed).
+- Forgetting zero_grad(): gradients accumulate across iterations → wrong updates.`,
+          practical: "PyTorch hooks: register_forward_hook(fn), register_backward_hook(fn) — powerful for debugging. Gradient inspection: for name, param in model.named_parameters(): print(param.grad.norm()). torch.autograd.set_detect_anomaly(True) — throws informative errors when NaN gradients appear (10× slower, use for debugging only). Check: is my graph leaking? Monitor GPU memory with torch.cuda.memory_allocated()."
+        }
+      },
+      {
+        q: "Write a complete PyTorch training loop from scratch — model, dataset, optimizer, loss, train/val split, early stopping, checkpointing, and mixed precision.",
+        tags: ["medium","pytorch","implementation"],
+        answer: {
+          intuition: "A production-quality training loop handles the full lifecycle: data loading, forward pass, loss computation, backward pass, optimizer step, validation, model saving, and training stability features.",
+          math: ``,
+          theory: `Complete training loop structure:`,
+          code: `import torch, torch.nn as nn
+from torch.utils.data import DataLoader, random_split
+from torch.cuda.amp import GradScaler, autocast
+import copy
+
+# 1. Model
+class MLP(nn.Module):
+    def __init__(self, in_dim, hidden, out_dim, dropout=0.3):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(in_dim, hidden), nn.LayerNorm(hidden),
+            nn.GELU(), nn.Dropout(dropout),
+            nn.Linear(hidden, out_dim)
+        )
+    def forward(self, x): return self.net(x)
+
+# 2. Dataset split
+dataset = MyDataset(...)  # your Dataset class
+n_val = int(len(dataset) * 0.1)
+train_ds, val_ds = random_split(dataset, [len(dataset)-n_val, n_val])
+train_loader = DataLoader(train_ds, batch_size=64, shuffle=True, 
+                           num_workers=4, pin_memory=True)
+val_loader   = DataLoader(val_ds,   batch_size=128, shuffle=False,
+                           num_workers=4, pin_memory=True)
+
+# 3. Setup
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+model = MLP(256, 512, 10).to(device)
+optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3, weight_decay=1e-2)
+scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=100)
+criterion = nn.CrossEntropyLoss()
+scaler = GradScaler()  # mixed precision
+
+# 4. Training loop with early stopping
+best_val_loss = float('inf')
+best_weights = None
+patience, patience_counter = 10, 0
+
+for epoch in range(200):
+    # --- Training ---
+    model.train()
+    train_loss = 0
+    for x, y in train_loader:
+        x, y = x.to(device), y.to(device)
+        optimizer.zero_grad()
+        with autocast():  # fp16 forward pass
+            out = model(x)
+            loss = criterion(out, y)
+        scaler.scale(loss).backward()
+        scaler.unscale_(optimizer)
+        torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+        scaler.step(optimizer)
+        scaler.update()
+        train_loss += loss.item()
+    
+    # --- Validation ---
+    model.eval()
+    val_loss, correct, total = 0, 0, 0
+    with torch.no_grad():
+        for x, y in val_loader:
+            x, y = x.to(device), y.to(device)
+            out = model(x)
+            val_loss += criterion(out, y).item()
+            correct += (out.argmax(1) == y).sum().item()
+            total += y.size(0)
+    
+    val_loss /= len(val_loader)
+    val_acc = correct / total
+    scheduler.step()
+    
+    # --- Early stopping + checkpointing ---
+    if val_loss < best_val_loss:
+        best_val_loss = val_loss
+        best_weights = copy.deepcopy(model.state_dict())
+        torch.save({'epoch': epoch, 'model': best_weights,
+                    'optim': optimizer.state_dict(), 
+                    'val_loss': best_val_loss}, 'best_model.pt')
+        patience_counter = 0
+    else:
+        patience_counter += 1
+        if patience_counter >= patience:
+            print(f"Early stopping at epoch {epoch}")
+            break
+    
+    if epoch % 10 == 0:
+        print(f"Ep{epoch:3d} | train_loss={train_loss/len(train_loader):.4f}"
+              f" | val_loss={val_loss:.4f} | val_acc={val_acc:.3f}")
+
+model.load_state_dict(best_weights)  # restore best model`,
+          practical: "Key details: pin_memory=True on DataLoader speeds up CPU→GPU transfer. autocast() does fp16 forward pass (2× faster on Tensor Cores). GradScaler prevents fp16 underflow. clip_grad_norm_ prevents exploding gradients. Copy deepcopy of state_dict (not model reference) for best weights. num_workers=4 for parallel data loading."
+        }
+      },
+      {
+        q: "Explain mixed precision training and distributed training (DDP vs FSDP). When does each help and what are the tradeoffs?",
+        tags: ["hard","pytorch","distributed","mixed-precision"],
+        answer: {
+          intuition: "Mixed precision trains with float16 instead of float32 for most operations — nearly doubling throughput on modern GPUs with Tensor Cores. Distributed training parallelizes training across multiple GPUs/nodes — necessary for large models.",
+          math: `Mixed Precision:
+FP32: 32 bits per value, range ~[1.2e-38, 3.4e38]
+FP16: 16 bits per value, range ~[6.1e-5, 65504]
+
+The problem: FP16 underflows for small gradients and overflows for large.
+Solution: gradient scaling — multiply loss by scale_factor before backward,
+then unscale before optimizer step.
+
+Effective: 2× memory reduction + 2-4× faster computation on Tensor Cores.
+BF16 (bfloat16): same range as FP32, less precision. Better for training (no overflow), used in TPUs and newer GPUs (A100+).`,
+          theory: `Data Parallelism (DistributedDataParallel - DDP):
+Each GPU has full model copy.
+Each GPU gets a different data shard.
+Gradients synchronized (all-reduce) after each backward pass.
+
+Efficient when: model fits in single GPU memory.
+Scales up to ~1000 GPUs (with high-bandwidth interconnect).
+
+Tensor Parallelism:
+Split individual weight matrices across GPUs.
+Each GPU computes part of each matrix multiply.
+Used for: transformer attention layers split across GPUs.
+
+Pipeline Parallelism:
+Split model layers across GPUs (GPU 0: layers 1-12, GPU 1: layers 13-24).
+Micro-batches flow through pipeline.
+Problem: pipeline bubble (GPUs idle while waiting).
+
+FSDP (Fully Sharded Data Parallelism):
+Shards model parameters, gradients, AND optimizer states across GPUs.
+Each GPU only holds 1/N of each parameter shard.
+When needed: all-gather to compute forward/backward pass.
+Then shard again to save memory.
+
+Memory reduction: ~N× (N GPUs) for parameters + gradients + optimizer states.
+Used for training LLMs (GPT-4, Llama 2) — they don't fit in single GPU even in FP16.`,
+          practical: "Mixed precision: torch.cuda.amp.autocast() + GradScaler. BF16: autocast(dtype=torch.bfloat16) on A100+. DDP: torch.nn.parallel.DistributedDataParallel, launch with torchrun. FSDP: torch.distributed.fsdp.FullyShardedDataParallel with ShardingStrategy.FULL_SHARD. For most projects: DDP is sufficient. For >10B parameter models: FSDP or DeepSpeed ZeRO (Stage 2/3). Use Accelerate (HuggingFace) for easy DDP/FSDP with minimal code changes."
+        }
+      },
+    ]
+  },
+  {
+    id: "rl",
+    icon: "🎮",
+    title: "Reinforcement Learning Basics",
+    subtitle: "MDP, reward, policy, value functions, Q-learning",
+    questions: [
+      {
+        q: "Define the core elements of an MDP (Markov Decision Process). What is the Bellman equation, and how does Q-learning derive from it?",
+        tags: ["hard","math","rl","q-learning"],
+        answer: {
+          intuition: "RL is about learning to make decisions by trial and error. An agent takes actions in an environment, receives rewards, and updates its policy to maximize cumulative future reward. The MDP framework formalizes this.",
+          math: `MDP Definition: (S, A, P, R, γ)
+  S: state space
+  A: action space
+  P(s'|s,a): transition probability
+  R(s,a,s'): reward function
+  γ ∈ [0,1]: discount factor
+
+Return (cumulative discounted reward):
+  Gₜ = Σₖ₌₀∞ γᵏ Rₜ₊ₖ₊₁
+
+Value Functions:
+  V^π(s) = E_π[Gₜ | Sₜ=s]   [expected return from state s under policy π]
+  Q^π(s,a) = E_π[Gₜ | Sₜ=s, Aₜ=a]   [state-action value]
+
+Bellman Equation for V^π:
+  V^π(s) = Σₐ π(a|s) Σₛ' P(s'|s,a)[R(s,a,s') + γV^π(s')]
+
+Bellman Optimality:
+  Q*(s,a) = Σₛ' P(s'|s,a)[R(s,a,s') + γ max_{a'} Q*(s',a')]
+
+Q-Learning (Watkins, 1989):
+  Q(s,a) ← Q(s,a) + α[r + γ max_{a'} Q(s',a') - Q(s,a)]
+  
+  TD target: r + γ max Q(s',a')
+  TD error: target - current Q estimate
+  Off-policy: uses greedy max (not actual action taken)`,
+          theory: `Markov Property: P(sₜ₊₁|s₀,a₀,...,sₜ,aₜ) = P(sₜ₊₁|sₜ,aₜ)
+The future depends only on the present state, not the history.
+
+Exploration vs Exploitation:
+ε-greedy: with probability ε take random action, else take greedy.
+UCB (Upper Confidence Bound): explore actions with uncertain value estimates.
+Thompson Sampling: sample from posterior belief about Q values.
+
+Deep Q-Network (DQN):
+Parameterize Q(s,a;θ) with a neural network.
+Loss: L = E[(r + γ max Q(s',a';θ⁻) - Q(s,a;θ))²]
+
+DQN tricks (Mnih et al., 2015):
+1. Experience Replay: store (s,a,r,s') in replay buffer, sample random minibatches → breaks correlations
+2. Target Network θ⁻: updated slowly (every C steps) → stable TD targets
+
+Policy Gradient (alternative to value-based):
+Directly optimize policy π_θ(a|s).
+REINFORCE: ∇J(θ) = E[∇ log π_θ(a|s) · G]
+Problem: high variance. Solution: subtract baseline (Actor-Critic, PPO, A3C).`,
+          practical: "Libraries: stable-baselines3 (easy), RLlib (scalable), CleanRL (educational code). Environments: OpenAI Gym, Gymnasium. Start with: CartPole-v1 (DQN), LunarLander-v2 (PPO). DQN hyperparams: replay_buffer_size=100000, batch_size=64, target_update=1000, epsilon_decay. For continuous actions: PPO or SAC (Soft Actor-Critic)."
+        }
+      },
+    ]
+  },
+  {
+    id: "system-design",
+    icon: "🏗️",
+    title: "ML System Design",
+    subtitle: "Model serving, feature stores, monitoring, data pipelines",
+    questions: [
+      {
+        q: "How do you design a production ML system end-to-end? What is the ML project lifecycle, and what are the most common failure modes in production?",
+        tags: ["hard","system-design","production"],
+        answer: {
+          intuition: "Building a model in a notebook is the easy part. Production ML systems require data pipelines, feature engineering at scale, model serving infrastructure, monitoring, and continuous retraining. Most failures happen after deployment.",
+          math: ``,
+          theory: `ML Project Lifecycle:
+1. Problem Definition: frame as ML, define success metrics, data availability?
+2. Data Collection: sources, labeling strategy, data contracts, storage
+3. Feature Engineering: feature store, feature computation (batch/online), versioning
+4. Model Development: experiments, hyperparameter tuning, model selection
+5. Evaluation: offline metrics → match business metric alignment
+6. Deployment: A/B testing or shadow mode, canary release
+7. Monitoring: data drift, model drift, performance degradation, alerts
+8. Retraining: trigger-based (drift detected) or schedule-based
+
+Model Serving Patterns:
+Batch: offline predictions, store in DB. Lowest latency requirement.
+Online (REST API): real-time, FastAPI/Flask + model. Latency 10-200ms.
+Streaming: Kafka + consumer → model → output topic. For real-time pipelines.
+Edge: model on device (ONNX, TFLite, CoreML). No network latency.
+
+Common Production Failures:
+1. Training-serving skew: feature computation code differs between training and serving → different distributions. Fix: shared feature store.
+2. Data drift: input distribution changes over time (new users, seasonality). Fix: monitor feature distributions, retrain.
+3. Label drift: ground truth distribution shifts.
+4. Feedback loops: model affects behavior which affects future training data.
+5. Silent failures: model returns valid output but wrong. Fix: monitor business metrics, not just technical.
+
+Feature Store:
+Central repository for computed features.
+Offline store: historical features for training (data warehouse).
+Online store: low-latency lookup for serving (Redis/DynamoDB).
+Feature reuse: one computation, multiple models.`,
+          practical: "MLOps stack: MLflow (experiment tracking), DVC (data versioning), Feast (feature store), BentoML/TorchServe (model serving), Evidently (monitoring), Airflow/Prefect (pipeline orchestration). Quantization for deployment: torch.quantization (INT8 → 4× smaller, 2-4× faster). ONNX export for cross-framework serving. vLLM for high-throughput LLM serving."
+        }
+      },
+      {
+        q: "Explain how LLM serving works at scale. What is KV-cache, continuous batching, and tensor parallelism? How does vLLM improve throughput?",
+        tags: ["hard","llm","serving","system-design"],
+        answer: {
+          intuition: "Serving LLMs at scale is fundamentally different from serving traditional ML models. Autoregressive generation has unique characteristics — the KV-cache, variable sequence lengths, and GPU memory constraints require specialized serving infrastructure.",
+          math: `Autoregressive generation:
+P(x₁,...,xₙ) = ∏ᵢ P(xᵢ | x₁,...,xᵢ₋₁)
+
+At each step, we need attention over all previous tokens.
+With KV-cache: store K, V matrices for all previous tokens.
+Next token: compute Q for new token, attend to cached K, V.
+Cost per token: O(context_length) instead of O(context_length²)
+
+Memory cost: 2 × n_layers × seq_len × d_model × batch_size × 2 bytes
+For GPT-3: ~0.5 MB per token in cache
+
+Throughput = tokens generated per second
+Latency = time to first token (TTFT) + time per output token (TPOT)`,
+          theory: `Continuous Batching (Orca, 2022):
+Traditional batching: batch all requests, process together. Problem: different sequences finish at different times — must wait for longest sequence (GPU sits idle).
+Continuous batching: swap out completed sequences mid-batch, insert new ones. GPU utilization improves from ~30% to ~90%.
+
+PagedAttention (vLLM):
+Problem: KV cache must be contiguous in memory. Can't share memory between sequences. Memory fragmentation.
+Solution: Virtual memory for KV cache! Split cache into 16-token 'pages'. Non-contiguous allocation. Share pages across parallel beams in beam search.
+Result: 24× higher throughput than naive serving, near-optimal memory utilization.
+
+Speculative Decoding:
+Use a small 'draft' model to generate k tokens speculatively.
+Verify all k tokens in parallel with large model.
+If draft correct: accept all k (k× speedup). Else: reject from first wrong token.
+Speedup: 2-3× for coding tasks (draft model very good at common patterns).
+
+Tensor Parallelism for LLMs:
+Split attention heads across GPUs.
+head_0 on GPU_0, head_1 on GPU_1, ...
+All-reduce after each layer to combine.
+Used for single-model inference across multiple GPUs.`,
+          practical: "vLLM: from vllm import LLM, SamplingParams. Automatic KV cache management, continuous batching, tensor parallelism. TGI (Text Generation Inference, HuggingFace): Docker-based, supports many models. Triton Inference Server: NVIDIA, multi-framework, high-performance. For quantization: GPTQ (post-training), AWQ (activation-aware weight quantization). INT4 quantization: ~4× memory reduction with <1% quality loss."
+        }
+      },
+    ]
+  }
+];
+
+// ============================================================
+// RENDER
+// ============================================================
+let reviewedSet = new Set();
+let currentDiff = 'all';
+let currentSearch = '';
+
+function buildSidebar() {
+  const sb = document.getElementById('sidebar');
+  sb.innerHTML = '<div class="sidebar-title">Sections</div>';
+  let total = 0;
+  SECTIONS.forEach(sec => {
+    total += sec.questions.length;
+    const btn = document.createElement('button');
+    btn.className = 'section-link';
+    btn.id = 'nav-' + sec.id;
+    btn.innerHTML = `<span>${sec.icon} ${sec.title}</span><span class="badge">${sec.questions.length}</span>`;
+    btn.onclick = () => document.getElementById('sec-' + sec.id).scrollIntoView({behavior:'smooth', block:'start'});
+    sb.appendChild(btn);
+    const bar = document.createElement('div');
+    bar.className = 'progress-mini';
+    bar.id = 'prog-' + sec.id;
+    bar.innerHTML = '<div class="progress-mini-fill" style="width:0%"></div>';
+    sb.appendChild(bar);
+  });
+  document.getElementById('total-q').textContent = total;
+  document.getElementById('done-q').textContent = 0;
+  document.getElementById('h-total').textContent = total;
+  document.getElementById('h-done').textContent = 0;
+}
+
+function renderAnswer(ans, qIdx, secId) {
+  let html = '';
+  if (ans.intuition) {
+    html += `<div class="ans-block"><div class="ans-label">💡 Intuition</div><p class="ans">${ans.intuition}</p></div>`;
+  }
+  if (ans.math && ans.math.trim()) {
+    html += `<div class="ans-block"><div class="ans-label">📐 Mathematical Formulation</div><div class="math-block">${ans.math.replace(/\n/g,'<br>')}</div></div>`;
+  }
+  if (ans.theory) {
+    html += `<div class="ans-block"><div class="ans-label">📚 Theory & Concepts</div><p class="ans">${ans.theory.replace(/\n\n/g,'</p><p class="ans">').replace(/\n/g,'<br>')}</p></div>`;
+  }
+  if (ans.code) {
+    html += `<div class="ans-block"><div class="ans-label">💻 Implementation</div><pre>${escapeHtml(ans.code)}</pre></div>`;
+  }
+  if (ans.practical) {
+    html += `<div class="ans-block"><div class="ans-label">🚀 Practical Notes</div><div class="callout tip">${ans.practical}</div></div>`;
+  }
+  return html;
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function buildMain() {
+  const main = document.getElementById('main-content');
+  main.innerHTML = '';
+  SECTIONS.forEach((sec, si) => {
+    const div = document.createElement('div');
+    div.className = 'section';
+    div.id = 'sec-' + sec.id;
+    div.innerHTML = `
+      <div class="section-header">
+        <div class="section-icon">${sec.icon}</div>
+        <div class="section-meta">
+          <div class="section-num">Section ${si+1}</div>
+          <div class="section-title">${sec.title}</div>
+          <div class="section-subtitle">${sec.subtitle}</div>
+        </div>
+      </div>
+    `;
+    sec.questions.forEach((q, qi) => {
+      const card = document.createElement('div');
+      card.className = 'q-card';
+      card.dataset.diff = q.tags.find(t=>['hard','medium','easy'].includes(t)) || 'medium';
+      card.dataset.text = q.q.toLowerCase();
+      card.dataset.secid = sec.id;
+      card.dataset.qid = `${sec.id}-${qi}`;
+      const tagHtml = q.tags.map(t => `<span class="q-tag ${['hard','medium','easy'].includes(t)?t:''}">${t}</span>`).join('');
+      card.innerHTML = `
+        <div class="q-header" onclick="toggleCard(this)">
+          <div class="q-num">Q${qi+1}</div>
+          <div>
+            <div class="q-text">${q.q}</div>
+            <div class="q-tags">${tagHtml}</div>
+          </div>
+          <div class="q-mark" onclick="event.stopPropagation(); toggleReview(this)" title="Mark as reviewed">✓</div>
+          <div class="q-chevron">▼</div>
+        </div>
+        <div class="q-answer">${renderAnswer(q.answer, qi, sec.id)}</div>
+      `;
+      div.appendChild(card);
+    });
+    main.appendChild(div);
+  });
+  applyFilters();
+  updateScrollSpy();
+}
+
+function toggleCard(header) {
+  const card = header.parentElement;
+  card.classList.toggle('open');
+}
+
+function toggleReview(markEl) {
+  const card = markEl.closest('.q-card');
+  const id = card.dataset.qid;
+  if (reviewedSet.has(id)) {
+    reviewedSet.delete(id);
+    card.classList.remove('answered');
+  } else {
+    reviewedSet.add(id);
+    card.classList.add('answered');
+  }
+  updateStats();
+}
+
+function updateStats() {
+  const total = document.querySelectorAll('.q-card').length;
+  const done = reviewedSet.size;
+  document.getElementById('total-q').textContent = total;
+  document.getElementById('done-q').textContent = done;
+  document.getElementById('h-done').textContent = done;
+  SECTIONS.forEach(sec => {
+    const secCards = document.querySelectorAll(`.q-card[data-secid="${sec.id}"]`);
+    const secDone = [...secCards].filter(c => reviewedSet.has(c.dataset.qid)).length;
+    const bar = document.querySelector(`#prog-${sec.id} .progress-mini-fill`);
+    if (bar) bar.style.width = (secCards.length ? secDone/secCards.length*100 : 0) + '%';
+  });
+}
+
+function applyFilters() {
+  const cards = document.querySelectorAll('.q-card');
+  cards.forEach(card => {
+    const diffMatch = currentDiff === 'all' || card.dataset.diff === currentDiff;
+    const searchMatch = !currentSearch || card.dataset.text.includes(currentSearch.toLowerCase());
+    card.style.display = (diffMatch && searchMatch) ? '' : 'none';
+  });
+  // Hide empty sections
+  SECTIONS.forEach(sec => {
+    const secEl = document.getElementById('sec-' + sec.id);
+    const visible = secEl.querySelectorAll('.q-card:not([style*="none"])').length;
+    secEl.style.display = visible ? '' : 'none';
+  });
+}
+
+function filterDiff(diff, btn) {
+  currentDiff = diff;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters();
+}
+
+function searchQuestions(val) {
+  currentSearch = val.trim();
+  applyFilters();
+}
+
+function expandAll() {
+  document.querySelectorAll('.q-card').forEach(c => c.classList.add('open'));
+}
+function collapseAll() {
+  document.querySelectorAll('.q-card').forEach(c => c.classList.remove('open'));
+}
+
+function toggleTheme() {
+  document.body.classList.toggle('light');
+  const btn = document.querySelector('.theme-btn');
+  btn.textContent = document.body.classList.contains('light') ? '🌙 Dark' : '☀ Light';
+}
+
+function updateScrollSpy() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      const id = e.target.id.replace('sec-','');
+      const link = document.getElementById('nav-' + id);
+      if (!link) return;
+      if (e.isIntersecting) {
+        document.querySelectorAll('.section-link').forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+      }
+    });
+  }, {rootMargin: '-100px 0px -60% 0px'});
+  SECTIONS.forEach(sec => {
+    const el = document.getElementById('sec-' + sec.id);
+    if (el) observer.observe(el);
+  });
+}
+
+buildSidebar();
+buildMain();
+</script>
+</body>
+</html>
+
+
