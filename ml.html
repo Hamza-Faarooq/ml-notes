@@ -1,0 +1,2540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ML Interview Gauntlet — CDC Day 1 Prep</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #1a1a24;
+    --border: #2a2a3a;
+    --accent: #7c6af7;
+    --accent2: #f7c26a;
+    --accent3: #6af7c2;
+    --text: #e8e8f0;
+    --text-muted: #7a7a9a;
+    --text-dim: #4a4a6a;
+    --math: #f7a26a;
+    --tag-classical: #7c6af7;
+    --tag-unsupervised: #6af7c2;
+    --tag-eval: #f7c26a;
+    --tag-feat: #f76af7;
+    --tag-dl: #6ab4f7;
+    --tag-opt: #f76a8a;
+    --tag-seq: #a2f76a;
+    --tag-cv: #f7926a;
+    --tag-nlp: #6af7f7;
+    --tag-llm: #c26af7;
+    --tag-rag: #f7f76a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ===== HEADER ===== */
+  header {
+    position: relative;
+    padding: 60px 40px 50px;
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .header-bg {
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse 80% 60% at 20% 50%, rgba(124,106,247,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 80% at 80% 30%, rgba(106,247,194,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 60% 80%, rgba(247,194,106,0.06) 0%, transparent 50%);
+  }
+
+  .header-grid {
+    position: absolute;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(124,106,247,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,106,247,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  header .inner {
+    position: relative;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .tag-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(124,106,247,0.15);
+    border: 1px solid rgba(124,106,247,0.3);
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    letter-spacing: 0.05em;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+
+  h1 .line1 { color: var(--text); }
+  h1 .line2 {
+    background: linear-gradient(90deg, var(--accent), var(--accent3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .header-meta {
+    margin-top: 18px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    align-items: center;
+  }
+
+  .header-meta p {
+    color: var(--text-muted);
+    font-size: 15px;
+    max-width: 550px;
+    line-height: 1.6;
+  }
+
+  .stats {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat .num {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.6rem;
+    color: var(--accent2);
+    line-height: 1;
+  }
+
+  .stat .label {
+    font-size: 11px;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 3px;
+  }
+
+  /* ===== SEARCH + TOOLBAR ===== */
+  .toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,10,15,0.92);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 40px;
+  }
+
+  .toolbar-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .search-wrap {
+    flex: 1;
+    min-width: 200px;
+    position: relative;
+  }
+
+  .search-wrap svg {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.4;
+  }
+
+  #searchInput {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    padding: 10px 14px 10px 38px;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  #searchInput:focus { border-color: var(--accent); }
+  #searchInput::placeholder { color: var(--text-dim); }
+
+  .filter-btns {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .filter-btn:hover, .filter-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  .count-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-left: auto;
+    white-space: nowrap;
+  }
+
+  /* ===== NAV ===== */
+  .layout {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 40px 80px;
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 40px;
+    align-items: start;
+  }
+
+  .side-nav {
+    position: sticky;
+    top: 80px;
+  }
+
+  .side-nav h3 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--text-muted);
+    font-size: 13px;
+    text-decoration: none;
+    border: 1px solid transparent;
+  }
+
+  .nav-item:hover {
+    background: var(--surface2);
+    color: var(--text);
+    border-color: var(--border);
+  }
+
+  .nav-item.active {
+    background: rgba(124,106,247,0.1);
+    border-color: rgba(124,106,247,0.3);
+    color: var(--accent);
+  }
+
+  .nav-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .nav-count {
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+
+  /* ===== MAIN CONTENT ===== */
+  .main-content { min-width: 0; }
+
+  .section-block {
+    margin-bottom: 60px;
+  }
+
+  .section-block.hidden { display: none; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  .section-header h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .section-subtitle {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+    margin-top: 2px;
+  }
+
+  .q-count {
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    background: var(--surface2);
+    padding: 3px 8px;
+    border-radius: 20px;
+    flex-shrink: 0;
+  }
+
+  /* ===== QUESTION CARDS ===== */
+  .q-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .q-card:hover { border-color: #3a3a50; }
+  .q-card.open { border-color: var(--accent); }
+  .q-card.hidden-q { display: none; }
+
+  .q-header {
+    padding: 18px 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    user-select: none;
+  }
+
+  .q-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    background: var(--surface2);
+    padding: 3px 7px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .q-text {
+    flex: 1;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--text);
+  }
+
+  .q-badges {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+  }
+
+  .badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    letter-spacing: 0.04em;
+  }
+
+  .badge.math { background: rgba(247,162,106,0.12); color: var(--math); border: 1px solid rgba(247,162,106,0.2); }
+  .badge.theory { background: rgba(106,247,194,0.1); color: var(--accent3); border: 1px solid rgba(106,247,194,0.2); }
+  .badge.system { background: rgba(124,106,247,0.1); color: var(--accent); border: 1px solid rgba(124,106,247,0.2); }
+
+  .q-toggle {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-dim);
+    transition: transform 0.25s, color 0.2s;
+    margin-top: 1px;
+  }
+
+  .q-card.open .q-toggle { transform: rotate(180deg); color: var(--accent); }
+
+  .q-answer {
+    display: none;
+    padding: 0 20px 20px 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .q-card.open .q-answer { display: block; }
+
+  .answer-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent3);
+    margin: 16px 0 10px;
+  }
+
+  .q-answer p {
+    font-size: 14.5px;
+    line-height: 1.75;
+    color: #c8c8d8;
+  }
+
+  .q-answer .math-inline {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--math);
+    background: rgba(247,162,106,0.08);
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+
+  .q-answer .highlight {
+    background: linear-gradient(transparent 60%, rgba(124,106,247,0.2) 60%);
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .no-results {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    display: none;
+  }
+
+  /* ===== PROGRESS BAR ===== */
+  .progress-track {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 30px;
+  }
+
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+
+  .progress-bar {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent3));
+    border-radius: 3px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    header, .toolbar { padding-left: 20px; padding-right: 20px; }
+    .layout { 
+      grid-template-columns: 1fr; 
+      padding: 24px 20px 60px;
+      gap: 24px;
+    }
+    .side-nav { position: static; }
+    .filter-btns { gap: 6px; }
+    .filter-btn { font-size: 10px; padding: 5px 8px; }
+  }
+
+  /* ===== SCROLLBAR ===== */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* ===== ANIMATIONS ===== */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-block { animation: fadeInUp 0.4s ease both; }
+  .section-block:nth-child(1) { animation-delay: 0.05s; }
+  .section-block:nth-child(2) { animation-delay: 0.1s; }
+  .section-block:nth-child(3) { animation-delay: 0.15s; }
+  .section-block:nth-child(4) { animation-delay: 0.2s; }
+  .section-block:nth-child(5) { animation-delay: 0.25s; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-bg"></div>
+  <div class="header-grid"></div>
+  <div class="inner">
+    <div class="tag-pill">⚡ CDC Day 1 Prep · IIT KGP</div>
+    <h1>
+      <div class="line1">ML Interview</div>
+      <div class="line2">Gauntlet</div>
+    </h1>
+    <div class="header-meta">
+      <p>The ultimate whiteboard defense toolkit — covering Classical ML, Deep Learning, Transformers, LLMs, RAG, and more. Covering both mathematical rigor and algorithmic intuition.</p>
+      <div class="stats">
+        <div class="stat"><div class="num">136</div><div class="label">Questions</div></div>
+        <div class="stat"><div class="num">11</div><div class="label">Sections</div></div>
+        <div class="stat"><div class="num">4</div><div class="label">Tiers</div></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="toolbar">
+  <div class="toolbar-inner">
+    <div class="search-wrap">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="searchInput" placeholder="Search questions, keywords, topics...">
+    </div>
+    <div class="filter-btns">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="math">Math Heavy</button>
+      <button class="filter-btn" data-filter="theory">Theory</button>
+      <button class="filter-btn" data-filter="system">Systems</button>
+    </div>
+    <span class="count-badge" id="countBadge">136 questions</span>
+  </div>
+</div>
+
+<div class="layout">
+  <nav class="side-nav">
+    <h3>Sections</h3>
+    <a class="nav-item active" href="#s1" onclick="scrollTo('s1')">
+      <span class="nav-dot" style="background:#7c6af7"></span>Classical ML<span class="nav-count">18</span>
+    </a>
+    <a class="nav-item" href="#s2" onclick="scrollTo('s2')">
+      <span class="nav-dot" style="background:#6af7c2"></span>Unsupervised<span class="nav-count">13</span>
+    </a>
+    <a class="nav-item" href="#s3" onclick="scrollTo('s3')">
+      <span class="nav-dot" style="background:#f7c26a"></span>Evaluation<span class="nav-count">12</span>
+    </a>
+    <a class="nav-item" href="#s4" onclick="scrollTo('s4')">
+      <span class="nav-dot" style="background:#f76af7"></span>Feature Engg<span class="nav-count">9</span>
+    </a>
+    <a class="nav-item" href="#s5" onclick="scrollTo('s5')">
+      <span class="nav-dot" style="background:#6ab4f7"></span>Deep Learning<span class="nav-count">14</span>
+    </a>
+    <a class="nav-item" href="#s6" onclick="scrollTo('s6')">
+      <span class="nav-dot" style="background:#f76a8a"></span>Optimization<span class="nav-count">12</span>
+    </a>
+    <a class="nav-item" href="#s7" onclick="scrollTo('s7')">
+      <span class="nav-dot" style="background:#a2f76a"></span>Seq Models<span class="nav-count">12</span>
+    </a>
+    <a class="nav-item" href="#s8" onclick="scrollTo('s8')">
+      <span class="nav-dot" style="background:#f7926a"></span>Computer Vision<span class="nav-count">12</span>
+    </a>
+    <a class="nav-item" href="#s9" onclick="scrollTo('s9')">
+      <span class="nav-dot" style="background:#6af7f7"></span>NLP & Transformers<span class="nav-count">15</span>
+    </a>
+    <a class="nav-item" href="#s10" onclick="scrollTo('s10')">
+      <span class="nav-dot" style="background:#c26af7"></span>LLMs & LoRA<span class="nav-count">14</span>
+    </a>
+    <a class="nav-item" href="#s11" onclick="scrollTo('s11')">
+      <span class="nav-dot" style="background:#f7f76a"></span>RAG & Systems<span class="nav-count">9</span>
+    </a>
+  </nav>
+
+  <main class="main-content">
+    <div class="progress-track">
+      <div class="progress-label">
+        <span>Study Progress</span>
+        <span id="progressText">0 / 136 opened</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+
+    <div id="no-results" class="no-results">No questions match your search.</div>
+
+    <!-- ===== SECTION 1: CLASSICAL ML ===== -->
+    <div class="section-block" id="s1" data-section="classical">
+      <div class="section-header">
+        <div class="section-icon" style="background:rgba(124,106,247,0.12);border:1px solid rgba(124,106,247,0.25)">🧮</div>
+        <div>
+          <h2 style="color:#a99cf7">Classical ML — Supervised Learning</h2>
+          <div class="section-subtitle">Regression · Trees · Boosting · SVM · Bayes</div>
+        </div>
+        <span class="q-count">18 Q</span>
+      </div>
+
+      <div class="q-card" data-tags="math classical">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q1</span>
+          <div><div class="q-text">Mathematically, why is Logistic Regression actually a linear classifier?</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Logistic regression applies the sigmoid function to a linear combination of inputs: <span class="math-inline">p = 1 / (1 + e^-(w^T x + b))</span>. The decision boundary is where <span class="math-inline">p = 0.5</span>. Setting the equation to 0.5 yields <span class="math-inline">e^-(w^T x+b) = 1</span>, which means <span class="math-inline">w^T x + b = 0</span>. This is the equation of a flat hyperplane — thus the boundary is perfectly linear.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="math classical">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q2</span>
+          <div><div class="q-text">Derive the fundamental difference between SVM and Logistic Regression loss functions.</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Logistic Regression uses Log-Loss (Cross-Entropy): <span class="math-inline">L = −[y·log(p) + (1−y)·log(1−p)]</span>. It pushes every single point as far away from the boundary as possible. SVM uses Hinge Loss: <span class="math-inline">L = max(0, 1 − y·(w^T x + b))</span>. Once a point is safely past the margin (score > 1), the loss becomes exactly 0. <span class="highlight">SVM only cares about the support vectors near the boundary; LR cares about all points.</span></p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="math classical">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q3</span>
+          <div><div class="q-text">How does a Random Forest reduce variance without increasing bias? (Show the math)</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>For N independent trees with variance σ², the variance of their average is <span class="math-inline">σ²/N</span>. However, trees in a forest are correlated by ρ. The true variance is: <span class="math-inline">ρσ² + (1−ρ)σ²/N</span>. By using feature bagging (random subsets of features), RF drives the correlation ρ down, pushing the variance toward <span class="math-inline">σ²/N</span> without changing the bias of the individual deep trees.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="math classical">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q4</span>
+          <div><div class="q-text">Explain the mathematical superiority of XGBoost over standard Gradient Boosting (GBM).</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>GBM uses only first-order derivatives (gradients) to optimize the loss. XGBoost uses a second-order Taylor expansion. The objective at step t becomes: <span class="math-inline">L^(t) ≈ Σ[l(yᵢ, ŷ^(t-1)) + gᵢ·fₜ(xᵢ) + ½hᵢ·fₜ²(xᵢ)]</span>, where gᵢ is the gradient and hᵢ is the Hessian (second derivative). Using the Hessian allows XGBoost to take more accurate Newton-Raphson steps, converging faster and more stably.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="math classical">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q5</span>
+          <div><div class="q-text">Derive the Dual formulation of the SVM from the Primal. Why do we solve the Dual?</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Primal: <span class="math-inline">min ½||w||² + C·Σξᵢ</span> subject to <span class="math-inline">yᵢ(w^T xᵢ + b) ≥ 1 − ξᵢ</span>. We construct the Lagrangian and take derivatives w.r.t. w and b, yielding <span class="math-inline">w = Σαᵢyᵢxᵢ</span>. Substituting back gives the Dual: <span class="math-inline">max Σαᵢ − ½ΣΣαᵢαⱼyᵢyⱼxᵢᵀxⱼ</span>. We solve the dual because (1) it bounds parameters by data points N rather than dimensions D, and (2) it enables the <span class="highlight">Kernel Trick</span> because data only appears as a dot product xᵢᵀxⱼ.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="math classical">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q6</span>
+          <div><div class="q-text">Prove that OLS (Ordinary Least Squares) is equivalent to MLE under Gaussian noise.</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Assume <span class="math-inline">yᵢ = θᵀxᵢ + ϵᵢ</span> where <span class="math-inline">ϵᵢ ~ N(0,σ²)</span>. The log-likelihood is: <span class="math-inline">L(θ) = −N·log(√2πσ²) − (1/2σ²)·Σ(yᵢ − θᵀxᵢ)²</span>. Since the first term is constant and 1/2σ² is a positive constant, <span class="highlight">maximizing L(θ) is mathematically identical to minimizing the sum of squared errors</span>: <span class="math-inline">min Σ(yᵢ − θᵀxᵢ)²</span>.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="math classical">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q7</span>
+          <div><div class="q-text">In XGBoost, write the exact formula for the "Similarity Score" used to evaluate a tree split.</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>The optimal weight for leaf j is <span class="math-inline">w*ⱼ = −Σgᵢ / (Σhᵢ + λ)</span>. The Gain (Similarity Score) for a proposed split is: <span class="math-inline">Gain = ½[(ΣLgᵢ)²/(ΣLhᵢ+λ) + (ΣRgᵢ)²/(ΣRhᵢ+λ) − (ΣL+Rgᵢ)²/(ΣL+Rhᵢ+λ)] − γ</span>. If Gain < 0, the split is rejected (pruned). The λ term is L2 regularization on leaf weights; γ is minimum gain for a split.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="math classical">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q8</span>
+          <div><div class="q-text">What happens to Linear Regression if features are perfectly multicollinear?</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>OLS solution is <span class="math-inline">θ = (XᵀX)⁻¹XᵀY</span>. If two features are perfectly correlated, columns of X are linearly dependent — <span class="math-inline">XᵀX</span> is singular with determinant = 0. A matrix with zero determinant is non-invertible. <span class="highlight">The algorithm completely crashes</span>. Fix: Ridge regression adds λI to the diagonal, forcing all eigenvalues > 0, ensuring invertibility.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory classical">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q9</span>
+          <div><div class="q-text">What is the fundamental flaw of a single Decision Tree, and how does Random Forest fix it?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>A single decision tree is incredibly greedy — it memorizes training data by splitting until it perfectly classifies every point, leading to massive overfitting (high variance). <span class="highlight">Random Forest uses "Wisdom of the Crowd" (Bagging).</span> It builds hundreds of deep, overfitted trees but forces them to be different by giving each tree a random subset of data AND a random subset of features. When you average hundreds of uncorrelated, overfitted models, the noise cancels out while preserving complex patterns.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory classical">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q10</span>
+          <div><div class="q-text">Explain the "Kernel Trick" in SVMs intuitively. What problem does it solve?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Imagine red and blue marbles mixed on a flat table — you cannot draw a straight line to separate them. <span class="highlight">The Kernel Trick is like shaking the table so marbles pop into 3D space.</span> While in mid-air, you slide a flat sheet of cardboard between them. When they land, that cardboard looks like a highly complex, curvy boundary on the flat table. It solves non-linear problems without actually calculating infinite dimensions — the "trick" is that kernels compute dot products in high-dimensional spaces implicitly, avoiding the expensive coordinate transformation.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory classical">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q11</span>
+          <div><div class="q-text">Conceptually, how does XGBoost differ from Random Forest in how it learns from errors?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Random Forest builds all trees independently and simultaneously (parallel). It does not learn from mistakes — it hopes the average is correct. <span class="highlight">XGBoost builds trees sequentially.</span> Tree 1 makes a prediction. Tree 2 is trained specifically on the errors (residuals) of Tree 1. Tree 3 is trained on the errors of Tree 2. XGBoost actively focuses on the hardest-to-predict data points, making it highly accurate but prone to overfitting if not regularized.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory classical">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q12</span>
+          <div><div class="q-text">Why does Naive Bayes fail with unseen words in testing, and how is it fixed?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Naive Bayes multiplies all feature probabilities. If a word never appeared in training, its probability is 0. Multiplying anything by 0 makes the entire class probability 0, destroying the prediction. <span class="highlight">Fix: Laplace Smoothing (Additive Smoothing)</span> artificially adds a count of 1 to every word in the vocabulary, ensuring no probability is ever exactly zero. The formula becomes <span class="math-inline">P(w|c) = (count(w,c) + 1) / (count(c) + |V|)</span>.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory classical system">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q13</span>
+          <div><div class="q-text">How does a Decision Tree efficiently find the optimal split for a continuous feature with 1,000,000 unique values?</div><div class="q-badges"><span class="badge theory">theory</span><span class="badge system">system</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>A naive approach would test every split, which is O(N²). Modern algorithms first sort feature values in O(N log N), then iterate through the sorted list evaluating only midpoints between adjacent values. <span class="highlight">LightGBM uses Histogram Binning</span> — compressing 1,000,000 values into ~256 discrete bins, reducing split-search complexity to O(bins), making it infinitely faster for massive datasets.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory classical system">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q14</span>
+          <div><div class="q-text">Why does Logistic Regression "blow up" (weights → infinity) on perfectly linearly separable data?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Logistic Regression tries to push probabilities to exactly 1.0 and 0.0 for perfectly separated classes. Because the sigmoid curve only reaches 1 or 0 at <span class="math-inline">±∞</span>, the optimizer keeps pushing weights larger infinitely. <span class="highlight">Fix: L2 Regularization</span> penalizes large weights, forcing the algorithm to settle for probabilities like 0.99 instead of 1.0, keeping the optimization bounded.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory classical">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q15</span>
+          <div><div class="q-text">How does AdaBoost differ from XGBoost in handling difficult data points?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>AdaBoost handles difficult points by explicitly <span class="highlight">increasing their sample weight</span> — the next round pays more attention because they carry heavier penalties. XGBoost doesn't touch sample weights at all. Instead, it calculates the residual error (Actual − Predicted) for every point. The next tree in XGBoost is trained directly on these residuals, literally attempting to predict the mathematical mistakes of the previous tree.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory classical">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q16</span>
+          <div><div class="q-text">Why are Tree-based models immune to extreme outliers in continuous data, but Linear Regression is not?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Linear Regression uses physical geometric distance — an outlier of 1,000,000 pulls the line violently toward it because the squared residual penalty is enormous. <span class="highlight">Decision trees only care about ordering (percentiles), not distance.</span> If a tree splits at "Value > 50", it treats a data point of 51 and a data point of 1,000,000 exactly the same way. The outlier cannot pull or skew the split threshold.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory classical">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q17</span>
+          <div><div class="q-text">Why do Random Forests usually not overfit with 1000+ trees, but XGBoost heavily overfits?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Random Forest builds trees completely independently. Adding more trees just averages out noise further, pushing variance lower without touching bias. <span class="highlight">Gradient Boosting builds trees sequentially</span> — Tree 100 specifically learns the micro-errors of Tree 99. After 1,000 trees, the algorithm runs out of macro-patterns to learn and starts perfectly memorizing the random noise of training data, causing severe overfitting.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory classical">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q18</span>
+          <div><div class="q-text">Why is Label Encoding disastrous for categorical variables like "City" in Linear Regression?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Label encoding assigns integers (Delhi=1, Mumbai=2, Bangalore=3). Linear Regression interprets these mathematically, assuming Bangalore is "3 times greater" than Delhi, or that the average of Delhi and Bangalore equals Mumbai. <span class="highlight">This is geometric nonsense.</span> One-Hot Encoding creates independent binary columns, preventing the model from assuming false ordinal hierarchies between city names.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SECTION 2: UNSUPERVISED ===== -->
+    <div class="section-block" id="s2" data-section="unsupervised">
+      <div class="section-header">
+        <div class="section-icon" style="background:rgba(106,247,194,0.1);border:1px solid rgba(106,247,194,0.2)">🔮</div>
+        <div>
+          <h2 style="color:#6af7c2">Unsupervised Learning</h2>
+          <div class="section-subtitle">K-Means · PCA · DBSCAN · GMM · Autoencoders</div>
+        </div>
+        <span class="q-count">13 Q</span>
+      </div>
+
+      <div class="q-card" data-tags="math unsupervised">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q19</span>
+          <div><div class="q-text">Why does K-Means always converge, and does it guarantee a global minimum?</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>K-Means uses Coordinate Descent (Lloyd's Algorithm), alternating between: (1) assigning points to the nearest centroid, and (2) updating centroids to the mean of their points. Because WCSS monotonically decreases at every step and there are finite cluster assignments, <span class="highlight">it must converge.</span> However, it only guarantees a local minimum due to non-convexity — which is why K-Means++ initialization is used to seed centroids far apart.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="math unsupervised">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q20</span>
+          <div><div class="q-text">Formulate PCA as an optimization problem. What are the principal components mathematically?</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>PCA seeks to maximize: <span class="math-inline">max_w (wᵀΣw)</span> subject to <span class="math-inline">wᵀw = 1</span>. Using Lagrange multiplier λ, setting the derivative to zero yields <span class="math-inline">Σw = λw</span>. <span class="highlight">The principal components are precisely the eigenvectors of the covariance matrix Σ.</span> The eigenvalues represent the variance explained by each component. In practice, SVD is preferred — PCA components are the right singular vectors V of X.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="math unsupervised">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q21</span>
+          <div><div class="q-text">Prove the relationship between PCA and SVD. Why is SVD preferred in practice?</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>SVD decomposes X = UΣ_svd Vᵀ. Therefore <span class="math-inline">XᵀX = VΣ²Vᵀ</span> — this exactly matches the eigendecomposition QΛQ⁻¹. <span class="highlight">The principal components (eigenvectors of XᵀX) are exactly the columns of V.</span> Eigenvalues are <span class="math-inline">λᵢ = σᵢ²/(N−1)</span>. SVD is preferred because computing the massive XᵀX matrix directly loses numerical precision when X has many collinear features.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="math unsupervised">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q22</span>
+          <div><div class="q-text">Formulate the Evidence Lower Bound (ELBO) in VAEs. What do its two components represent?</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>We want to maximize <span class="math-inline">log p(x)</span> but the integral over latent z is intractable. By Jensen's Inequality: <span class="math-inline">log p(x) ≥ E_q[log p(x|z)] − D_KL(q(z|x) || p(z))</span>. This is the ELBO. The <span class="highlight">first term is Reconstruction Loss</span> — how well the decoder rebuilds x from z. The <span class="highlight">second term is KL Divergence</span> — acting as a regularizer forcing the latent space to match a standard Gaussian prior.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory unsupervised">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q23</span>
+          <div><div class="q-text">Contrast GMM and K-Means. When does GMM fail in high dimensions?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>K-Means performs "hard" clustering (a point belongs entirely to one cluster) and assumes spherical clusters. GMM performs "soft" probabilistic clustering using the E-M algorithm and can model elliptical clusters via a full covariance matrix. <span class="highlight">GMM fails in high dimensions</span> because the covariance matrix requires O(D²) parameters. With sparse data, the matrix becomes singular (determinant → 0), causing numerical instability and degenerate solutions.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory unsupervised">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q24</span>
+          <div><div class="q-text">In what real-world scenario does K-Means fail but DBSCAN succeeds?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>K-Means assumes spherical clusters of roughly equal size. If data forms a moon shape, concentric rings, or long winding rivers, K-Means will draw straight lines cutting through them. <span class="highlight">DBSCAN clusters based on continuous density</span> — it follows the winding path of a ring shape and naturally ignores isolated outliers as noise. K-Means forces outliers into the nearest cluster, while DBSCAN labels them as noise points (class = −1).</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory unsupervised">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q25</span>
+          <div><div class="q-text">Why is PCA highly sensitive to outliers? What is the geometric reason?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>PCA finds the line that maximizes variance (spread) of the data. Because it calculates variance using squared distances, an extreme outlier generates a massive squared penalty. <span class="highlight">PCA will literally rotate its principal axis just to "capture" that single outlier</span>, completely ignoring the natural spread of the real data cluster. This is why robust scaling or outlier removal is mandatory before PCA.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory unsupervised">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q26</span>
+          <div><div class="q-text">What is the Fiedler Vector in Spectral Clustering, and why does it matter?</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>The Graph Laplacian is <span class="math-inline">L = D − A</span> (degree matrix minus adjacency matrix). The smallest eigenvalue is always 0. <span class="highlight">The second smallest eigenvalue's corresponding eigenvector (the Fiedler Vector)</span> solves the relaxed Normalized Cut problem. The signs of the entries in the Fiedler vector optimally partition the graph into two maximally disjoint clusters — positive entries go to cluster 1, negative to cluster 2.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory unsupervised">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q27</span>
+          <div><div class="q-text">Why is K-Means sensitive to initial centroids, and how does K-Means++ fix this?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>If K-Means accidentally places two initial centroids next to each other in the same cluster, they split it in half, getting stuck in a bad local minimum. <span class="highlight">K-Means++ fixes this by picking the first centroid randomly, then picking each subsequent centroid with probability proportional to its squared distance</span> from the nearest existing centroid. This forces centroids to spread out across the data space before the algorithm begins.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory unsupervised">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q28</span>
+          <div><div class="q-text">How does t-SNE conceptually differ from PCA for visualization?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>PCA preserves global variance — it keeps points far apart in high-D far apart in 2D, often crushing local clusters together. <span class="highlight">t-SNE acts like a localized magnetic field.</span> It aggressively focuses on preserving local neighborhoods using probability distributions. It creates beautiful distinct clusters for visualization but completely destroys macro-distances — the distance between two clusters in t-SNE is entirely meaningless.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory unsupervised">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q29</span>
+          <div><div class="q-text">What is Isolation Forest and why is it computationally superior to KNN for anomaly detection?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>KNN anomaly detection scales at O(N²). <span class="highlight">Isolation Forest randomly selects a feature and randomly splits data repeatedly.</span> Normal data points are buried deep inside dense clusters — requiring dozens of random splits to isolate. An anomaly sitting in open space is isolated in just 2–3 random splits. Points with extremely short path lengths are flagged as anomalies, making the algorithm O(N log N) and trivially parallelizable.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory unsupervised system">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q30</span>
+          <div><div class="q-text">In DBSCAN, 80% of valid data is classified as "Noise". What is the misconfiguration and how do you fix it?</div><div class="q-badges"><span class="badge system">system</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Your eps (radius) is too small or min_samples is too high — the algorithm demands too high a density to form a cluster. <span class="highlight">Fix: plot a K-Distance Graph.</span> Calculate the distance from every point to its kth nearest neighbor and sort them. The graph forms a "knee" or "elbow." The exact distance at this elbow is the mathematically optimal eps value to separate clusters from true spatial noise.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory unsupervised">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q31</span>
+          <div><div class="q-text">What algorithmic change makes an Autoencoder vastly superior to PCA for dimensionality reduction?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>A linear-only Autoencoder is just matrix multiplication, which mathematically reduces to PCA (a linear hyperplane projection). <span class="highlight">By introducing non-linear activation functions (ReLU, Tanh) in hidden layers</span>, the Autoencoder is no longer constrained to a flat plane. It can bend, fold, and warp the latent space, compressing highly complex non-linear manifolds (like twisting spirals) that PCA would completely destroy.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SECTION 3: EVALUATION ===== -->
+    <div class="section-block" id="s3" data-section="evaluation">
+      <div class="section-header">
+        <div class="section-icon" style="background:rgba(247,194,106,0.1);border:1px solid rgba(247,194,106,0.2)">📊</div>
+        <div>
+          <h2 style="color:#f7c26a">Model Evaluation & Metrics</h2>
+          <div class="section-subtitle">AUC · F1 · Calibration · Bias-Variance · Cross-Val</div>
+        </div>
+        <span class="q-count">12 Q</span>
+      </div>
+
+      <div class="q-card" data-tags="math evaluation">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q32</span>
+          <div><div class="q-text">Provide the probabilistic interpretation of ROC-AUC.</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>AUC is the probability that the model will score a randomly chosen positive instance higher than a randomly chosen negative instance: <span class="math-inline">P(Score(x⁺) > Score(x⁻))</span>. <span class="highlight">It is completely threshold-independent</span>, unlike F1-score. An AUC of 0.5 is random chance; 1.0 is perfect ranking. This makes it ideal for imbalanced datasets where the threshold needs tuning.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="math evaluation">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q33</span>
+          <div><div class="q-text">Why do we use the Harmonic Mean for F1 Score instead of the Arithmetic Mean?</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p><span class="math-inline">F1 = 2·P·R / (P + R)</span>. The arithmetic mean is too forgiving of extreme differences. If Precision = 1.0 and Recall = 0.0, the arithmetic mean is 0.5 (looks okay). The harmonic mean of 1.0 and 0.0 is exactly 0.0. <span class="highlight">The harmonic mean severely punishes extreme disparities</span>, forcing the model to genuinely balance both metrics rather than excelling at one while ignoring the other.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="math evaluation">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q34</span>
+          <div><div class="q-text">Break down the Bias-Variance Decomposition equation.</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Expected MSE on unseen data: <span class="math-inline">E[(y − f̂(x))²] = Bias[f̂(x)]² + Variance[f̂(x)] + σ²</span>. Where σ² is the irreducible noise. <span class="highlight">Increasing model complexity decreases Bias but increases Variance.</span> The sweet spot is the minimum of the total error curve. Simple models (high bias) underfit; complex models (high variance) overfit. Irreducible noise σ² is a hard floor you can never beat.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory evaluation">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q35</span>
+          <div><div class="q-text">For fraud detection, which metric do you optimize — Precision or Recall — and why?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>You optimize <span class="highlight">Recall (Sensitivity)</span>. A False Negative (letting a fraudster steal money) is catastrophic. A False Positive (flagging a normal transaction for verification) is just a minor inconvenience. Recall forces the model to cast a wide net and catch as much actual fraud as possible, even if it generates some false alarms. In medical diagnosis (cancer detection), the same logic applies.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory evaluation">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q36</span>
+          <div><div class="q-text">On imbalanced datasets (99% healthy, 1% cancer), why is PR-AUC preferred over ROC-AUC?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>ROC-AUC relies on the True Negative Rate. With millions of healthy patients, predicting someone is healthy is trivially easy — inflating the TNR to near 100%, making ROC look fantastic even if the model is terrible at finding cancer. <span class="highlight">PR-AUC ignores True Negatives entirely.</span> It only evaluates how well the model handles the positive (minority) class, giving a far more honest assessment of rare-event detection performance.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory evaluation">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q37</span>
+          <div><div class="q-text">What is "Data Leakage" in cross-validation? How does applying StandardScaler before splitting cause it?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Data Leakage is when information from the test set accidentally "leaks" into training, causing the model to cheat. If you apply StandardScaler to the entire dataset before splitting, the mean and variance used to scale the training data include the physical values of the test data. <span class="highlight">Fix: split first, fit the scaler ONLY on training data, then transform the test set</span> using the training statistics. The test set must remain a true black box.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory evaluation">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q38</span>
+          <div><div class="q-text">Your model has ROC-AUC of 0.90 but terrible Log-Loss. How is this possible?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>ROC-AUC only measures ranking capability. If the model scores clicks at 0.003 and non-clicks at 0.001, its ranking is perfect (great AUC). However, <span class="highlight">Log-Loss measures calibration</span> — are the probabilities actually representative of reality? Because the model output 0.003 instead of a true probability of ~0.60, Log-Loss heavily penalizes the model. Fix: wrap the output in a calibrator like Platt Scaling or Isotonic Regression.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory evaluation">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q39</span>
+          <div><div class="q-text">What is the conceptual difference between Macro-F1 and Micro-F1?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p><span class="highlight">Macro-F1</span> calculates F1 for every class independently, then averages them equally — treating a minority class of 10 samples as equally important as a majority class of 10,000. <span class="highlight">Micro-F1</span> aggregates all TPs, FPs, and FNs globally, then calculates one massive F1, being dominated by the majority class. Use Macro-F1 if minority classes matter (medical diagnosis); use Micro-F1 if overall volume matters more.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory evaluation">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q40</span>
+          <div><div class="q-text">Why is MAPE highly dangerous for forecasting sparse inventory demand?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Two massive flaws. First, if actual demand is 0, MAPE divides by zero, crashing the system. Second, <span class="highlight">MAPE is severely asymmetric</span>: if demand is 10 and you predict 20, error is 100%. If demand is 10 and you predict 0, error is also 100%. But large over-forecasts get unbounded penalties while under-forecasts are capped. This causes models to systematically under-stock. Use SMAPE or MASE instead for sparse items.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory evaluation system">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q41</span>
+          <div><div class="q-text">Why is standard K-Fold Cross-Validation illegal for Time Series data?</div><div class="q-badges"><span class="badge system">system</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>K-Fold randomly shuffles data. If predicting Wednesday's stock price, K-Fold might accidentally give the model training data from Thursday and Friday — massive Time Leakage. The model peers into the future to predict the past. <span class="highlight">Fix: Walk-Forward Validation (Time Series Split)</span> where the training set strictly precedes the validation set in chronological order, simulating real-world rolling deployment. Each fold advances forward in time.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory evaluation system">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q42</span>
+          <div><div class="q-text">F1 = 0.30 but ROC-AUC = 0.90. How do you fix F1 without retraining?</div><div class="q-badges"><span class="badge system">system</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>ROC-AUC is threshold-independent; F1 uses a hard threshold (default 0.5). With imbalanced data, the model might output probabilities around 0.1 for positives — great ranking but a 0.5 threshold turns everything into negative, tanking F1. <span class="highlight">Fix: Threshold Sweep</span> — lower the threshold (e.g., to 0.05) and sweep the precision-recall curve to find the threshold that maximizes F1. No retraining required.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory evaluation">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q43</span>
+          <div><div class="q-text">Why should you use Cross-Entropy Loss instead of MSE for classification problems?</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>MSE penalizes errors linearly — if the model predicts 0.1 for a true class of 1, MSE penalizes it by 0.81. Cross-Entropy uses <span class="math-inline">−log(p)</span>. If the model confidently predicts 0.001 for the true class, the log loss scales the penalty to near infinity. <span class="highlight">Cross-Entropy exponentially punishes confident mistakes</span>, creating massive gradients that force fast corrections. MSE gradients near 0 and 1 are very flat, causing the vanishing gradient problem in classification.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SECTION 4: FEATURE ENGINEERING ===== -->
+    <div class="section-block" id="s4" data-section="feature">
+      <div class="section-header">
+        <div class="section-icon" style="background:rgba(247,106,247,0.1);border:1px solid rgba(247,106,247,0.2)">⚙️</div>
+        <div>
+          <h2 style="color:#f76af7">Feature Engineering</h2>
+          <div class="section-subtitle">Encoding · Imputation · Scaling · Curse of Dimensionality</div>
+        </div>
+        <span class="q-count">9 Q</span>
+      </div>
+
+      <div class="q-card" data-tags="math feature">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q44</span>
+          <div><div class="q-text">Explain the "Curse of Dimensionality" geometrically.</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>As dimensions D increase, the volume of a hypersphere inscribed in a hypercube goes to zero: <span class="math-inline">V_sphere/V_cube → 0 as D → ∞</span>. In high-dimensional space, almost all data points exist in the "corners" of the space, making all pairwise distances between points roughly equal. <span class="highlight">Algorithms like KNN completely break down</span> because "nearest" loses its meaning — everyone is equidistant. You need exponentially more data to maintain the same density.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="math feature">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q45</span>
+          <div><div class="q-text">Formulate TF-IDF. Why does the IDF term use a logarithm?</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p><span class="math-inline">TF-IDF = TF(t,d) × log(N / DF(t))</span>. The logarithm acts as a dampening factor. If a word appears in 1,000,000 documents instead of 100, we don't want its importance penalized linearly by a factor of 10,000. <span class="highlight">Zipf's Law states word frequency decays exponentially</span>, so we use a log to linearize the penalty, gracefully handling common stop-words without completely destroying their signal.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory feature">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q46</span>
+          <div><div class="q-text">When is Target Encoding dangerous, and how do you fix it with K-Fold encoding?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Target encoding replaces a category with the mean target value. If calculated on the full training set, you're indirectly feeding specific target answers back into their own features — causing severe overfitting. <span class="highlight">Fix: K-Fold Target Encoding</span> — calculate the mean for fold 1 using only data from folds 2-5, never using fold 1's own targets. Combine with Additive Smoothing (Laplace) to pull categories with few samples toward the global mean.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory feature">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q47</span>
+          <div><div class="q-text">Why do SVM and KNN require feature scaling, but Random Forest doesn't care?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>SVM and KNN rely on geometric distance (Euclidean). If "Salary" ranges 0–1,000,000 and "Age" ranges 0–100, the algorithm thinks Salary is 10,000× more important due to larger numbers. <span class="highlight">Random Forests only make horizontal/vertical cuts on one feature at a time</span> (Is Age > 50? Is Salary > 50k?). Trees care only about the sorting order of values, not their scale. Monotone transformations don't change tree splits.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory feature">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q48</span>
+          <div><div class="q-text">What's the problem with One-Hot Encoding a feature with 10,000 unique categories (like Zip Code)?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Creating 10,000 binary columns produces a massively sparse matrix. For tree-based models, a split like "Is Zip=721302?" only affects 5 rows out of a million. The tree becomes incredibly deep, highly unbalanced, and painfully slow — <span class="highlight">completely overfitting to noise.</span> Use Target Encoding, Binary Encoding, or Neural Network Embeddings instead, which compress the cardinality into dense, informative representations.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory feature">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q49</span>
+          <div><div class="q-text">Why is Median Imputation dangerous when 40% of data is missing?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Replacing 40% of a column with the same median value creates a massive artificial spike at the center of the distribution, completely destroying the variance and breaking its correlation with other variables. <span class="highlight">Fix: Iterative Imputation (MICE) or KNN Imputation.</span> Treat the missing column as the target and use a mini-ML model trained on the remaining columns to predict missing values conditionally, preserving natural variance and inter-feature relationships.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory feature">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q50</span>
+          <div><div class="q-text">Why does SMOTE outperform simple oversampling, and what is its major conceptual flaw?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Random oversampling duplicates exact copies of the minority class, leading to extreme memorization. SMOTE takes two minority points and interpolates a brand new synthetic point halfway between them — creating novel data, not duplicates. <span class="highlight">The flaw: if minority and majority classes overlap in space</span>, SMOTE might draw a line and create a minority point deep inside majority territory, permanently confusing the classifier. Use borderline-SMOTE or SMOTE+Tomek links for better results.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory feature">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q51</span>
+          <div><div class="q-text">Why does standard TF-IDF fail to understand "not good" as negative sentiment?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>TF-IDF uses a "Bag of Words" approach — it completely destroys sequential grammar. It sees "not" and "good" as completely independent variables. The model sees "good" and assigns positive sentiment, completely ignoring the negation. <span class="highlight">Fixes: N-gram tokenization</span> (tokenizing "not good" as a single bi-gram unit), or switching to sequence-aware models like Word2Vec context windows or Transformers that understand word order.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory feature">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q52</span>
+          <div><div class="q-text">Conceptually, what is the difference between L1 (Lasso) and L2 (Ridge) on 5 correlated features?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p><span class="highlight">L2 (Ridge) likes to share the penalty</span> — it shrinks all 5 correlated features down but keeps all of them, giving them roughly equal small weights. <span class="highlight">L1 (Lasso) is a ruthless feature selector</span> — it picks exactly one of those correlated features to keep (gives it a large weight) and forces the other 4 to exactly zero. Geometrically, L1's diamond-shaped constraint has corners on the axes, and the loss contour is overwhelmingly likely to hit a corner (where coordinates are zero).</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SECTION 5: DEEP LEARNING ===== -->
+    <div class="section-block" id="s5" data-section="deeplearning">
+      <div class="section-header">
+        <div class="section-icon" style="background:rgba(106,180,247,0.1);border:1px solid rgba(106,180,247,0.2)">🧠</div>
+        <div>
+          <h2 style="color:#6ab4f7">Deep Learning Foundations</h2>
+          <div class="section-subtitle">Backprop · Activations · BN · Dropout · Initialization</div>
+        </div>
+        <span class="q-count">14 Q</span>
+      </div>
+
+      <div class="q-card" data-tags="math deeplearning">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q53</span>
+          <div><div class="q-text">Prove why the Vanishing Gradient problem occurs with Sigmoid activation in deep networks.</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>The derivative of Sigmoid is <span class="math-inline">σ(x)(1−σ(x))</span>, with maximum value exactly 0.25 (when x=0). During backpropagation, the chain rule multiplies local gradients across L layers. The gradient at the first layer becomes proportional to <span class="math-inline">(0.25)^L</span>. <span class="highlight">As L → ∞, the gradient exponentially decays to 0.</span> By layer 10, the gradient is (0.25)^10 ≈ 0.000001. Early layers stop learning completely.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="math deeplearning">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q54</span>
+          <div><div class="q-text">Derive He Initialization. Why does Xavier fail for ReLU?</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>To keep variance stable across layers, <span class="math-inline">n·Var(W) = 1</span>. Xavier assumes linear activation near 0, giving <span class="math-inline">Var(W) = 1/n</span>. However, ReLU deletes exactly half the distribution (all negative values), chopping output variance in half. <span class="highlight">He Initialization compensates by doubling the variance:</span> <span class="math-inline">Var(W) = 2/n</span>, or <span class="math-inline">W ~ N(0, √(2/n))</span>. This ensures the signal neither explodes nor vanishes through ReLU layers.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="math deeplearning">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q55</span>
+          <div><div class="q-text">Write the backpropagation through Batch Normalization. Why does BN act as a regularizer?</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>BN normalizes: <span class="math-inline">x̂ᵢ = (xᵢ − μB) / √(σ²B + ε)</span>. The backprop derivative is complex because xᵢ influences L directly via x̂ᵢ but also indirectly by changing batch mean μB and variance σ²B. Because μ and σ are computed over a random mini-batch, <span class="highlight">they inject statistical noise into every forward pass.</span> This noise forces downstream layers to not rely too heavily on any single activation — identical in principle to Dropout's regularization effect.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory deeplearning">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q56</span>
+          <div><div class="q-text">How does Batch Normalization behave differently during Training vs. Inference?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>During Training, BN calculates mean μ and variance σ² of the current mini-batch to normalize. During Inference, batch size might be 1, making batch statistics meaningless. Instead, <span class="highlight">BN uses an Exponential Moving Average (EMA) of mean and variance</span> tracked during training for deterministic normalization. If you forget to call model.eval(), BN tries to compute variance of a batch of 1 (std=0), divides by zero, and outputs NaNs.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory deeplearning">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q57</span>
+          <div><div class="q-text">What is the "Dying ReLU" problem, and how does Leaky ReLU revive dead neurons?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>ReLU outputs 0 for any negative input. If a large learning rate causes a massive weight update, a neuron might be pushed so far into negative space that no normal input will ever activate it again. Because the derivative of a negative ReLU is exactly 0, the neuron can never update during backprop — it is <span class="highlight">permanently dead.</span> Leaky ReLU (<span class="math-inline">max(0.01x, x)</span>) gives negative inputs a slight slope (0.01x), allowing a tiny gradient to flow backward so the neuron can eventually "heal."</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory deeplearning">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q58</span>
+          <div><div class="q-text">Why does Dropout during training make a neural network more robust?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Without Dropout, a network becomes overly reliant on a few "super-neurons," memorizing the training data. <span class="highlight">Dropout acts like an unpredictable workplace</span> — if random employees call in sick every day, the company can't rely on one genius. Every employee must learn to do the job independently. Dropout forces the network to distribute learned representations redundantly across all neurons, effectively training an ensemble of <span class="math-inline">2^N</span> smaller networks simultaneously.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory deeplearning">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q59</span>
+          <div><div class="q-text">What is the conceptual difference between Layer Normalization and Batch Normalization? Why do Transformers use Layer Norm?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Batch Norm normalizes one feature across a whole batch of different sequences. Layer Norm normalizes all features within a single sequence. <span class="highlight">Batch Norm fails catastrophically in NLP</span> because sentences have vastly different lengths — you cannot calculate a batch mean for the 50th word if half the sentences only have 10 words. Layer Norm operates independently per sentence, completely bypassing sequence length issues.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory deeplearning">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q60</span>
+          <div><div class="q-text">Why is it catastrophically bad to apply Dropout to the final output layer?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Dropout is meant to regularize internal hidden representations. The final output layer is the literal prediction. If you apply dropout there, you are randomly zeroing out the model's actual answers (arbitrarily forcing the probability of 'Cat' to 0) directly before calculating the loss. <span class="highlight">You are injecting massive, artificial chaos directly into the loss function</span>, making the gradients nonsensical and making convergence essentially impossible.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory deeplearning">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q61</span>
+          <div><div class="q-text">What happens if you initialize all weights to exactly 0.01 in a neural network?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>The network suffers from <span class="highlight">Symmetry Breaking Failure.</span> Because every weight is identical, every neuron in a given layer outputs the exact same value. During backprop, gradients are perfectly identical for every neuron. They all update by the exact same amount. The network effectively collapses into a single massive neuron and loses all ability to learn complex representations — no matter how many layers or neurons you have.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="math deeplearning">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q62</span>
+          <div><div class="q-text">Why does GELU outperform ReLU in Transformers? Write the equation.</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>ReLU is non-differentiable at 0 and drops all negative information. <span class="highlight">GELU weights inputs by their probability under a Gaussian distribution:</span> <span class="math-inline">GELU(x) = x·Φ(x)</span>, where Φ(x) is the CDF of N(0,1). Approximated as <span class="math-inline">x·½[1 + tanh(√(2/π)(x + 0.044715x³))]</span>. This creates a smooth, non-monotonic curve near zero, allowing a small amount of negative information to pass through — acting as a smoother stochastic regularizer.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory deeplearning">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q63</span>
+          <div><div class="q-text">Why are Saddle Points a much bigger threat than Local Minima in deep networks?</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>A local minimum requires all Hessian eigenvalues to be positive. In a million-dimensional space, the probability of this is exponentially small. Instead, networks encounter <span class="highlight">Saddle Points</span> where some eigenvalues are positive (uphill) and some are negative (downhill). Standard SGD gets stuck on the flat plateau where gradient ≈ 0. Adam and Momentum escape by carrying velocity across the plateau until finding the downward slope.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory deeplearning">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q64</span>
+          <div><div class="q-text">What happens if you have large random initial weights (from standard normal) in a deep network?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Variance explodes as data passes deeper into the network. By layer 5, raw activation values are massive. If passed into Sigmoid or Tanh, these massive values immediately hit the flat extremes of the curve (saturation). <span class="highlight">The gradient derivative at saturation is exactly zero.</span> The network instantly suffers from the Vanishing Gradient before it even takes its first backward step, without ever having the chance to learn anything.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory deeplearning">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q65</span>
+          <div><div class="q-text">What happens if you remove all ReLU activation functions between Conv layers in a 50-layer CNN?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>A convolution is just a linear matrix multiplication. A fundamental law of linear algebra: a matrix multiplied by a matrix multiplied by a matrix can be simplified into a single unified matrix. <span class="highlight">Without non-linear ReLUs as barriers between layers, the entire 50-layer network mathematically collapses into the equivalent of a single 1-layer network.</span> It loses all ability to learn deep hierarchical representations regardless of depth.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory deeplearning">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q66</span>
+          <div><div class="q-text">Why does ReLU naturally induce "Sparsity" in networks, and why is this computationally advantageous?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>ReLU outputs exactly 0 for any negative input. In a deep network, roughly 50% of neurons in a given layer output absolute zero — effectively turning them off. <span class="highlight">This sparsity forces the network to rely on a smaller, cleaner subset of features</span> (dynamic feature selection/regularization). Computationally, multiplying by zero is instant — sparse matrix operations massively optimize forward-pass FLOPs and reduce memory bandwidth on specialized hardware.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SECTION 6: OPTIMIZATION ===== -->
+    <div class="section-block" id="s6" data-section="optimization">
+      <div class="section-header">
+        <div class="section-icon" style="background:rgba(247,106,138,0.1);border:1px solid rgba(247,106,138,0.2)">📉</div>
+        <div>
+          <h2 style="color:#f76a8a">Optimization</h2>
+          <div class="section-subtitle">SGD · Adam · AdamW · LR Schedules · Regularization</div>
+        </div>
+        <span class="q-count">12 Q</span>
+      </div>
+
+      <div class="q-card" data-tags="math optimization">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q67</span>
+          <div><div class="q-text">Write the update rule for Momentum. How does it physically escape local minima?</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p><span class="math-inline">vₜ = γvₜ₋₁ + η∇J(θ); θₜ = θₜ₋₁ − vₜ</span>. It acts like a ball rolling down a hill. By keeping an EMA (γ ≈ 0.9) of past gradients, if the optimizer hits a shallow local minimum where ∇J ≈ 0, the <span class="highlight">built-up velocity vₜ₋₁ carries it over the ridge.</span> Erratic oscillations across a ravine also cancel (positive and negative gradients negate each other), while consistent gradients down the valley accumulate velocity.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="math optimization">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q68</span>
+          <div><div class="q-text">What is the mathematical bug in Adam that necessitated AdamW?</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>In standard Adam, L2 regularization is added to the loss gradient. Adam then <span class="highlight">divides this combined gradient by the moving average of squared gradients</span> (the variance term). This accidentally divides the weight decay penalty by the variance — meaning weights with sparse gradients don't decay properly. AdamW explicitly decouples weight decay: <span class="math-inline">θₜ = θₜ₋₁ − AdamStep − λθₜ₋₁</span>, applying decay directly to weights, not through the gradient update.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="math optimization">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q69</span>
+          <div><div class="q-text">Geometrically, why does L1 cause sparse weights but L2 does not?</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>L1 penalty forms a diamond shape (in 2D); L2 forms a circle. Loss function contours expand outward until hitting the constraint. A circle has no sharp edges, so it usually intersects contours at non-zero coordinates. <span class="highlight">A diamond has sharp corners directly on the axes (w₁=0, w₂=c).</span> The loss contours overwhelmingly hit these corners, forcing exact zeros in weights. This is why Lasso is used for feature selection — it literally forces irrelevant features to zero.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory optimization">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q70</span>
+          <div><div class="q-text">What specific challenge does Adam's variance tracking solve that SGD with Momentum cannot?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>In text datasets, some features (stop words) appear millions of times; others (rare names) appear rarely. Standard SGD updates all weights at the same speed. <span class="highlight">Adam divides the learning rate by √variance.</span> For frequent features, accumulated variance is high — Adam shrinks their learning rate. For rare features, variance is low — Adam boosts their learning rate. Every single parameter gets its own custom, adaptive speed limit, dramatically helping sparse NLP tasks.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory optimization">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q71</span>
+          <div><div class="q-text">Training loss is trending down but violently zigzagging step-to-step. What are the two conceptual causes?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Two root causes: (1) <span class="highlight">Learning Rate too high</span> — optimizer continuously overshoots the valley center, bouncing off walls while making forward progress. (2) <span class="highlight">Batch Size too small</span> — updating weights on only 8 samples means those 8 might be highly unrepresentative of the global dataset, causing erratic, noisy gradient directions. Solution: reduce LR, increase batch size, or use gradient accumulation.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory optimization">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q72</span>
+          <div><div class="q-text">Why does Early Stopping act as a literal form of L2 regularization?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>When a network is initialized, weights are near zero. As training progresses, weights physically grow larger to create complex boundaries memorizing training noise. <span class="highlight">Early Stopping halts training before weights have enough time (iterations) to grow massive.</span> By capping the weight magnitude in time, it achieves geometrically identical effects to L2 regularization — keeping the model in a region of small weights where it generalizes better.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory optimization">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q73</span>
+          <div><div class="q-text">Why is high learning rate used early in training, then decayed (Cosine Annealing)?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>At the start, you're randomly placed on a massive mountain. A <span class="highlight">high learning rate allows massive leaps — quickly escaping bad local minima and exploring the global landscape.</span> As the model approaches the true minimum, massive leaps cause continuous overshooting. Decaying the learning rate applies the brakes, allowing the model to smoothly settle into the deepest, narrowest part of the minimum. Cosine decay provides a smooth schedule: fast start, gentle landing.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory optimization">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q74</span>
+          <div><div class="q-text">Explain the intuition behind the "Warmup" phase in learning rate schedulers.</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>At Step 1, network weights are completely random garbage. If you immediately hit it with maximum learning rate, it takes a massive, chaotic leap in a random direction — potentially exploding gradients and ruining the architecture. <span class="highlight">Warmup uses a tiny learning rate for the first few thousand steps</span>, allowing weights to slowly align into a "sane" direction before applying full speed. Especially critical for Transformers where gradient magnitudes can be extreme early on.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="system optimization">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q75</span>
+          <div><div class="q-text">GPU can only fit Batch Size 4, but you need Batch Size 64. How do you solve this algorithmically?</div><div class="q-badges"><span class="badge system">system</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Use <span class="highlight">Gradient Accumulation.</span> Run a forward+backward pass on a batch of 4, calculating gradients. Instead of calling optimizer.step(), hold the gradients in memory. Repeat this 16 times, adding gradients together (16 × 4 = 64). Only after the 16th iteration call optimizer.step() and optimizer.zero_grad(). This mathematically perfectly simulates a batch size of 64 using the memory footprint of 4, without any approximation.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory optimization">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q76</span>
+          <div><div class="q-text">In sparse NLP data, why does Adam drastically outperform SGD with Momentum?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Standard SGD applies the same global learning rate to all parameters. A rare word appearing in only 5 batches out of 10,000 barely moves its weight. Adam tracks the uncentered variance per parameter. For a rare word, the accumulated variance is tiny. <span class="highlight">Adam divides the learning rate by this tiny variance, mathematically boosting the learning rate specifically for that rare parameter</span> — giving rare features massive steps and frequent features cautious steps automatically.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="math optimization">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q77</span>
+          <div><div class="q-text">How does Gradient Clipping physically prevent exploding gradients in RNNs?</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>BPTT multiplies the recurrent weight matrix W_hh by itself T times. If the dominant eigenvalue > 1, the gradient grows exponentially, causing a massive update that destroys model weights (resulting in NaN loss). <span class="highlight">Gradient Clipping scales the entire gradient vector g if ||g|| exceeds threshold c:</span> <span class="math-inline">g ← c·(g/||g||)</span>. This preserves the direction of the gradient vector in high-dimensional space but bounds its magnitude — like a speed limiter that keeps direction but caps velocity.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory optimization">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q78</span>
+          <div><div class="q-text">Conceptually, how does Momentum solve the "narrow ravine" problem in loss landscapes?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Standard SGD in a ravine-shaped loss landscape wildly bounces back and forth off the steep walls, making very little downhill progress. <span class="highlight">Momentum acts like a heavy bowling ball.</span> The erratic oscillations across the walls cancel out — positive and negative cross-ravine gradients negate each other. Meanwhile, consistent gradients pointing down the valley accumulate, building velocity in the correct direction and accelerating the optimizer straight to the minimum.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SECTION 7: SEQUENCE MODELS ===== -->
+    <div class="section-block" id="s7" data-section="sequence">
+      <div class="section-header">
+        <div class="section-icon" style="background:rgba(162,247,106,0.1);border:1px solid rgba(162,247,106,0.2)">🔄</div>
+        <div>
+          <h2 style="color:#a2f76a">Sequence Models</h2>
+          <div class="section-subtitle">RNNs · LSTMs · GRUs · BPTT · Encoder-Decoder</div>
+        </div>
+        <span class="q-count">12 Q</span>
+      </div>
+
+      <div class="q-card" data-tags="math sequence">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q79</span>
+          <div><div class="q-text">How does the LSTM Cell State (Cₜ) solve the vanishing gradient problem?</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Standard RNNs use multiplicative updates: <span class="math-inline">hₜ = σ(W·hₜ₋₁)</span>. LSTMs use an additive update for the cell state: <span class="math-inline">Cₜ = fₜ⊙Cₜ₋₁ + iₜ⊙C̃ₜ</span>. <span class="highlight">The derivative of an addition is 1.</span> This creates an uninterrupted "gradient superhighway" where gradients can flow backward through time without being decayed by repeated weight multiplications. Gradients are controlled only by the forget gate fₜ, not by the activation function's small derivatives.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="math sequence">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q80</span>
+          <div><div class="q-text">Compare the parameter count of GRU vs. LSTM. When would you use each?</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Let d be hidden dimension. LSTM has 4 gates (Forget, Input, Output, Cell) requiring <span class="math-inline">4 × (d² + d·d_in)</span> parameters. GRU combines to 3 gates (Update, Reset, New Memory) requiring <span class="math-inline">3 × (d² + d·d_in)</span>. <span class="highlight">GRUs have ~25% fewer parameters</span>, converging faster on smaller datasets. LSTMs have slightly more expressive capacity and tend to outperform on long-sequence tasks. Use GRU for quick iteration; LSTM for tasks requiring fine-grained memory control.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory sequence">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q81</span>
+          <div><div class="q-text">Why does a vanilla RNN "forget" the beginning of a long paragraph?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>A vanilla RNN has a single hidden state as its entire memory. Every time it reads a new word, it crushes the new word into the existing memory, heavily overwriting it. By word 100, information from word 1 has been overwritten, squashed, and passed through the Tanh activation 100 times. <span class="highlight">Early context is entirely diluted by recent words.</span> The memory is a single fixed-size vector — it physically cannot hold 100 words of context simultaneously.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory sequence">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q82</span>
+          <div><div class="q-text">Think of LSTM's Cell State as a conveyor belt. How do the "Forget" and "Input" gates control it?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>The Cell State is the master memory track. The <span class="highlight">Forget Gate acts like an eraser</span> — if it reads a new subject ("Alice"), it deletes the previous subject ("Bob") from the conveyor belt. The <span class="highlight">Input Gate acts like a pen</span> — it decides which specific attributes of "Alice" (gender, singular/plural) are important enough to write onto the newly cleared space. The Output Gate then controls what part of the belt's contents to actually "read" for the current prediction.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory sequence">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q83</span>
+          <div><div class="q-text">What problem does Bi-LSTM solve, and why can't it be used for real-time text generation?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>A forward LSTM processing "I went to the bank to deposit money" must guess "bank" before seeing "deposit." A Bi-LSTM reads the sentence both backward and forward simultaneously, giving every word full future and past context. It correctly resolves "bank" as financial because it has already seen "deposit." <span class="highlight">However, you cannot use them for generation</span> — you cannot read the "future" text of a user who hasn't typed it yet.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory sequence">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q84</span>
+          <div><div class="q-text">What is "Teacher Forcing" in training RNNs, and what problem does it solve?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>During text generation, if the RNN makes a mistake on word 2, it feeds that mistake into word 3, causing cascading hallucinations that make training impossible. <span class="highlight">Teacher Forcing ignores the model's bad predictions during training.</span> At time step 3, we force-feed the network the actual correct word 2 from our dataset, keeping it mathematically grounded regardless of past mistakes. This dramatically speeds up convergence but creates "Exposure Bias" at inference time.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory sequence">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q85</span>
+          <div><div class="q-text">What is the fatal bottleneck of Encoder-Decoder RNNs for translation of long texts?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>The Encoder reads the entire sentence and must compress its complete meaning into a single, fixed-size array called the Context Vector. The Decoder uses only this vector. <span class="highlight">The "Information Crush" bottleneck:</span> you cannot compress a 500-word paragraph into 256 numbers without destroying early words. Translates 5-word sentences perfectly, but hallucinates on 50-word paragraphs. This exact bottleneck is precisely what the Attention Mechanism was invented to solve.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory sequence">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q86</span>
+          <div><div class="q-text">What is the LSTM's Forget Gate bias initialization trick, and why does it matter?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Setting the Forget Gate bias to a highly negative number pushes Sigmoid output strictly to 0. Since the Forget Gate multiplies against the cell state (Cₜ₋₁), multiplying by 0 instantly deletes all historical memory at every step. <span class="highlight">The LSTM completely loses its ability to track sequences</span> and degenerates into a standard feed-forward network seeing only the current word. Conversely, initializing forget bias to +1 (as recommended by Jozefowicz et al.) helps LSTMs learn long-term dependencies faster.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory sequence">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q87</span>
+          <div><div class="q-text">How does a 1D-CNN process text compared to an LSTM, and where does it fail semantically?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>An RNN reads text sequentially, maintaining running memory. A 1D-CNN acts like a highlighter — it slides a fixed window (e.g., 3 words wide) across the sentence, processing all chunks simultaneously. <span class="highlight">It is massively parallelizable and excellent at detecting specific short phrases ("absolutely hated it")</span> regardless of position. It fails on long-range dependencies — if a review says "great actors... [30 words]... but the plot ruined everything," the CNN's small window cannot link the final negation to the main subject.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory sequence">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q88</span>
+          <div><div class="q-text">Why might an engineering team choose 1D-CNN over LSTM for real-time sentiment analysis?</div><div class="q-badges"><span class="badge system">system</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>LSTMs must wait for word 1 to finish before reading word 2 — they are inherently sequential. 1D-CNNs process all chunks simultaneously, making them <span class="highlight">massively parallelizable with much lower inference latency</span>. For real-time applications (streaming social media sentiment), the 10–50ms latency difference can be critical. CNNs also have fewer parameters, making them easier to deploy on edge devices or mobile. The trade-off is loss of long-range context.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory sequence">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q89</span>
+          <div><div class="q-text">What does "Exposure Bias" mean in RLHF context, and how does it relate to Teacher Forcing?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>SFT uses Teacher Forcing. If the model predicts wrong at step 3, loss is calculated, but for step 4, we feed the true word anyway. The model is never exposed to its own mistakes. In production, if it makes a mistake, it derails completely — no teacher to correct the path. <span class="highlight">RLHF/DPO fixes this by forcing the model to generate entire sequences autonomously</span>, then scoring the complete output. It teaches the model to navigate and recover from its own conversational trajectories.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory sequence">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q90</span>
+          <div><div class="q-text">In an Encoder-Decoder for translation, what specifically does the Attention Mechanism fix over the vanilla context vector?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Instead of compressing the entire source sentence into a single fixed vector, Attention retains ALL hidden states from the encoder. At each decoding step, the decoder queries all encoder hidden states and computes a weighted sum — <span class="highlight">dynamically focusing on the most relevant part of the source sentence</span>. Translating the word "deposer" (French for deposit), the decoder attends heavily to "bank" and "money" in the English source, not just the last hidden state.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SECTION 8: COMPUTER VISION ===== -->
+    <div class="section-block" id="s8" data-section="cv">
+      <div class="section-header">
+        <div class="section-icon" style="background:rgba(247,146,106,0.1);border:1px solid rgba(247,146,106,0.2)">👁️</div>
+        <div>
+          <h2 style="color:#f7926a">Computer Vision</h2>
+          <div class="section-subtitle">CNNs · ResNet · YOLO · Pooling · Depthwise Convolution</div>
+        </div>
+        <span class="q-count">12 Q</span>
+      </div>
+
+      <div class="q-card" data-tags="math cv">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q91</span>
+          <div><div class="q-text">Calculate the output dimensions of a Convolutional Layer.</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Output size: <span class="math-inline">O = ⌊(W − K + 2P) / S⌋ + 1</span>, where W = input width, K = kernel size, P = padding, S = stride. Example: Input 32×32, kernel 3×3, padding 1, stride 1 → <span class="math-inline">O = (32−3+2) / 1 + 1 = 32</span> (same padding). With stride 2: <span class="math-inline">O = (32−3+2)/2 + 1 = 16.5 → 16</span>. The floor function handles non-integer results by dropping the last incomplete window.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="math cv">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q92</span>
+          <div><div class="q-text">What is the math behind Depthwise Separable Convolutions (MobileNet)? What's the FLOPs reduction?</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Standard conv: <span class="math-inline">D²·K²·C_in·C_out FLOPs</span>. Depthwise separable breaks into: (1) Depthwise: <span class="math-inline">D²·K²·C_in</span> (one K×K filter per channel), (2) Pointwise: <span class="math-inline">D²·C_in·C_out</span> (1×1 conv to mix channels). Reduction factor: <span class="math-inline">1/C_out + 1/K²</span>. For a 3×3 kernel: <span class="highlight">~9× compute reduction</span> (~90% fewer FLOPs), enabling deployment on mobile devices without significant accuracy loss.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory cv">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q93</span>
+          <div><div class="q-text">Why is a Convolutional layer theoretically superior to a fully-connected layer for processing images?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Two reasons: (1) <span class="highlight">Parameter Sharing</span>: A fully connected layer treats a 1000×1000 image as 1 million independent pixels — trillions of parameters. A CNN uses a 3×3 filter (9 parameters) slid across the entire image, respecting 2D spatial structure. (2) <span class="highlight">Spatial Hierarchy</span>: A vertical edge in the top-left corner is the same feature as one in the bottom-right. A FC layer learns each edge independently; a Conv layer learns it once and detects it everywhere.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory cv">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q94</span>
+          <div><div class="q-text">What feature does Max Pooling extract, and why does it give the model "translation invariance"?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Max Pooling asks: "Did this feature appear anywhere in this 2×2 grid?" It passes only the highest activation, discarding exact location. If a cat shifts two pixels right, the high activation moves to an adjacent spot within the pooling window. <span class="highlight">Because the max value is identical, the network's output remains unchanged despite the input shift</span> — granting local translation invariance. This is why CNNs can recognize objects regardless of their exact pixel position.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory cv">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q95</span>
+          <div><div class="q-text">Why did ResNet revolutionize deep learning and allow 100+ layer networks?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Before ResNet, gradients vanished flowing through 100 layers of multiplication. <span class="highlight">ResNet introduced Skip Connections</span> — literal wired bridges allowing the gradient signal to bypass dense matrix multiplications and flow directly backward, unhindered. The formula becomes <span class="math-inline">F(x) + x</span> instead of just <span class="math-inline">F(x)</span>. This "gradient highway" ensures early layers receive strong learning signals no matter the depth. The model only needs to learn the residual F(x), not the full transformation.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory cv">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q96</span>
+          <div><div class="q-text">How does data augmentation (flips, rotations) theoretically regularize a CNN?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Overfitting happens when a model memorizes exact training images (all cats face left). Data augmentation dynamically alters images (flipping, zooming, brightness changes) before the model sees them. This <span class="highlight">effectively creates an infinitely large dataset.</span> The model is forced to learn the concept of a cat (ears, whiskers, texture) rather than memorizing the exact pixel layout. It cannot memorize what it has never seen the same way twice.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory cv">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q97</span>
+          <div><div class="q-text">In Object Detection (YOLO), what specific problem does Non-Maximum Suppression (NMS) solve?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>A deep learning detector slides thousands of anchor boxes over an image. For a single dog, it might output 50 highly overlapping bounding boxes all claiming to contain the dog. <span class="highlight">NMS cleans this up:</span> it takes the box with the highest confidence score (e.g., 99%) and deletes all other boxes that heavily overlap with it (IoU > threshold). This leaves a single, clean prediction per object while removing redundant overlapping detections.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory cv">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q98</span>
+          <div><div class="q-text">How does a tiny 3×3 filter in Layer 50 of a CNN "see" an entire large object like a dog?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>This is the <span class="highlight">Receptive Field</span> concept. In Layer 1, a 3×3 filter sees 3×3 pixels of the original image. After Max Pooling (halving the image) and another convolution, a 3×3 filter in Layer 2 processes features from a 6×6 pixel area of the original image. By Layer 50, due to aggressive downsampling, a single activation in the 3×3 grid mathematically represents a massive patch of the original image — containing the entire dog.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory cv">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q99</span>
+          <div><div class="q-text">What is the algorithmic purpose of a 1×1 Convolution in networks like ResNet/InceptionNet?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>A 1×1 convolution doesn't look at neighboring pixels — it acts as a fully connected dense layer across the channel dimension. If you have a 56×56 tensor with 256 channels, a 1×1 conv with 64 filters mathematically combines and squishes those 256 channels down to 64. It is a <span class="highlight">Dimensionality Reduction tool</span> that massively reduces the compute (FLOPs) required for the next layer, without altering spatial height/width. InceptionNet uses it as a "bottleneck" before expensive 3×3 or 5×5 convolutions.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory cv">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q100</span>
+          <div><div class="q-text">How does a Transposed Convolution physically enlarge an image in segmentation (U-Net)?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Standard interpolation blindly duplicates pixels. A Transposed Convolution uses a <span class="highlight">learnable weight matrix</span>. It takes a single pixel from the small feature map, multiplies it by a 3×3 learned filter, and "paints" the result onto a larger output grid. It literally learns the optimal geometric patterns required to map compressed, high-level concepts back into high-resolution spatial coordinates — enabling precise per-pixel segmentation masks.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory cv">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q101</span>
+          <div><div class="q-text">How can you trick K-Means into correctly clustering concentric rings using a coordinate transform?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>K-Means fails with concentric circles because Euclidean distance in Cartesian coordinates (X, Y) cannot distinguish them. The fix: convert coordinates to <span class="highlight">Polar Coordinates (Radius, Angle).</span> In polar space, the inner ring becomes a flat horizontal line with small radius, and the outer ring becomes one with large radius. K-Means can easily draw a straight horizontal line between them. This is the intuition behind Kernel K-Means and Spectral Clustering.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory cv">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q102</span>
+          <div><div class="q-text">If you scale one feature (Salary) by 1000x before K-Means, what happens algorithmically?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>K-Means uses Euclidean distance. Salary ranging 0–1,000,000 vs Age ranging 0–100 means the squared Salary distance completely dominates the equation. <span class="highlight">The algorithm becomes effectively 1-dimensional</span>, clustering entirely based on Salary and completely ignoring Age. This is why strict Standard Scaling (Z-score normalization: subtract mean, divide by std) is a mandatory preprocessing step before any distance-based clustering algorithm.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SECTION 9: NLP & TRANSFORMERS ===== -->
+    <div class="section-block" id="s9" data-section="nlp">
+      <div class="section-header">
+        <div class="section-icon" style="background:rgba(106,247,247,0.1);border:1px solid rgba(106,247,247,0.2)">💬</div>
+        <div>
+          <h2 style="color:#6af7f7">NLP & Transformers</h2>
+          <div class="section-subtitle">Attention · BERT · GPT · Tokenization · Positional Encoding</div>
+        </div>
+        <span class="q-count">15 Q</span>
+      </div>
+
+      <div class="q-card" data-tags="math nlp">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q103</span>
+          <div><div class="q-text">Write the exact formula for Scaled Dot-Product Attention. Why the √dk division?</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p><span class="math-inline">Attention(Q,K,V) = softmax(QKᵀ/√dk)·V</span>. If Q and K are independent with mean 0 and variance 1, their dot product has variance dₖ. As dₖ grows (e.g., 64), dot products get massive, pushing softmax into regions with near-zero gradients (saturation). <span class="highlight">Dividing by √dₖ pulls the variance back to 1</span>, keeping the softmax in its "normal operating range" where gradients are healthy and the model can learn to attend differentially.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="math nlp">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q104</span>
+          <div><div class="q-text">Mathematically, what is the time complexity of Self-Attention vs. an RNN?</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Self-Attention computes QKᵀ: (N×d) × (d×N) = <span class="math-inline">O(N²·d)</span>. An RNN does a recurrent update per step: <span class="math-inline">O(N·d²)</span>. <span class="highlight">If N > d (long context), Attention memory explodes quadratically.</span> For a 128K context window, N²= 16 billion operations. This is why FlashAttention, Sliding Window Attention, and sparse attention patterns were invented — to escape the O(N²) trap while preserving attention's parallelism advantage.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="math nlp">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q105</span>
+          <div><div class="q-text">Why do Transformers use Sine and Cosine for Positional Encodings?</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>The model needs to learn relative positions, not just absolute ones. A key mathematical property: for any fixed offset k, <span class="math-inline">PE(pos+k)</span> can be represented as a linear combination of PE(pos). Specifically, <span class="math-inline">sin(x+k) = sin(x)cos(k) + cos(x)sin(k)</span>. <span class="highlight">This allows the attention mechanism to easily learn to attend to relative shifts in grammar</span> through linear transformations, without needing to memorize absolute positions explicitly.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory nlp">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q106</span>
+          <div><div class="q-text">Explain Self-Attention in plain language. How does "bank" know if it means a river or a financial institution?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>In old models, "bank" had one static definition. In Self-Attention, every word "looks around" and asks questions to every other word. "Bank" looks at the rest of the sentence. If it sees "water" and "mud," those words send strong signals (high attention scores) back to "bank." If it sees "deposit" and "loan," different signals come back. <span class="highlight">Context actively sculpts the meaning of the word in real-time</span>, transforming its vector representation dynamically based on surrounding words.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory nlp">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q107</span>
+          <div><div class="q-text">Since Transformers process all words simultaneously, how do they know the order of words?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Without intervention, a Transformer thinks "The dog bit the man" and "The man bit the dog" are the same bag of words. <span class="highlight">Positional Encodings inject a unique geometric fingerprint</span> (a wave of sines and cosines) into every word vector based on its absolute position. The model learns to decode these waves to understand relative distances between words. Different frequencies encode different scales of positional information, from single-token shifts to global document structure.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory nlp">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q108</span>
+          <div><div class="q-text">What is the purpose of the "Causal Mask" in autoregressive generation (GPT)?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>During training, we feed the entire sentence into the Transformer at once for parallelism. But we want to train it to predict the next word. If we don't blindfold it, attention simply looks at the answer. <span class="highlight">The Causal Mask is a physical barrier</span> — setting future attention scores to negative infinity (so softmax → 0) — that prevents any word from attending to words that come after it. This forces the model to predict using only past context, mimicking real-world generation conditions.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory nlp">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q109</span>
+          <div><div class="q-text">Why do LLMs struggle with character-level tasks like reversing a string? How does BPE tokenization cause this?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>LLMs don't see letters — they see tokens. BPE groups frequent letter combinations into chunks. "Kharagpur" might be tokenized as [Khar, ag, pur]. If you ask the LLM to reverse the string, it is <span class="highlight">blind to the individual characters 'r' and 'u' inside the token [pur].</span> It cannot manipulate characters when its fundamental unit of perception is entire syllables. This is why LLMs fail at spelling bees, counting letters, and anagram tasks.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory nlp">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q110</span>
+          <div><div class="q-text">Conceptually, why does Multi-Head Attention significantly outperform Single-Head with the same total dimension?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Language is multifaceted. In "The bank declined the loan," "bank" relates to "declined" (grammar) but also to "loan" (financial topic). A single head is forced to average these concepts. <span class="highlight">Multi-Head creates 8 separate "mini-brains"</span> — Head 1 tracks grammar/subject-verb relationships, Head 2 tracks coreference/pronouns, Head 3 tracks semantic topics, Head 4 tracks syntactic dependencies. They independently analyze different linguistic dimensions and combine for a richer final representation.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory nlp">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q111</span>
+          <div><div class="q-text">In the Transformer Decoder, what is the physical purpose of the "Cross-Attention" block?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Self-Attention allows generated tokens to look at other generated tokens. But to translate accurately, the Decoder must reference the original input. <span class="highlight">In Cross-Attention, Queries come from the Decoder</span> (the current French word asking "What should I translate next?"), while <span class="highlight">Keys and Values come from the Encoder</span> (the original English sentence providing the answers). This is the mechanism that aligns source and target language representations.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory nlp">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q112</span>
+          <div><div class="q-text">Why does Sub-word tokenization (BPE) dominate over word-level or character-level tokenization?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Word-level: massive vocabulary (1M+ words), crashes on typos. Character-level: only 26 tokens but a single sentence becomes 200 characters, destroying the context window length. <span class="highlight">BPE is the perfect middle ground</span> — keeps common words whole ("apple") but breaks rare words into logical morphemes ("un-believ-able"). Fixes both vocabulary bloat and context length explosion. Handles multilingual text gracefully and is robust to misspellings and novel compound words.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="math nlp">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q113</span>
+          <div><div class="q-text">Why are Positional Encoding vectors added to word embeddings rather than concatenated?</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Concatenating a 512-d word vector with a 512-d positional vector would create a 1024-d input, doubling every subsequent weight matrix's size and destroying memory efficiency. In very high-dimensional space (512-d), <span class="highlight">random vectors are naturally nearly orthogonal (perpendicular).</span> Adding them creates a non-destructive superposition — the neural network's linear layers easily learn to untangle the orthogonal "positional" signal from the "semantic" signal without them corrupting each other.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="math nlp">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q114</span>
+          <div><div class="q-text">Why is the Transformer's time complexity strictly O(N²) and exactly where in the architecture does this happen?</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>The bottleneck is Self-Attention: <span class="math-inline">Q×Kᵀ</span>. Query matrix is (N×d) and transposed Key is (d×N). Multiplying yields an <span class="math-inline">(N×N)</span> Attention Score matrix. <span class="highlight">Every token must calculate a dot-product with every other token.</span> Doubling context length from 4K to 8K quadruples memory (not doubles). This is the core motivation for FlashAttention (tiling), Longformer (sparse attention), Linear Attention, and Multi-Query Attention (reducing K/V heads).</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="math nlp">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q115</span>
+          <div><div class="q-text">Why are there 8 separate 64-dimensional heads rather than one 512-dimensional head in a Transformer?</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>A single 512-d head is forced to average all relationships in one representation. Multi-head projects data into 8 isolated 64-d sub-spaces. <span class="highlight">Each head can specialize</span> — one tracking pronoun coreference, another tracking verb tense, another tracking semantic sentiment — independently and simultaneously. The total compute is the same (8 × 64² = 1 × 512²), but the representational capacity is far richer because linguistic information is disentangled across orthogonal subspaces.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="math nlp">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q116</span>
+          <div><div class="q-text">Explain RoPE (Rotary Positional Embeddings) using the intuition of complex number rotation.</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Standard positional encodings are additive. RoPE is multiplicative — it pairs d dimensions into 2D planes and rotates each plane by angle mθ for position m: <span class="math-inline">f_q(x_m, m) = (x_m^(1) + ix_m^(2))·e^(imθ)</span>. When attention computes q_m·k_n, complex conjugate math yields: <span class="math-inline">Re[x_m·x_n·e^(i(m−n)θ)]</span>. Absolute positions m and n cancel — <span class="highlight">the attention score becomes strictly a function of relative distance (m−n)</span>, enabling extrapolation to longer sequences than seen during training.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="math nlp">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q117</span>
+          <div><div class="q-text">How does FlashAttention achieve exact self-attention with O(N) memory IO instead of O(N²)?</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Standard attention writes the massive N×N matrix to GPU HBM, reads it for softmax, writes it back, reads it again for V multiplication. FlashAttention uses <span class="highlight">Tiling — it splits Q, K, V into blocks that fit entirely in ultra-fast SRAM.</span> It computes local softmax piece-by-piece, maintaining a running tracker of the denominator (sum of exponentials). By cleverly rescaling local sums, it calculates exact global attention without ever materializing the N×N tensor in HBM. IO complexity drops from O(N²) to O(N).</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SECTION 10: LLMs ===== -->
+    <div class="section-block" id="s10" data-section="llm">
+      <div class="section-header">
+        <div class="section-icon" style="background:rgba(194,106,247,0.1);border:1px solid rgba(194,106,247,0.2)">🤖</div>
+        <div>
+          <h2 style="color:#c26af7">LLMs, LoRA & Fine-Tuning</h2>
+          <div class="section-subtitle">LoRA · QLoRA · RLHF · DPO · KV Cache · Quantization</div>
+        </div>
+        <span class="q-count">14 Q</span>
+      </div>
+
+      <div class="q-card" data-tags="math llm">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q118</span>
+          <div><div class="q-text">Prove how LoRA drastically reduces VRAM compared to full fine-tuning.</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Instead of fine-tuning W ∈ ℝ^(d×d), LoRA freezes W and learns an additive update ΔW = A·B where A ∈ ℝ^(d×r) and B ∈ ℝ^(r×d). Parameter count drops from d² to 2rd. <span class="highlight">If d=4096, r=8: parameters drop from 16.7M to 65K</span> (256× reduction). Furthermore, Adam optimizer states (2 extra values per parameter) are only stored for A and B, not the frozen W. Memory savings multiply at 3× (model + 2 Adam states) for trainable parameters.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="math llm">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q119</span>
+          <div><div class="q-text">Derive the exact VRAM required for the KV Cache at d_model=4096, 32 layers, context=100K.</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>The KV cache stores K and V tensors for every past token. Per token: <span class="math-inline">2 (K and V) × 32 (layers) × 4096 (d_model) × 2 (FP16 bytes) = 524,288 bytes = 0.5 MB</span>. For 100K context: <span class="math-inline">100,000 × 0.5 MB = 52.4 GB</span> — just for the cache of a single user, ignoring model weights. <span class="highlight">This proves why Multi-Query Attention (MQA) and Grouped Query Attention (GQA) are mathematically mandatory</span> for long-context inference — they share K/V heads across attention heads.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="math llm">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q120</span>
+          <div><div class="q-text">Mathematically formulate the DPO objective. How does it eliminate the RLHF Reward Model?</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>RLHF requires a separate reward model r(x,y). DPO leverages that the optimal RL policy satisfies <span class="math-inline">r(x,y) = β·log(π*(y|x)/π_ref(y|x)) + Z(x)</span>. Substituting this into the Bradley-Terry preference model — the partition function Z(x) cancels out! The final DPO loss: <span class="math-inline">L_DPO = −log σ(β·log(π_θ(yw|x)/π_ref(yw|x)) − β·log(π_θ(yl|x)/π_ref(yl|x)))</span>. <span class="highlight">Pure binary cross-entropy on the LLM's own log-probabilities — no reward model needed.</span></p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="math llm">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q121</span>
+          <div><div class="q-text">Explain INT8 Quantization mapping. What is the scale factor formula?</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>To convert FP32 to INT8: find <span class="math-inline">α = max(|W|)</span>. Compute scale factor <span class="math-inline">S = 127/α</span>. Map: <span class="math-inline">W_INT8 = round(W_FP32 × S)</span>. To dequantize: <span class="math-inline">W_approx = W_INT8 / S</span>. The range [−127, 127] maps to the original range [−α, α]. <span class="highlight">4× memory reduction with minimal accuracy loss for inference.</span> The challenge: outlier values stretch the bucket, reducing precision for normal values — addressed by LLM.int8() with mixed precision for outlier dimensions.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory llm">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q122</span>
+          <div><div class="q-text">Why don't we just fine-tune all LLM weights? How does LoRA bypass this constraint?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Fine-tuning 70B parameters requires storing massive optimizer states (Adam stores 2 extra values per parameter) — hundreds of GBs of VRAM. <span class="highlight">LoRA freezes the main brain entirely.</span> It injects tiny "adapter" matrices (A and B) next to the frozen model. Only the adapter trains. With r=8, the adapter has millions of parameters instead of billions — slashing GPU memory requirements by 90%+ and enabling fine-tuning on a single A100 instead of a cluster.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory llm">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q123</span>
+          <div><div class="q-text">What is "Catastrophic Forgetting" when fine-tuning an LLM, and how does PEFT mitigate it?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Fine-tuning heavily on medical records shifts matrix weights so radically that neurons responsible for logic, coding, and general knowledge are physically overwritten. The model becomes a doctor but forgets Python. <span class="highlight">PEFT (LoRA, Adapters, Prefix Tuning) strictly freezes the base brain</span>, keeping general knowledge completely intact while adding a tiny specialized adapter. Only the adapter weights are modified, preserving all original capabilities while adding the new domain knowledge.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory llm">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q124</span>
+          <div><div class="q-text">What is QLoRA and how does it differ from standard LoRA?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Standard LoRA freezes the main model in FP16 precision — a 70B model still requires ~140 GB of VRAM just to load. <span class="highlight">QLoRA mathematically quantizes the massive frozen model to 4-bit precision</span>, dropping VRAM by 75%. Crucially, the tiny LoRA adapter is kept in FP16 — gradient accuracy is preserved. With double quantization and paged optimizers, QLoRA enables training 70B models on a single consumer 48GB A6000 GPU. The trade-off is slightly slower throughput during training.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory llm">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q125</span>
+          <div><div class="q-text">What specific redundant computation does the KV Cache eliminate during LLM generation?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Generation is autoregressive. To generate token #100, attention must look back at all 99 previous tokens. Without caching, the model recomputes Keys and Values for tokens 1–99 from scratch every single step. Then recomputes 1–100 to generate 101. <span class="highlight">The KV Cache saves K and V in GPU memory after they're computed once</span>, turning an O(N³) compute bottleneck into a simple memory lookup. The bottleneck shifts from Compute-bound to Memory Bandwidth-bound (moving the cache from HBM to SRAM).</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory llm">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q126</span>
+          <div><div class="q-text">What is the conceptual difference between Pre-training and Supervised Fine-Tuning (SFT)?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Pre-training is "Next Token Prediction" on the entire internet. Goal: learn grammar, facts, and reasoning. A pre-trained model is not helpful — asked a question, it might answer with another question. <span class="highlight">SFT changes the objective from "predict the internet" to "Conversational Compliance."</span> We train on [User Query] → [Helpful Answer] pairs formatted as RLHF-style data, and crucially mask the loss on the User Prompt — only the assistant's answer contributes to the training gradient.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory llm">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q127</span>
+          <div><div class="q-text">What is the conceptual purpose of the Reward Model in RLHF?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>You cannot write a Python function to mathematically evaluate if a poem is "polite" or "helpful." During RLHF, humans rank AI outputs. We use this data to train a second neural network (the Reward Model) to act as <span class="highlight">a digital judge that has internalized human preferences.</span> Once trained, it scores the LLM's outputs millions of times per hour during reinforcement learning, teaching the LLM human alignment at scale without requiring a human rater for every single training step.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory llm">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q128</span>
+          <div><div class="q-text">What is the "Outlier Emergence" problem in INT8 quantization, and how does LLM.int8() solve it?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>In massive LLMs, certain parameters ("outliers") grow extremely large (value 50.0) while 99% stay between −1.0 and 1.0. Forcing them all into the same 8-bit bucket stretches it, destroying precision for the 99% normal weights. <span class="highlight">LLM.int8() uses Mixed Precision:</span> it dynamically isolates the 1% outlier columns and processes them in high-precision FP16, while safely quantizing the remaining 99% to INT8. This retains speed without sacrificing accuracy for the activations that matter most.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory llm">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q129</span>
+          <div><div class="q-text">How does the loss function differ between Pre-Training and Instruct Fine-Tuning (SFT)?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>The core loss function (Cross-Entropy next-token prediction) does not change. <span class="highlight">What changes is the Data Masking.</span> During pre-training, loss is calculated on every word in the document. During SFT, we format data as [User Prompt] → [Assistant Answer] and algorithmically mask the [User Prompt] tokens during backprop. Loss is only calculated on the model's ability to generate the answer — teaching it to react to instructions rather than just continuing arbitrary text.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory llm">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q130</span>
+          <div><div class="q-text">What is Speculative Decoding and how does it speed up LLM generation?</div><div class="q-badges"><span class="badge system">system</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Autoregressive generation is painfully slow — one token per step. <span class="highlight">Speculative Decoding uses a tiny fast "draft" model</span> (e.g., 1B parameters) to instantly guess the next 5 tokens. The massive main model (70B) reads all 5 guessed tokens in a single parallel forward pass. If it agrees, you just generated 5 tokens for the cost of 1. If it disagrees at token 3, it rejects and corrects from there. Typical speedup: 2–4× with zero accuracy loss since the main model is always the final arbiter.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory llm">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q131</span>
+          <div><div class="q-text">What is Continuous Batching in production LLM serving, and what bottleneck does it solve?</div><div class="q-badges"><span class="badge system">system</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Standard batching groups 4 user prompts. If User 1 needs 10 tokens and User 4 needs 500 tokens, the GPU must hold User 1's memory slot occupied and idle until User 4 finishes. <span class="highlight">Continuous Batching dynamically kicks User 1 out the exact millisecond their 10th token finishes</span>, slotting a new User 5 into that GPU slot on the fly. This maximizes GPU occupancy, dramatically increasing throughput (requests/second) in production serving systems like vLLM.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SECTION 11: RAG & SYSTEMS ===== -->
+    <div class="section-block" id="s11" data-section="rag">
+      <div class="section-header">
+        <div class="section-icon" style="background:rgba(247,247,106,0.1);border:1px solid rgba(247,247,106,0.2)">🔍</div>
+        <div>
+          <h2 style="color:#f7f76a">RAG & System Design</h2>
+          <div class="section-subtitle">Vector DBs · Chunking · Re-ranking · HNSW · PagedAttention</div>
+        </div>
+        <span class="q-count">9 Q</span>
+      </div>
+
+      <div class="q-card" data-tags="math rag">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q132</span>
+          <div><div class="q-text">Why is a Cross-Encoder superior for RAG re-ranking but too slow for initial retrieval?</div><div class="q-badges"><span class="badge system">system</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>A Bi-Encoder embeds Query and Document separately, then computes a fast dot product. A Cross-Encoder concatenates them as [CLS] Query [SEP] Document and runs the full Transformer. <span class="highlight">Self-attention allows every query word to attend to every document word simultaneously</span>, yielding massive accuracy. But running a full Transformer pass for 1,000,000 documents is O(M·N²) — computationally impossible. So we use Bi-Encoder to find Top 50 fast, then Cross-Encoder to perfectly re-rank those 50.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="math rag">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q133</span>
+          <div><div class="q-text">How does HNSW achieve sub-linear O(log N) vector search instead of O(N)?</div><div class="q-badges"><span class="badge math">math</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>HNSW builds a multi-layered graph like a skip-list. The top layer has very few nodes (long-distance highway connections). Lower layers are denser with local connections. To search: enter the top layer, find the nearest neighbor, drop down a layer, repeat. <span class="highlight">Search complexity: O(log N)</span> — millisecond retrieval on billion-scale vector databases. Building the index takes O(N log N) but is done offline once. This is why FAISS, Pinecone, Weaviate, and Qdrant all use HNSW as their core ANN algorithm.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory rag">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q134</span>
+          <div><div class="q-text">What is the primary cause of LLM hallucination in a RAG pipeline, and how does the Vector DB fix it?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>An LLM hallucinates because it relies on its internal training memory — blurry, outdated, or fabricated. RAG grounds the LLM in reality. The Vector DB retrieves factual, current documents based on the query. These documents are pasted directly into the LLM's context. <span class="highlight">The LLM becomes a strict "reading comprehension engine"</span> rather than a "guessing machine." The instruction becomes: "Only answer using the provided text. If the answer isn't in the text, say you don't know."</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory rag">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q135</span>
+          <div><div class="q-text">Your RAG retrieves completely irrelevant documents. What are the three main pipeline places to investigate?</div><div class="q-badges"><span class="badge system">system</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Three diagnostic checkpoints: (1) <span class="highlight">Chunking Strategy</span>: Are chunks too small (missing context) or too large (diluting exact answers)? (2) <span class="highlight">Embedding Model</span>: Using a generic embedder for highly specific medical/legal data? Need a domain-trained embedder. (3) <span class="highlight">Similarity Metric</span>: Using Dot Product instead of Cosine Similarity on unnormalized vectors? The system fetches longest documents rather than most relevant ones.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory rag">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q136</span>
+          <div><div class="q-text">What is "Semantic Chunking" in RAG and why does it outperform fixed-character chunking?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Fixed chunking blindly cuts text every 500 characters — frequently cutting a crucial sentence in half, destroying grammatical meaning before passing it to the embedding model. <span class="highlight">Semantic chunking uses NLP heuristics to cut only at logical boundaries</span> — periods, new paragraphs, or topic shifts. Every chunk is a self-contained, meaningful thought, resulting in far more accurate, dense vector representations and dramatically better retrieval relevance.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="system rag">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q137</span>
+          <div><div class="q-text">What is the "Lost in the Middle" phenomenon in RAG context windows?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>When stuffing 20 documents into a massive LLM context window, empirical tests show perfect recall for the very first document (Primacy Effect) and the very last document (Recency Effect). <span class="highlight">The LLM's attention sags in the middle</span>, completely ignoring documents buried in the center of a 32K or 128K context. System design fix: re-rank retrieved documents and always place the highest-scoring document at the very end of the prompt, right before the LLM generates text.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="system rag">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q138</span>
+          <div><div class="q-text">What is PagedAttention (vLLM) and how does it optimize LLM serving?</div><div class="q-badges"><span class="badge system">system</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Standard LLM inference pre-allocates contiguous GPU memory for the KV cache. Because output lengths are unpredictable, systems pre-allocate maximum memory, leading to heavy internal fragmentation (wasted memory). <span class="highlight">PagedAttention borrows Virtual Memory concepts from OS</span>. It breaks the KV cache into fixed-size "pages" (e.g., 16 tokens). Tokens are stored in non-contiguous pages, managed by a block table — reducing memory waste to near zero and increasing batch size throughput by 3×.</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="system rag">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q139</span>
+          <div><div class="q-text">What is the conceptual role of a "Re-ranker" in a massive RAG pipeline?</div><div class="q-badges"><span class="badge system">system</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>Searching 10M documents with an LLM is impossible. We use a Vector DB (Bi-Encoder) for ultra-fast geometric search to find Top 50 documents. However, this shallow math often gets the order wrong. <span class="highlight">A Re-ranker (Cross-Encoder) is a deep, slower LLM that reads only those Top 50</span>, performs intense logical cross-referencing against the query, and re-sorts them perfectly. Only the best 3 are fed to the final generator. This two-stage architecture balances speed (Bi-Encoder) with accuracy (Cross-Encoder).</p>
+        </div>
+      </div>
+
+      <div class="q-card" data-tags="theory rag">
+        <div class="q-header" onclick="toggle(this)">
+          <span class="q-num">Q140</span>
+          <div><div class="q-text">What is the theoretical advantage of DPO over RLHF for alignment?</div><div class="q-badges"><span class="badge theory">theory</span></div></div>
+          <span class="q-toggle">▾</span>
+        </div>
+        <div class="q-answer">
+          <div class="answer-label">Answer</div>
+          <p>RLHF requires maintaining four massive neural networks simultaneously (Actor, Reference, Reward Model, Critic) — incredibly unstable and resource-heavy. <span class="highlight">DPO proves mathematically that you don't need the Reward Model at all.</span> You can map human preference data directly to the LLM's classification loss. DPO achieves the same alignment by simply punishing the LLM for generating rejected answers and rewarding chosen answers, using standard supervised fine-tuning hardware with much greater training stability.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  let openedCards = new Set();
+  const totalCards = document.querySelectorAll('.q-card').length;
+
+  function toggle(header) {
+    const card = header.parentElement;
+    const wasOpen = card.classList.contains('open');
+    card.classList.toggle('open');
+    if (!wasOpen) {
+      openedCards.add(card);
+    }
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const pct = Math.round((openedCards.size / totalCards) * 100);
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressText').textContent = openedCards.size + ' / ' + totalCards + ' opened';
+  }
+
+  // Search
+  const searchInput = document.getElementById('searchInput');
+  const countBadge = document.getElementById('countBadge');
+  const noResults = document.getElementById('no-results');
+
+  function doSearch() {
+    const q = searchInput.value.toLowerCase().trim();
+    const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+    let visibleCount = 0;
+
+    document.querySelectorAll('.q-card').forEach(card => {
+      const text = card.textContent.toLowerCase();
+      const tags = card.dataset.tags || '';
+      const matchSearch = !q || text.includes(q);
+      const matchFilter = activeFilter === 'all' || tags.includes(activeFilter);
+      if (matchSearch && matchFilter) {
+        card.classList.remove('hidden-q');
+        visibleCount++;
+      } else {
+        card.classList.add('hidden-q');
+      }
+    });
+
+    document.querySelectorAll('.section-block').forEach(section => {
+      const visible = section.querySelectorAll('.q-card:not(.hidden-q)').length;
+      section.classList.toggle('hidden', visible === 0);
+    });
+
+    countBadge.textContent = visibleCount + ' questions';
+    noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+  }
+
+  searchInput.addEventListener('input', doSearch);
+
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      doSearch();
+    });
+  });
+
+  // Smooth scroll for nav items
+  document.querySelectorAll('.nav-item').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const id = link.getAttribute('href').replace('#', '');
+      const target = document.getElementById(id);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        link.classList.add('active');
+      }
+    });
+  });
+
+  // Intersection observer for nav highlighting
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        document.querySelectorAll('.nav-item').forEach(nav => {
+          nav.classList.toggle('active', nav.getAttribute('href') === '#' + id);
+        });
+      }
+    });
+  }, { threshold: 0.2, rootMargin: '-100px 0px -60% 0px' });
+
+  document.querySelectorAll('.section-block[id]').forEach(s => observer.observe(s));
+
+  // Keyboard shortcut: '/' to focus search
+  document.addEventListener('keydown', e => {
+    if (e.key === '/' && document.activeElement !== searchInput) {
+      e.preventDefault();
+      searchInput.focus();
+    }
+    if (e.key === 'Escape') searchInput.blur();
+  });
+</script>
+</body>
+</html>
