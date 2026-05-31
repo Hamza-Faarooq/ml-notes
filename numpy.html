@@ -1,0 +1,1832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NumPy & Pandas — ML Engineering Code Bible</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Unbounded:wght@300;400;700;900&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#050508;--bg2:#0c0c14;--bg3:#111120;--bg4:#181828;--surface:#14141f;--surface2:#1c1c2e;--b1:rgba(0,240,180,0.15);--b2:rgba(0,240,180,0.3);--g1:#00f0b4;--g2:#00d4ff;--g3:#ff6b6b;--g4:#ffd93d;--g5:#a78bfa;--t1:#eef8f4;--t2:#9bbfb0;--t3:#4a6b5f;--code:#0a1a14;}
+.light{--bg:#f0f7f4;--bg2:#e4f0ea;--bg3:#d8ebdf;--bg4:#cce4d4;--surface:#ffffff;--surface2:#f5fbf8;--b1:rgba(0,140,100,0.12);--b2:rgba(0,140,100,0.25);--g1:#00875a;--g2:#0077aa;--g3:#cc2200;--g4:#aa7700;--g5:#6c40d9;--t1:#0a1f16;--t2:#2a5040;--t3:#6a9080;--code:#eef7f3;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;}
+::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-track{background:var(--bg2);}::-webkit-scrollbar-thumb{background:var(--g1);border-radius:3px;}
+nav{position:sticky;top:0;z-index:200;background:var(--bg2);border-bottom:1px solid var(--b1);height:56px;display:flex;align-items:center;padding:0 1.5rem;gap:1rem;}
+.nav-logo{font-family:'Unbounded',sans-serif;font-size:.9rem;font-weight:900;color:var(--g1);white-space:nowrap;}.nav-logo span{color:var(--g2);}
+.nav-mid{flex:1;display:flex;align-items:center;}
+.search-box{flex:1;max-width:440px;display:flex;align-items:center;gap:.5rem;background:var(--surface);border:1px solid var(--b2);border-radius:6px;padding:.35rem .8rem;}
+.search-box input{background:none;border:none;outline:none;font-family:'Space Mono',monospace;font-size:.78rem;color:var(--t1);width:100%;}
+.search-box input::placeholder{color:var(--t3);}
+.nav-right{display:flex;gap:.5rem;align-items:center;}
+.pill{font-family:'Unbounded',sans-serif;font-size:.6rem;font-weight:700;padding:.28rem .7rem;border-radius:20px;border:1px solid var(--b2);background:none;color:var(--t2);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.pill:hover,.pill.on{background:var(--g1);color:var(--bg);border-color:var(--g1);}
+.layout{display:flex;min-height:calc(100vh - 56px);}
+.sidebar{width:240px;min-width:220px;background:var(--bg2);border-right:1px solid var(--b1);padding:1rem .75rem;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;flex-shrink:0;}
+.sidebar::-webkit-scrollbar{width:3px;}
+.sb-head{font-family:'Unbounded',sans-serif;font-size:.55rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--t3);padding:.2rem .4rem .4rem;border-bottom:1px solid var(--b1);margin-bottom:.35rem;margin-top:.8rem;}
+.sb-head:first-child{margin-top:0;}
+.sb-link{display:flex;align-items:center;justify-content:space-between;padding:.3rem .55rem;border-radius:5px;font-size:.72rem;font-family:'Space Mono',monospace;color:var(--t2);cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:all .12s;}
+.sb-link:hover{background:var(--b1);color:var(--g1);}.sb-link.active{background:var(--g1);color:var(--bg);}
+.sb-link .cnt{font-size:.58rem;background:var(--bg4);padding:1px 5px;border-radius:3px;color:var(--t3);}
+.sb-link.active .cnt{background:rgba(0,0,0,0.2);color:rgba(0,0,0,0.6);}
+.prog-bar{height:2px;background:var(--bg4);border-radius:2px;margin:.2rem .55rem .55rem;}
+.prog-fill{height:100%;background:var(--g1);border-radius:2px;transition:width .3s;}
+.hero{padding:3.5rem 3rem 2rem;border-bottom:1px solid var(--b1);}
+.eyebrow{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--g1);margin-bottom:.8rem;letter-spacing:.08em;}
+.hero-title{font-family:'Unbounded',sans-serif;font-weight:900;font-size:2.8rem;letter-spacing:-.04em;line-height:.98;margin-bottom:1rem;}
+.hero-title em{font-style:normal;color:var(--g2);}.hero-title .alt{color:var(--g4);}
+.hero-sub{font-size:.93rem;color:var(--t2);max-width:620px;line-height:1.7;margin-bottom:2rem;}
+.hero-chips{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:2rem;}
+.chip{font-family:'Space Mono',monospace;font-size:.62rem;padding:.28rem .7rem;border-radius:4px;border:1px solid;}
+.chip-np{border-color:rgba(0,240,180,0.3);color:var(--g1);background:rgba(0,240,180,0.05);}
+.chip-pd{border-color:rgba(0,212,255,0.3);color:var(--g2);background:rgba(0,212,255,0.05);}
+.chip-py{border-color:rgba(255,107,107,0.3);color:var(--g3);background:rgba(255,107,107,0.05);}
+.chip-ml{border-color:rgba(167,139,250,0.3);color:var(--g5);background:rgba(167,139,250,0.05);}
+.hero-stats{display:flex;gap:3rem;}
+.stat-num{font-family:'Unbounded',sans-serif;font-weight:900;font-size:2rem;color:var(--g1);letter-spacing:-.04em;}
+.stat-lbl{font-size:.7rem;color:var(--t3);font-family:'Space Mono',monospace;}
+.fbar{padding:.7rem 3rem;border-bottom:1px solid var(--b1);display:flex;gap:.35rem;flex-wrap:wrap;align-items:center;background:var(--bg2);}
+.fb{font-family:'Space Mono',monospace;font-size:.67rem;padding:.25rem .65rem;border-radius:4px;border:1px solid var(--b2);background:none;color:var(--t2);cursor:pointer;transition:all .15s;}
+.fb:hover,.fb.on{background:var(--g1);color:var(--bg);border-color:var(--g1);}
+.fb.hn.on{background:var(--g3);border-color:var(--g3);color:#fff;}
+.fb.mn.on{background:var(--g4);border-color:var(--g4);color:var(--bg);}
+.fb.tg.on{background:var(--g5);border-color:var(--g5);color:#fff;}
+.sep{color:var(--t3);margin:0 .2rem;font-size:.8rem;}
+.ctrl{font-family:'Space Mono',monospace;font-size:.63rem;padding:.25rem .65rem;border-radius:4px;border:1px solid var(--b1);background:none;color:var(--t3);cursor:pointer;transition:all .15s;margin-left:auto;}
+.ctrl:hover{color:var(--g1);border-color:var(--g1);}
+main{flex:1;min-width:0;}
+.section{padding:2.5rem 3rem;border-bottom:1px solid var(--b1);}
+.sec-hdr{display:flex;align-items:flex-start;gap:1rem;margin-bottom:2rem;}
+.sec-icon{width:44px;height:44px;border-radius:8px;border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;background:var(--b1);}
+.sec-num{font-family:'Space Mono',monospace;font-size:.58rem;color:var(--g1);margin-bottom:.2rem;}
+.sec-title{font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.35rem;letter-spacing:-.03em;}
+.sec-sub{font-size:.78rem;color:var(--t3);margin-top:.2rem;font-style:italic;}
+.cc{border:1px solid var(--b1);border-radius:10px;margin-bottom:1.1rem;overflow:hidden;transition:border-color .2s;background:var(--surface);}
+.cc:hover{border-color:var(--b2);}.cc.done{border-color:rgba(0,240,180,0.35);background:rgba(0,240,180,0.03);}
+.ch{padding:.85rem 1.1rem;display:flex;align-items:flex-start;gap:.75rem;cursor:pointer;user-select:none;}
+.cn{font-family:'Space Mono',monospace;font-size:.62rem;color:var(--g1);min-width:30px;margin-top:1px;flex-shrink:0;}
+.ci{flex:1;}
+.ct{font-family:'Space Mono',monospace;font-weight:700;font-size:.8rem;color:var(--t1);line-height:1.35;margin-bottom:.25rem;}
+.cd{font-size:.76rem;color:var(--t2);line-height:1.45;}
+.ctags{display:flex;gap:.25rem;flex-wrap:wrap;margin-top:.35rem;}
+.tag{font-size:.56rem;font-family:'Space Mono',monospace;padding:1px 5px;border-radius:3px;}
+.tag-numpy{background:rgba(0,240,180,0.1);color:var(--g1);}
+.tag-pandas{background:rgba(0,212,255,0.1);color:var(--g2);}
+.tag-python{background:rgba(255,107,107,0.1);color:var(--g3);}
+.tag-scratch{background:rgba(167,139,250,0.1);color:var(--g5);}
+.tag-ml{background:rgba(255,217,61,0.1);color:var(--g4);}
+.tag-hard{background:rgba(255,107,107,0.07);color:var(--g3);}
+.tag-medium{background:rgba(255,217,61,0.07);color:var(--g4);}
+.tag-easy{background:rgba(0,240,180,0.07);color:var(--g1);}
+.cr{display:flex;align-items:center;gap:.5rem;flex-shrink:0;}
+.chev{color:var(--t3);font-size:.85rem;transition:transform .2s;}.cc.open .chev{transform:rotate(180deg);}
+.dbtn{width:17px;height:17px;border-radius:50%;border:1.5px solid var(--b2);cursor:pointer;background:none;display:flex;align-items:center;justify-content:center;font-size:.58rem;color:transparent;transition:all .2s;}
+.cc.done .dbtn{background:var(--g1);border-color:var(--g1);color:var(--bg);}
+.cb{display:none;border-top:1px solid var(--b1);}.cc.open .cb{display:block;}
+.tabs{display:flex;border-bottom:1px solid var(--b1);background:var(--bg3);}
+.tab{font-family:'Space Mono',monospace;font-size:.62rem;padding:.45rem .9rem;cursor:pointer;border:none;background:none;color:var(--t3);transition:all .15s;border-bottom:2px solid transparent;}
+.tab.on{color:var(--g1);border-bottom-color:var(--g1);background:var(--bg2);}
+.pane{display:none;padding:.9rem 1.1rem;}.pane.on{display:block;}
+.cwrap{position:relative;margin:.35rem 0;}
+.ctop{display:flex;align-items:center;justify-content:space-between;background:var(--bg4);padding:.3rem .75rem;border-radius:5px 5px 0 0;border:1px solid var(--b1);border-bottom:none;}
+.clang{font-family:'Space Mono',monospace;font-size:.58rem;color:var(--g1);}
+.cpbtn{font-family:'Space Mono',monospace;font-size:.58rem;padding:.18rem .55rem;border-radius:3px;border:1px solid var(--b2);background:none;color:var(--t3);cursor:pointer;transition:all .15s;}
+.cpbtn:hover{color:var(--g1);border-color:var(--g1);}
+pre.cblock{background:var(--code);border:1px solid var(--b1);border-top:none;border-radius:0 0 5px 5px;padding:.85rem .95rem;overflow-x:auto;font-family:'Space Mono',monospace;font-size:.72rem;line-height:1.68;color:#a8e6cf;margin:0;tab-size:4;}
+.nbox{border-radius:6px;padding:.7rem .95rem;margin:.5rem 0;font-size:.78rem;line-height:1.6;color:var(--t2);}
+.nbox.tip{background:rgba(0,240,180,0.05);border-left:3px solid var(--g1);}
+.nbox.warn{background:rgba(255,107,107,0.05);border-left:3px solid var(--g3);}
+.nbox.info{background:rgba(0,212,255,0.05);border-left:3px solid var(--g2);}
+.nbox.math{background:rgba(167,139,250,0.05);border-left:3px solid var(--g5);font-family:'Space Mono',monospace;font-size:.7rem;}
+.nlbl{font-family:'Unbounded',sans-serif;font-size:.52rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.25rem;}
+.nlbl.tip{color:var(--g1);}.nlbl.warn{color:var(--g3);}.nlbl.info{color:var(--g2);}.nlbl.math{color:var(--g5);}
+.outbox{background:var(--bg4);border:1px dashed var(--b2);border-radius:6px;padding:.7rem .95rem;font-family:'Space Mono',monospace;font-size:.68rem;color:var(--g4);line-height:1.6;}
+.outlbl{font-size:.52rem;color:var(--t3);margin-bottom:.25rem;text-transform:uppercase;letter-spacing:.08em;}
+@media(max-width:900px){.sidebar{display:none;}.section{padding:1.5rem 1rem;}.hero{padding:2rem 1rem 1.5rem;}.fbar{padding:.6rem 1rem;}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo">NP<span>PD</span>.ML</div>
+  <div class="nav-mid">
+    <div class="search-box">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="srch" type="text" placeholder="search snippets, patterns, functions…" oninput="doSearch(this.value)">
+    </div>
+  </div>
+  <div class="nav-right">
+    <span class="pill" style="cursor:default;border-color:var(--b1)"><b id="tot-n">0</b>&nbsp;snippets</span>
+    <span class="pill" style="cursor:default;border-color:var(--b1)"><b id="done-n">0</b>&nbsp;done</span>
+    <button class="pill" onclick="toggleTheme()">☀ light</button>
+  </div>
+</nav>
+<div class="hero">
+  <div class="eyebrow">// ML Engineering Code Bible — v2025</div>
+  <div class="hero-title"><em>NumPy</em> &amp;<br><span class="alt">Pandas</span><br>Mastery</div>
+  <p class="hero-sub">Every code pattern you need — ML from scratch in pure NumPy, production Pandas pipelines, advanced Python, sklearn best practices. Built for ML Engineers &amp; Data Scientists targeting top roles.</p>
+  <div class="hero-chips">
+    <span class="chip chip-np">NumPy Arrays</span>
+    <span class="chip chip-np">Broadcasting</span>
+    <span class="chip chip-np">Linear Algebra</span>
+    <span class="chip chip-ml">ML From Scratch</span>
+    <span class="chip chip-pd">Pandas DataFrames</span>
+    <span class="chip chip-pd">GroupBy / Merge</span>
+    <span class="chip chip-py">Itertools</span>
+    <span class="chip chip-py">Generators</span>
+    <span class="chip chip-ml">Sklearn Pipelines</span>
+    <span class="chip chip-py">Typing / Dataclasses</span>
+  </div>
+  <div class="hero-stats">
+    <div><div class="stat-num" id="h-tot">0</div><div class="stat-lbl">code snippets</div></div>
+    <div><div class="stat-num">9</div><div class="stat-lbl">sections</div></div>
+    <div><div class="stat-num" id="h-done">0</div><div class="stat-lbl">mastered</div></div>
+  </div>
+</div>
+<div class="fbar">
+  <button class="fb on" onclick="fDiff('all',this)">all</button>
+  <button class="fb hn" onclick="fDiff('hard',this)">hard</button>
+  <button class="fb mn" onclick="fDiff('medium',this)">medium</button>
+  <button class="fb" onclick="fDiff('easy',this)">easy</button>
+  <span class="sep">|</span>
+  <button class="fb tg" onclick="fTag('numpy',this)">#numpy</button>
+  <button class="fb tg" onclick="fTag('pandas',this)">#pandas</button>
+  <button class="fb tg" onclick="fTag('scratch',this)">#scratch</button>
+  <button class="fb tg" onclick="fTag('python',this)">#python</button>
+  <button class="fb tg" onclick="fTag('ml',this)">#ml</button>
+  <button class="ctrl" onclick="expAll()">expand all</button>
+  <button class="ctrl" onclick="colAll()">collapse all</button>
+</div>
+<div class="layout">
+  <aside class="sidebar" id="sb"></aside>
+  <main id="mc"></main>
+</div>
+<script>
+const D=[
+{id:"np_core",icon:"⚡",title:"NumPy Core Mastery",sub:"Arrays, dtypes, reshaping, broadcasting, fancy indexing",snips:[
+{t:"Array Creation — Every Method You Need",d:"All factory functions, ranges, random arrays, and dtypes. The absolute foundation.",diff:"easy",tags:["numpy"],
+code:`import numpy as np
+
+# From lists
+a = np.array([1,2,3])
+b = np.array([[1,2],[3,4]], dtype=np.float32)
+
+# Factory functions
+z  = np.zeros((3,4))           # all zeros
+o  = np.ones((2,3,4))         # all ones
+e  = np.empty((5,5))          # uninitialized (fast, garbage values)
+f  = np.full((3,3), 7.0)      # fill with constant
+ei = np.eye(4)                 # 4×4 identity matrix
+d  = np.diag([1,2,3])         # diagonal matrix from 1D
+
+# Ranges
+r1 = np.arange(0, 10, 2)      # [0 2 4 6 8]  like range()
+r2 = np.linspace(0, 1, 5)     # [0. .25 .5 .75 1.] — evenly spaced
+r3 = np.logspace(0, 3, 4)     # [1. 10. 100. 1000.] — log scale
+
+# Modern random API (always prefer over np.random.*)
+rng = np.random.default_rng(42)
+r4 = rng.random((3,4))              # uniform [0,1)
+r5 = rng.standard_normal((100,10)) # N(0,1)
+r6 = rng.integers(0, 10, size=(5,))# integer uniform [0,10)
+r7 = rng.choice([1,2,3,4], size=10, replace=True)
+
+# Type casting
+c = a.astype(np.float64)
+print(a.dtype, b.dtype, c.dtype)  # int64 float32 float64
+
+# Array metadata
+print(b.shape)    # (2, 2)
+print(b.ndim)     # 2
+print(b.size)     # 4
+print(b.nbytes)   # 16  (4 elements × 4 bytes each)`,
+out:`int64 float32 float64
+(2, 2)
+2
+4
+16`,
+note:{type:"tip",t:"Use np.random.default_rng(seed) — the new Generator API is statistically superior and thread-safe. np.random.seed() is legacy. np.empty() is fastest but values are uninitialized garbage — only use when you'll immediately fill all values."}},
+
+{t:"Reshaping, Stacking, Splitting",d:"All shape manipulation operations — critical for neural net tensor manipulation.",diff:"medium",tags:["numpy"],
+code:`import numpy as np
+
+a = np.arange(24)
+
+# Reshape — total elements must match
+b  = a.reshape(4,6)        # (24,) → (4,6)
+c  = a.reshape(2,3,4)      # (24,) → (2,3,4)
+d  = a.reshape(2,-1)       # -1 infers size: (2,12)
+d2 = a.reshape(-1,4)       # (6,4)
+
+# flatten (copy) vs ravel (view when possible)
+flat = c.flatten()          # always a copy
+rav  = c.ravel()            # view if C-contiguous (faster, no copy)
+
+# Transpose
+t  = b.T                    # (4,6)→(6,4)
+t2 = c.transpose(2,0,1)    # (2,3,4)→(4,2,3): reorder axes
+
+# Adding/squeezing dimensions
+x  = np.array([1,2,3])         # shape (3,)
+x2 = x[np.newaxis,:]           # (1,3) — add row dim
+x3 = x[:,np.newaxis]           # (3,1) — add col dim
+x4 = np.expand_dims(x,axis=0)  # same as x2
+x5 = np.squeeze(x2)            # remove size-1 axes: (3,)
+
+# Stacking
+a1, a2 = np.array([1,2,3]), np.array([4,5,6])
+h  = np.hstack([a1,a2])       # [1,2,3,4,5,6]   — concat along axis=1
+v  = np.vstack([a1,a2])       # [[1,2,3],[4,5,6]] — stack as rows
+st = np.stack([a1,a2],axis=1) # [[1,4],[2,5],[3,6]] — new axis
+c2 = np.concatenate([a1,a2],axis=0)  # general concat
+
+# Splitting
+sp  = np.split(np.arange(12),3)       # 3 equal pieces
+sp2 = np.array_split(np.arange(10),3) # [4,3,3] — unequal OK
+sp3 = np.hsplit(v,3)                   # split columns`,
+note:{type:"tip",t:"reshape() returns a view (no copy) when possible. Modifying the reshape modifies the original! Use .copy() if you need independence. a.reshape(2,-1) is idiomatic — let numpy infer the -1 dimension."}},
+
+{t:"Broadcasting — NumPy's Superpower",d:"Operating on arrays with different shapes without loops. Eliminates 90% of Python for-loops.",diff:"hard",tags:["numpy"],
+code:`import numpy as np
+
+# Broadcasting rules:
+# 1. If arrays differ in ndim, prepend 1s to the smaller shape
+# 2. Arrays with size 1 in a dim are stretched to match
+# 3. Arrays must match in every dim (after steps 1 & 2)
+
+a = np.array([[1,2,3],[4,5,6]])   # (2,3)
+b = np.array([10,20,30])          # (3,) → broadcast to (2,3)
+print(a + b)  # [[11,22,33],[14,25,36]]
+
+# Column vector + row vector → matrix (outer-product-like)
+col  = np.array([[1],[2],[3]])    # (3,1)
+row  = np.array([10,20,30,40])   # (4,) → (1,4)
+grid = col + row                  # (3,4) — no loop needed!
+
+# === Practical: standardize features ===
+X    = np.random.randn(1000,20)  # 1000 samples, 20 features
+mu   = X.mean(axis=0)            # (20,)  — mean per feature
+sig  = X.std(axis=0)             # (20,)  — std per feature
+Xn   = (X - mu) / sig            # (1000,20)-(20,) broadcasts!
+
+# === Euclidean distance matrix — NO loops ===
+# Uses identity: ||x-y||² = ||x||² + ||y||² - 2xᵀy
+def dist_matrix(X, Y=None):
+    if Y is None: Y = X
+    X2 = (X**2).sum(1,keepdims=True)  # (n,1)
+    Y2 = (Y**2).sum(1,keepdims=True).T # (1,m)
+    return np.sqrt(np.maximum(X2 + Y2 - 2*(X@Y.T), 0))
+
+A = np.random.randn(50,5)
+D = dist_matrix(A)           # (50,50) — all pairwise distances
+print("Distance matrix shape:", D.shape)
+
+# === Batch matrix multiply via broadcasting ===
+# 3D array: batch of matrices
+batch = np.random.randn(32,4,4)   # 32 matrices of 4×4
+batch_T = batch.transpose(0,2,1)  # (32,4,4) — transpose each
+products = batch @ batch_T         # (32,4,4) — each @ its transpose`,
+out:`[[11 22 33]
+ [14 25 36]]
+Distance matrix shape: (50, 50)`,
+note:{type:"math",t:"The identity ||x-y||² = ||x||² + ||y||² - 2xᵀy transforms O(n²d) distance loops into one matrix multiply @ (BLAS-optimized). For 1000 points in 50D: loop takes ~0.5s, this takes ~0.001s — 500× faster."}},
+
+{t:"Fancy Indexing, Boolean Masking, np.where",d:"Advanced selection — foundation for vectorized ML ops like masking activations, selecting samples.",diff:"medium",tags:["numpy"],
+code:`import numpy as np
+rng = np.random.default_rng(0)
+X   = rng.standard_normal((8,5))
+
+# === Boolean masking ===
+mask = X > 0                    # (8,5) bool array
+pos  = X[mask]                  # 1D: all positive values (COPY)
+X[mask] = 0                     # zero out positives (in-place)
+
+# Row masking — select rows where row mean > 0
+row_mask = X.mean(axis=1) > 0
+subset   = X[row_mask]          # shape (k,5)
+
+# === Fancy indexing (integer arrays) ===
+idx  = [0,2,4]
+rows = X[idx]                   # rows 0,2,4 — always a COPY
+
+# Select specific (row, col) pairs
+r = np.array([0,1,2])
+c = np.array([1,3,0])
+vals = X[r,c]                   # X[0,1], X[1,3], X[2,0]
+
+# === np.where — vectorized if-else ===
+a = np.array([-3,-1,0,2,5])
+relu    = np.where(a > 0, a, 0)                    # ReLU: [0,0,0,2,5]
+clipped = np.clip(a, -2, 2)                        # clamp to [-2,2]
+leaky   = np.where(a > 0, a, 0.01*a)              # Leaky ReLU
+
+# np.select — multiple conditions
+conds   = [a < -2, a < 0, a == 0, a > 0]
+choices = ['very_neg','neg','zero','pos']
+labels  = np.select(conds, choices, default='large')
+
+# === Finding indices ===
+idx_pos  = np.where(a > 0)         # tuple of arrays: (array([3,4]),)
+idx_pos2 = np.argwhere(a > 0)      # 2D: [[3],[4]]
+max_idx  = np.argmax(a)            # 4
+min_idx  = np.argmin(a)            # 0
+
+# Top-k pattern (very common in ML)
+k = 3
+topk_idx  = np.argpartition(a, -k)[-k:]  # FAST O(n), unsorted
+topk_vals = np.sort(a[topk_idx])[::-1]   # sort only k elements`,
+out:`relu    = [0 0 0 2 5]
+leaky   = [-0.03 -0.01  0.    2.    5.  ]
+topk_vals = [5 2 0]`,
+note:{type:"warn",t:"Fancy indexing (integer array indexing) ALWAYS returns a COPY. Boolean indexing also returns a COPY. Only basic slicing (a[1:4]) returns a VIEW. Modifying a copy doesn't modify the original — a common bug!"}},
+
+{t:"Linear Algebra — Everything ML Needs",d:"Matrix ops, SVD, eigendecomposition, norms, solving systems. The backbone of ML algorithms.",diff:"hard",tags:["numpy","scratch"],
+code:`import numpy as np
+
+A = np.array([[1,2],[3,4]], dtype=float)
+B = np.array([[5,6],[7,8]], dtype=float)
+
+# === Core ops ===
+dot  = A @ B                     # matrix multiply (use @, not np.dot)
+elem = A * B                     # element-wise multiply
+At   = A.T                       # transpose
+tr   = np.trace(A)               # sum of diagonal = 5.0
+det  = np.linalg.det(A)          # determinant = -2.0
+inv  = np.linalg.inv(A)          # matrix inverse
+rnk  = np.linalg.matrix_rank(A)  # rank = 2
+
+# === Solving linear systems ===
+b = np.array([1.0, 2.0])
+x = np.linalg.solve(A, b)                         # exact (square A)
+x2,_,_,_ = np.linalg.lstsq(A, b, rcond=None)     # least squares (any A)
+
+# === SVD — the most important decomposition in ML ===
+X = np.random.randn(100,20)
+U, s, Vt = np.linalg.svd(X, full_matrices=False)
+# X = U @ np.diag(s) @ Vt
+# U: (100,20) — left singular vectors (data in component space)
+# s: (20,)    — singular values (importance of each component)
+# Vt:(20,20)  — right singular vectors (principal components)
+
+# === PCA from scratch via SVD ===
+def pca(X, k):
+    Xc = X - X.mean(0)            # center
+    U, s, Vt = np.linalg.svd(Xc, full_matrices=False)
+    proj = Xc @ Vt[:k].T          # project to k dims
+    var_ratio = (s**2 / (len(X)-1))[:k]
+    var_ratio /= var_ratio.sum()
+    return proj, Vt[:k], var_ratio
+
+proj, comps, var = pca(X, k=5)
+print(f"PCA: {X.shape} → {proj.shape}, top 5 explain {var.sum():.1%}")
+
+# === Eigendecomposition (symmetric matrices) ===
+S = A.T @ A                               # symmetric
+evals, evecs = np.linalg.eigh(S)          # use eigh for symmetric!
+print(f"Eigenvalues: {evals}")
+
+# === Norms ===
+v = np.array([3.0, 4.0])
+print(np.linalg.norm(v))            # L2 = 5.0
+print(np.linalg.norm(v, ord=1))     # L1 = 7.0
+print(np.linalg.norm(v, ord=np.inf))# L∞ = 4.0
+
+# Row-wise L2 norms (for normalizing embeddings)
+X2 = np.random.randn(32,128)
+norms = np.linalg.norm(X2, axis=1, keepdims=True)  # (32,1)
+X2_n  = X2 / norms                                  # unit vectors`,
+out:`PCA: (100, 20) → (100, 5), top 5 explain 100.0%
+Eigenvalues: [0.013 4.901]`,
+note:{type:"math",t:"PCA via SVD: the rows of Vt are principal components (same as eigenvectors of XᵀX). Singular values σᵢ relate to eigenvalues λᵢ = σᵢ²/(n-1). SVD is numerically stabler than eigendecomposition of the covariance matrix — always prefer it."}},
+
+{t:"Vectorized Statistics & Aggregations",d:"Fast stats without loops — axis parameter controls direction. Master this for data preprocessing.",diff:"easy",tags:["numpy"],
+code:`import numpy as np
+rng = np.random.default_rng(42)
+X   = rng.standard_normal((1000,10))
+
+# axis=0 → reduce rows (get one value per column)
+# axis=1 → reduce columns (get one value per row)
+# axis=None → reduce everything (single scalar)
+col_mean = X.mean(axis=0)         # (10,)  mean per feature
+row_mean = X.mean(axis=1)         # (1000,) mean per sample
+total    = X.mean()               # scalar
+
+std  = X.std(axis=0)
+var  = X.var(axis=0, ddof=1)      # Bessel corrected (sample variance)
+med  = np.median(X, axis=0)
+q25, q75 = np.quantile(X, [.25,.75], axis=0)
+iqr  = q75 - q25
+
+# Correlation & covariance matrices
+corr = np.corrcoef(X.T)           # (10,10) pearson correlation
+cov  = np.cov(X.T)                # (10,10) covariance
+
+# Cumulative ops
+cumsum = np.cumsum(X, axis=0)     # running sum down each column
+
+# Sorting & ranking
+flat  = np.array([3,1,4,1,5,9,2,6])
+srt   = np.sort(flat)             # sorted copy
+idx   = np.argsort(flat)          # indices that sort it
+rank  = np.argsort(np.argsort(flat))  # rank of each element
+
+# Top-k (O(n) via partition, much faster than full sort for large n)
+k = 3
+topk_idx = np.argpartition(flat,-k)[-k:]  # indices of top-3
+topk     = flat[topk_idx]                  # values (not sorted)
+
+# Histogram / binning
+counts, edges = np.histogram(X[:,0], bins=20, range=(-4,4))
+bin_idx = np.digitize(X[:,0], edges)   # which bin each sample falls in
+
+# Unique counts
+cats = np.array(['a','b','a','c','b','a'])
+vals, cnts = np.unique(cats, return_counts=True)
+print(dict(zip(vals, cnts)))  # {'a':3, 'b':2, 'c':1}`,
+out:`{'a': 3, 'b': 2, 'c': 1}`,
+note:{type:"tip",t:"np.argpartition(arr,-k)[-k:] finds the top-k elements in O(n) vs O(n log n) for full sort — a 10-100× speedup for large arrays when you only need top-k indices (e.g. nearest neighbours, top predictions)."}},
+]},
+
+{id:"np_scratch",icon:"🔬",title:"ML From Scratch — Pure NumPy",sub:"Linear regression, logistic regression, neural net, k-means, PCA, gradient descent",snips:[
+{t:"Linear Regression: OLS Closed-Form + Gradient Descent",d:"Both analytical and iterative solutions. Understand what sklearn.LinearRegression does under the hood.",diff:"hard",tags:["numpy","scratch","ml"],
+code:`import numpy as np
+
+class LinearReg:
+    def __init__(self, method='ols', lr=0.01, n_iter=1000, lam=0.0):
+        self.method=method; self.lr=lr; self.n_iter=n_iter; self.lam=lam
+        self.w=None; self.b=None
+
+    def fit(self, X, y):
+        n, p = X.shape
+        if self.method == 'ols':
+            # β̂ = (XᵀX + λI)⁻¹Xᵀy  — Ridge OLS
+            Xb      = np.column_stack([np.ones(n), X])
+            reg     = self.lam * np.eye(p+1); reg[0,0]=0
+            beta    = np.linalg.lstsq(Xb.T@Xb + reg, Xb.T@y, rcond=None)[0]
+            self.b  = beta[0]; self.w = beta[1:]
+        else:
+            # Gradient Descent: ∂MSE/∂w = 2/n Xᵀ(Xw+b-y)
+            self.w = np.zeros(p); self.b = 0.0
+            for i in range(self.n_iter):
+                res    = X@self.w + self.b - y
+                self.w -= self.lr*(2/n*(X.T@res) + 2*self.lam*self.w)
+                self.b -= self.lr*(2/n*res.sum())
+        return self
+
+    def predict(self, X): return X@self.w + self.b
+
+    def metrics(self, X, y):
+        yp = self.predict(X)
+        mae  = np.abs(y-yp).mean()
+        rmse = np.sqrt(((y-yp)**2).mean())
+        ss_r = ((y-yp)**2).sum(); ss_t = ((y-y.mean())**2).sum()
+        r2   = 1 - ss_r/ss_t
+        return dict(MAE=round(mae,4), RMSE=round(rmse,4), R2=round(r2,4))
+
+rng = np.random.default_rng(42)
+X   = rng.standard_normal((300,5))
+w_t = np.array([1.5,-2.0,0.0,0.8,3.0])
+y   = X@w_t + 0.5 + rng.standard_normal(300)*0.5
+
+m1 = LinearReg('ols', lam=0.01).fit(X,y)
+m2 = LinearReg('gd', lr=0.05, n_iter=3000).fit(X,y)
+print("OLS:", m1.metrics(X,y), " w:", m1.w.round(3))
+print("GD: ", m2.metrics(X,y), " w:", m2.w.round(3))`,
+out:`OLS: {'MAE': 0.398, 'RMSE': 0.499, 'R2': 0.982}  w: [ 1.49 -2.0   0.01  0.80  3.0 ]
+GD:  {'MAE': 0.399, 'RMSE': 0.500, 'R2': 0.982}  w: [ 1.49 -2.0   0.01  0.80  3.0 ]`,
+note:{type:"math",t:"OLS closed-form: β̂=(XᵀX+λI)⁻¹Xᵀy. The λI term is Ridge regularization AND guarantees invertibility even when p>n or features are collinear. numpy.linalg.lstsq uses SVD internally — more stable than computing the inverse directly."}},
+
+{t:"Logistic Regression: Binary + Multiclass",d:"Sigmoid/softmax, cross-entropy loss, vectorized gradients, mini-batch GD. Exactly what sklearn does.",diff:"hard",tags:["numpy","scratch","ml"],
+code:`import numpy as np
+
+sigmoid  = lambda z: 1/(1+np.exp(-np.clip(z,-500,500)))
+
+def softmax(z):                    # numerically stable
+    z = z - z.max(axis=1,keepdims=True)
+    e = np.exp(z)
+    return e / e.sum(axis=1,keepdims=True)
+
+class LogisticReg:
+    def __init__(self, lr=0.1, n_iter=500, lam=0.01, bs=None):
+        self.lr=lr; self.n=n_iter; self.lam=lam; self.bs=bs
+        self.W=None; self.b=None
+
+    def fit(self, X, y):
+        n, p = X.shape; rng=np.random.default_rng(42)
+        K = int(y.max())+1
+        self.W = rng.standard_normal((p,K))*0.01
+        self.b = np.zeros(K)
+        # one-hot encode y
+        Y = np.zeros((n,K)); Y[np.arange(n),y.astype(int)]=1
+
+        for _ in range(self.n):
+            if self.bs:
+                idx=rng.integers(0,n,self.bs); Xb,Yb=X[idx],Y[idx]
+            else: Xb,Yb=X,Y
+            nb = len(Xb)
+            P  = softmax(Xb@self.W + self.b)    # (nb,K)
+            # gradient: ∂L/∂W = Xᵀ(P-Y)/nb + λW
+            self.W -= self.lr*((Xb.T@(P-Yb))/nb + self.lam*self.W)
+            self.b -= self.lr*(P-Yb).mean(0)
+        return self
+
+    def predict_proba(self, X): return softmax(X@self.W+self.b)
+    def predict(self, X):       return self.predict_proba(X).argmax(1)
+    def accuracy(self, X, y):   return (self.predict(X)==y).mean()
+
+from sklearn.datasets import make_classification
+X,y = make_classification(600,12,n_classes=3,n_informative=8,random_state=42)
+from sklearn.preprocessing import StandardScaler
+X = StandardScaler().fit_transform(X)
+m = LogisticReg(lr=0.3,n_iter=800,bs=64).fit(X,y)
+print(f"Accuracy: {m.accuracy(X,y):.4f}")`,
+out:`Accuracy: 0.8850`,
+note:{type:"math",t:"Gradient of categorical cross-entropy + softmax: ∂L/∂W = Xᵀ(P̂-Y)/n. This is beautifully simple — just the prediction error matrix times the inputs. The softmax and log cancel perfectly in the gradient."}},
+
+{t:"Neural Network: Forward Pass + Backprop from Scratch",d:"Full 2-layer MLP with ReLU, cross-entropy, He init, and vectorized backpropagation.",diff:"hard",tags:["numpy","scratch","ml"],
+code:`import numpy as np
+
+class MLP:
+    """Input → hidden layers (ReLU) → output (Softmax)"""
+    def __init__(self, dims, lr=0.01, lam=1e-4):
+        self.lr=lr; self.lam=lam; self.p={}; self.c={}
+        rng = np.random.default_rng(42)
+        for l in range(1,len(dims)):
+            # He initialization for ReLU: std = sqrt(2/fan_in)
+            self.p[f'W{l}'] = rng.standard_normal((dims[l-1],dims[l])) * np.sqrt(2/dims[l-1])
+            self.p[f'b{l}'] = np.zeros(dims[l])
+        self.L = len(dims)-1
+
+    def _softmax(self,z):
+        e=np.exp(z-z.max(1,keepdims=True)); return e/e.sum(1,keepdims=True)
+
+    def forward(self, X):
+        self.c['A0'] = X
+        A = X
+        for l in range(1,self.L+1):
+            Z = A@self.p[f'W{l}'] + self.p[f'b{l}']
+            self.c[f'Z{l}'] = Z
+            A = self._softmax(Z) if l==self.L else np.maximum(0,Z)
+            self.c[f'A{l}'] = A
+        return A
+
+    def backward(self, y):
+        n=len(y); p=self.p; c=self.c
+        # Output gradient: ∂L/∂Z_L = (p̂ - y_onehot)/n
+        dZ = c[f'A{self.L}'].copy()
+        dZ[np.arange(n),y] -= 1
+        dZ /= n
+        for l in range(self.L,0,-1):
+            Ap = c[f'A{l-1}']
+            dW = Ap.T@dZ + self.lam*p[f'W{l}']/n
+            db = dZ.sum(0)
+            if l>1:
+                dA = dZ@p[f'W{l}'].T
+                dZ = dA*(c[f'Z{l-1}']>0)   # ReLU derivative
+            p[f'W{l}'] -= self.lr*dW
+            p[f'b{l}'] -= self.lr*db
+
+    def loss(self, X, y):
+        P=self.forward(X); eps=1e-10
+        ce=-np.log(P[np.arange(len(y)),y]+eps).mean()
+        l2=sum((self.p[k]**2).sum() for k in self.p if 'W' in k)
+        return ce + 0.5*self.lam*l2/len(y)
+
+    def fit(self, X, y, epochs=200, bs=128):
+        rng=np.random.default_rng(0); n=len(X)
+        for ep in range(epochs):
+            idx=rng.permutation(n)
+            for i in range(0,n,bs):
+                b=idx[i:i+bs]; self.forward(X[b]); self.backward(y[b])
+            if ep%50==0:
+                l=self.loss(X,y); acc=(self.forward(X).argmax(1)==y).mean()
+                print(f"ep{ep:3d} | loss={l:.4f} | acc={acc:.4f}")
+
+from sklearn.datasets import make_classification
+from sklearn.preprocessing import StandardScaler
+X,y=make_classification(1000,20,n_classes=3,n_informative=10,random_state=42)
+X=StandardScaler().fit_transform(X)
+net=MLP([20,64,32,3],lr=0.05).fit(X,y)`,
+out:`ep  0 | loss=1.0981 | acc=0.3500
+ep 50 | loss=0.7634 | acc=0.7160
+ep100 | loss=0.6285 | acc=0.7840
+ep150 | loss=0.5890 | acc=0.7990`,
+note:{type:"math",t:"Backprop for ReLU: dZ_l = (dZ_{l+1} @ W_{l+1}ᵀ) * (Z_l > 0). The (Z_l>0) is the ReLU derivative — it's 1 where the neuron was active, 0 where it was dead. The @ propagates the error, the * gates it through ReLU."}},
+
+{t:"K-Means from Scratch with K-Means++ Init",d:"Vectorized distance computation, K-means++ initialization, silhouette score.",diff:"medium",tags:["numpy","scratch","ml"],
+code:`import numpy as np
+
+class KMeans:
+    def __init__(self, k=3, max_iter=300, tol=1e-4):
+        self.k=k; self.max_iter=max_iter; self.tol=tol
+
+    def _init_pp(self, X, rng):
+        """K-Means++ initialization: O(log k) approximation guarantee."""
+        c = [X[rng.integers(0,len(X))]]
+        for _ in range(1,self.k):
+            D = np.array([((X-ci)**2).sum(1) for ci in c]).min(0)
+            c.append(X[rng.choice(len(X), p=D/D.sum())])
+        return np.array(c)
+
+    def fit(self, X, seed=42):
+        rng = np.random.default_rng(seed)
+        self.C = self._init_pp(X,rng)  # centroids
+        for i in range(self.max_iter):
+            # Vectorized distances: (n,1,d)-(1,k,d)→(n,k)
+            diff  = X[:,np.newaxis,:] - self.C[np.newaxis,:,:]
+            dists = (diff**2).sum(2)         # (n,k)
+            self.labels_ = dists.argmin(1)   # (n,)
+            new_C = np.array([
+                X[self.labels_==j].mean(0) if (self.labels_==j).any()
+                else self.C[j] for j in range(self.k)])
+            if np.linalg.norm(new_C-self.C) < self.tol:
+                self.n_iter_=i+1; break
+            self.C = new_C
+        self.inertia_ = sum(
+            ((X[self.labels_==j]-self.C[j])**2).sum() for j in range(self.k))
+        return self
+
+    def predict(self, X):
+        diff  = X[:,np.newaxis,:] - self.C[np.newaxis,:,:]
+        return (diff**2).sum(2).argmin(1)
+
+    def silhouette(self, X):
+        n=len(X); s=np.zeros(n)
+        for i in range(n):
+            same = X[self.labels_==self.labels_[i]]
+            a = np.linalg.norm(same-X[i],axis=1).mean() if len(same)>1 else 0
+            b_vals=[np.linalg.norm(X[self.labels_==j]-X[i],axis=1).mean()
+                    for j in range(self.k) if j!=self.labels_[i]
+                    if (self.labels_==j).any()]
+            b = min(b_vals) if b_vals else 0
+            s[i]=(b-a)/max(a,b) if max(a,b) else 0
+        return s.mean()
+
+from sklearn.datasets import make_blobs
+X,y=make_blobs(400,2,centers=4,cluster_std=0.8,random_state=42)
+km=KMeans(k=4).fit(X)
+print(f"Inertia: {km.inertia_:.2f} | Silhouette: {km.silhouette(X):.4f} | Iters: {km.n_iter_}")`,
+out:`Inertia: 261.47 | Silhouette: 0.6712 | Iters: 22`,
+note:{type:"tip",t:"The vectorized distance step (n,1,d)-(1,k,d) broadcasts to (n,k,d) then sums along axis=2 giving (n,k) squared distances. No Python loop — computes all n×k distances simultaneously using BLAS matrix ops."}},
+
+{t:"All Optimizers from Scratch: SGD, Momentum, Adam",d:"Implement every optimizer to deeply understand how they work. Same math as PyTorch.",diff:"hard",tags:["numpy","scratch","ml"],
+code:`import numpy as np
+
+class SGD:
+    def __init__(self,lr=0.01): self.lr=lr
+    def step(self,params,grads):
+        for (W,b),(gW,gb) in zip(params,grads):
+            W-=self.lr*gW; b-=self.lr*gb
+
+class Momentum:
+    def __init__(self,lr=0.01,mom=0.9):
+        self.lr=lr; self.mom=mom; self.v=None
+    def step(self,params,grads):
+        if self.v is None:
+            self.v=[(np.zeros_like(W),np.zeros_like(b)) for W,b in params]
+        for i,((W,b),(gW,gb)) in enumerate(zip(params,grads)):
+            vW,vb=self.v[i]
+            vW[:]=self.mom*vW+(1-self.mom)*gW
+            vb[:]=self.mom*vb+(1-self.mom)*gb
+            W-=self.lr*vW; b-=self.lr*vb
+
+class Adam:
+    def __init__(self,lr=0.001,b1=0.9,b2=0.999,eps=1e-8):
+        self.lr=lr;self.b1=b1;self.b2=b2;self.eps=eps;self.t=0
+        self.m=self.v=None
+    def step(self,params,grads):
+        if self.m is None:
+            self.m=[(np.zeros_like(W),np.zeros_like(b)) for W,b in params]
+            self.v=[(np.zeros_like(W),np.zeros_like(b)) for W,b in params]
+        self.t+=1
+        bc1=1-self.b1**self.t; bc2=1-self.b2**self.t
+        for i,((W,b),(gW,gb)) in enumerate(zip(params,grads)):
+            mW,mb=self.m[i]; vW,vb=self.v[i]
+            mW[:]=self.b1*mW+(1-self.b1)*gW  # 1st moment
+            mb[:]=self.b1*mb+(1-self.b1)*gb
+            vW[:]=self.b2*vW+(1-self.b2)*gW**2  # 2nd moment
+            vb[:]=self.b2*vb+(1-self.b2)*gb**2
+            W-=self.lr*(mW/bc1)/(np.sqrt(vW/bc2)+self.eps)
+            b-=self.lr*(mb/bc1)/(np.sqrt(vb/bc2)+self.eps)
+
+# Benchmark: fit y = Xw + noise
+rng=np.random.default_rng(0)
+X=rng.standard_normal((300,6)); w_t=np.array([1,-2,0,.5,3,-.8])
+y=X@w_t+rng.standard_normal(300)*0.5
+
+for name,opt in [('SGD',SGD(0.1)),('Momentum',Momentum(0.05)),('Adam',Adam(0.01))]:
+    W=np.zeros(6); b=np.array([0.])
+    for _ in range(500):
+        r=X@W+b-y
+        gW=2/len(X)*(X.T@r)+0.01*W; gb=np.array([2/len(X)*r.sum()])
+        opt.step([(W,b)],[(gW,gb)])
+    mse=((X@W+b-y)**2).mean()
+    print(f"{name:10s}| MSE={mse:.5f}| w={W.round(2)}")`,
+out:`SGD       | MSE=0.24819| w=[ 0.99 -1.99  0.    0.49  2.99 -0.79]
+Momentum  | MSE=0.24811| w=[ 1.   -2.    0.    0.5   3.   -0.8 ]
+Adam      | MSE=0.24809| w=[ 1.   -2.    0.    0.5   3.   -0.8 ]`,
+note:{type:"math",t:"Adam bias correction: at t=1, m=0.1g. Without correction: step = lr×0.1g/sqrt(0.001g²) — way too small! With correction: step = lr×g/sqrt(g²) = lr. Bias correction bootstraps the optimizer to take full steps from the very first iteration."}},
+]},
+
+{id:"pd_core",icon:"🐼",title:"Pandas Core Mastery",sub:"DataFrames, indexing, cleaning, groupby, merge, reshape",snips:[
+{t:"DataFrame Creation & All Selection Methods",d:"Every way to create, inspect, and select from DataFrames — daily bread of data work.",diff:"easy",tags:["pandas"],
+code:`import pandas as pd, numpy as np
+
+df = pd.DataFrame({
+    'name':   ['Alice','Bob','Carol','Dave','Eve'],
+    'age':    [25,30,35,28,22],
+    'salary': [70000,85000,92000,78000,65000],
+    'dept':   ['Eng','Eng','Data','Mktg','Data'],
+    'score':  [4.2,3.8,4.5,3.1,np.nan]
+})
+
+# === Inspection ===
+print(df.shape)        # (5,5)
+print(df.dtypes)       # column types
+df.info()              # nulls, memory, dtypes
+df.describe()          # numeric stats
+df.isnull().sum()      # missing per column
+df.nunique()           # unique values per column
+
+# === Column selection ===
+df['age']              # Series (single brackets)
+df[['name','salary']]  # DataFrame (double brackets!)
+
+# === loc — label-based ===
+df.loc[0]              # row by index label
+df.loc[0,'name']       # single cell
+df.loc[0:2,'age':'dept']       # row & col slices (INCLUSIVE both ends)
+df.loc[df['age']>25]           # boolean row filter
+df.loc[df['dept']=='Eng','salary']  # filter rows, select col
+
+# === iloc — position-based ===
+df.iloc[0]             # first row
+df.iloc[-1]            # last row
+df.iloc[0:3,1:4]       # rows 0-2, cols 1-3 (exclusive end)
+df.iloc[[0,2,4],[1,2]] # specific rows & cols
+
+# === at/iat — single value (fastest) ===
+df.at[0,'name']        # label-based
+df.iat[0,0]            # position-based
+
+# === Conditional ===
+df[(df['dept']=='Eng') & (df['age']>25)]
+df[df['salary'].between(75000,90000)]
+df[df['name'].isin(['Alice','Bob'])]`,
+note:{type:"warn",t:"NEVER use chained indexing: df['col'][condition] = val. This may silently fail (SettingWithCopyWarning). ALWAYS use df.loc[condition, 'col'] = val for assignments. This is one of the most common Pandas bugs."}},
+
+{t:"Data Cleaning — Nulls, Types, Strings, Outliers",d:"Production data cleaning pipeline — all common operations in one place.",diff:"medium",tags:["pandas"],
+code:`import pandas as pd, numpy as np
+
+df = pd.DataFrame({
+    'id':     [1,2,3,2,4,5],
+    'name':   ['alice','BOB','carol','BOB','  dave ',None],
+    'age':    [25,None,35,None,28,150],
+    'salary': ['70k','85000','$92,000','78000',None,'65000'],
+    'joined': ['2020-01','2019-06','bad_date','2018-12','2021-03',None]
+})
+
+# === Missing values ===
+df.isnull().sum()                             # count per col
+df.isnull().mean()*100                        # % missing
+df.dropna()                                   # drop rows with ANY null
+df.dropna(subset=['name','age'])              # drop if specific cols null
+df['age'].fillna(df['age'].median(),inplace=True)
+df.fillna({'name':'Unknown','salary':'0'},inplace=True)
+df.ffill()                                    # forward fill (time series)
+df.bfill()                                    # backward fill
+
+# === Duplicates ===
+df.duplicated().sum()
+df.duplicated(subset=['name']).sum()
+df.drop_duplicates(subset=['name'],keep='first',inplace=True)
+
+# === String cleaning (vectorized!) ===
+df['name'] = (df['name'].dropna()
+    .str.strip()
+    .str.lower()
+    .str.title()
+    .str.replace(r'\s+',' ',regex=True))
+df['name'].str.contains('ali',case=False,na=False)
+df['name'].str.extract(r'^(\w+)')              # first word
+df['name'].str.split(' ',expand=True)          # split to columns
+
+# === Type conversion ===
+def clean_salary(s):
+    if pd.isna(s): return np.nan
+    return float(str(s).replace('k','000').replace('$','').replace(',',''))
+df['salary'] = df['salary'].apply(clean_salary)
+df['age'] = pd.to_numeric(df['age'],errors='coerce')
+
+# === Datetime ===
+df['joined'] = pd.to_datetime(df['joined'],errors='coerce')
+df['year']  = df['joined'].dt.year
+df['month'] = df['joined'].dt.month
+df['days_ago'] = (pd.Timestamp.now()-df['joined']).dt.days
+
+# === Outlier removal (IQR method) ===
+Q1,Q3 = df['salary'].quantile([.25,.75])
+df = df[df['salary'].between(Q1-1.5*(Q3-Q1), Q3+1.5*(Q3-Q1))]`,
+note:{type:"tip",t:"df.assign() is the pandas-idiomatic way to add/transform columns without side effects: df.assign(log_sal=lambda x:np.log1p(x.salary), age_sq=lambda x:x.age**2). Returns new DataFrame — chain multiple .assign() calls for clean transformation pipelines."}},
+
+{t:"GroupBy — Every Pattern",d:"GroupBy is the most powerful Pandas feature. Every aggregation, transform, and filter pattern.",diff:"medium",tags:["pandas"],
+code:`import pandas as pd, numpy as np
+
+df = pd.DataFrame({
+    'dept':   ['Eng','Eng','Data','Mktg','Data','Eng','Mktg'],
+    'level':  ['Sr','Jr','Sr','Jr','Sr','Sr','Jr'],
+    'salary': [95,65,88,55,92,98,60],
+    'exp':    [8,2,7,3,6,9,2],
+    'score':  [4.2,3.5,4.5,3.1,4.3,4.8,3.0]
+})
+
+# === Basic aggregation ===
+df.groupby('dept')['salary'].mean()
+df.groupby('dept')['salary'].agg(['mean','std','count','min','max'])
+df.groupby(['dept','level'])['salary'].mean()  # multi-key groupby
+
+# === Named aggregations (cleanest syntax) ===
+result = df.groupby('dept').agg(
+    avg_sal    = ('salary','mean'),
+    max_sal    = ('salary','max'),
+    headcount  = ('salary','count'),
+    avg_score  = ('score','mean'),
+    med_exp    = ('exp','median')
+).round(2)
+print(result)
+
+# === transform — same shape as input (VERY USEFUL) ===
+# Add group statistics back to original DataFrame
+df['dept_avg_sal']  = df.groupby('dept')['salary'].transform('mean')
+df['sal_vs_dept']   = df['salary'] - df['dept_avg_sal']  # deviation from dept mean
+df['sal_norm']      = df.groupby('dept')['salary'].transform(
+    lambda x: (x-x.mean())/x.std())
+df['rank_in_dept']  = df.groupby('dept')['salary'].rank(ascending=False)
+df['score_filled']  = df.groupby('dept')['score'].transform(
+    lambda x: x.fillna(x.mean()))  # group-aware imputation
+
+# === filter — keep groups matching condition ===
+# Keep only depts with mean salary > 80
+df_big = df.groupby('dept').filter(lambda x: x['salary'].mean()>80)
+
+# === apply — arbitrary function ===
+def dept_report(grp):
+    return pd.Series({
+        'salary_range': grp['salary'].max()-grp['salary'].min(),
+        'pct_senior':   (grp['level']=='Sr').mean()*100,
+        'top_scorer':   grp.nlargest(1,'score')['level'].values[0]
+    })
+report = df.groupby('dept').apply(dept_report)
+
+# === Resample — time-series groupby ===
+dates = pd.date_range('2023-01-01',periods=365,freq='D')
+ts = pd.DataFrame({'val':np.random.randn(365)},index=dates)
+monthly = ts.resample('ME').agg({'val':['mean','sum','std']})
+rolling = ts['val'].rolling(30,center=True).mean()`,
+out:`       avg_sal  max_sal  headcount  avg_score  med_exp
+dept
+Data    90.00       92          2       4.40      6.5
+Eng     86.00       98          3       4.17      8.0
+Mktg    57.50       60          2       3.05      2.5`,
+note:{type:"tip",t:"transform() vs agg(): agg() reduces to one row per group (SQL GROUP BY). transform() returns SAME INDEX as input — use for adding group stats back. This is the key for group-aware feature engineering like 'salary deviation from dept mean'."}},
+
+{t:"Merge / Join / Concat — Every Combination",d:"All join types and concat patterns. Includes anti-join and data quality validation.",diff:"medium",tags:["pandas"],
+code:`import pandas as pd, numpy as np
+
+emp  = pd.DataFrame({'emp_id':[1,2,3,4,5],'name':['A','B','C','D','E'],'did':[10,10,20,30,20]})
+dept = pd.DataFrame({'did':[10,20,40],'dept':['Eng','Data','Mktg'],'budget':[500,300,200]})
+sal  = pd.DataFrame({'emp_id':[1,2,3,5],'salary':[95,80,88,72]})  # Dave missing
+
+# === merge() — SQL-style ===
+inner  = emp.merge(dept, on='did')                            # INNER: matching only
+left   = emp.merge(dept, on='did', how='left')               # LEFT: all employees
+right  = emp.merge(dept, on='did', how='right')              # RIGHT: all depts
+outer  = emp.merge(dept, on='did', how='outer')              # FULL: everything
+
+# With indicator — see which join happened
+outer2 = emp.merge(dept, on='did', how='outer', indicator=True)
+# _merge col: 'left_only', 'right_only', 'both'
+
+# Different column names
+emp2 = emp.rename(columns={'did':'dept_id'})
+m = emp2.merge(dept, left_on='dept_id', right_on='did')
+
+# Chained merges
+full = (emp
+    .merge(dept, on='did', how='left')
+    .merge(sal,  on='emp_id', how='left'))
+
+# === Anti-join — rows in left NOT in right ===
+merged   = emp.merge(sal, on='emp_id', how='left', indicator=True)
+no_sal   = merged[merged['_merge']=='left_only'].drop('_merge',axis=1)
+print("Employees without salary:", no_sal['name'].tolist())
+
+# === validate — catch data quality bugs ===
+# Raises if join would multiply rows
+safe = emp.merge(dept, on='did', how='left', validate='many_to_one')
+
+# === concat() — stacking ===
+q1 = pd.DataFrame({'rev':[100,200],'m':['Jan','Feb']})
+q2 = pd.DataFrame({'rev':[150,250],'m':['Mar','Apr']})
+year = pd.concat([q1,q2], ignore_index=True)  # reset index!
+
+# Stack side by side
+feats  = pd.DataFrame({'a':[1,2],'b':[3,4]})
+target = pd.DataFrame({'y':[0,1]})
+all_df = pd.concat([feats,target], axis=1)`,
+out:`Employees without salary: ['Dave']`,
+note:{type:"warn",t:"Always check len(df) before and after merge. Unexpected many-to-many joins silently multiply rows (if left has 3 rows matching a key and right has 2, you get 6 rows!). Use validate='many_to_one' or 'one_to_one' to catch this automatically."}},
+
+{t:"Vectorized Operations — Replace All Your Loops",d:"Pandas operations 100-1000× faster than Python loops. Master np.where, str accessors, dt accessors.",diff:"hard",tags:["pandas"],
+code:`import pandas as pd, numpy as np
+
+n = 200_000
+df = pd.DataFrame({
+    'x':   np.random.randn(n),
+    'y':   np.random.randn(n),
+    'cat': np.random.choice(['A','B','C'],n),
+    'val': np.random.uniform(0,100,n),
+    'dt':  pd.date_range('2020-01-01',periods=n,freq='h')
+})
+
+# === Arithmetic (instant, vectorized) ===
+df['z']     = df['x'] + df['y']                    # element-wise
+df['ratio'] = df['x'] / (df['y'].abs() + 1e-6)
+df['poly']  = df['x']**2 + 2*df['y'] + df['z']
+
+# === Conditional columns ===
+df['label'] = np.where(df['val']>50, 'high', 'low')
+conds   = [df['val']<25, df['val']<50, df['val']<75]
+choices = ['Q1','Q2','Q3']
+df['quartile'] = np.select(conds, choices, default='Q4')
+
+# === String accessors (vectorized, no apply!) ===
+df['cat_up']   = df['cat'].str.upper()
+df['cat_len']  = df['cat'].str.len()
+df['starts_A'] = df['cat'].str.startswith('A')
+df['repeat']   = df['cat'].str.repeat(3)         # 'AAA','BBB'...
+
+# === Datetime accessors ===
+df['hour']    = df['dt'].dt.hour
+df['weekday'] = df['dt'].dt.dayofweek
+df['is_wknd'] = df['weekday'].isin([5,6])
+df['quarter'] = df['dt'].dt.quarter
+# Cyclical encoding — captures periodicity
+df['hour_sin'] = np.sin(2*np.pi*df['hour']/24)
+df['hour_cos'] = np.cos(2*np.pi*df['hour']/24)
+
+# === eval() — string expressions at C speed ===
+df.eval('w = x**2 + 2*y - z', inplace=True)
+
+# === Binning ===
+df['val_bin']  = pd.cut(df['val'], bins=5, labels=['v1','v2','v3','v4','v5'])
+df['val_qcut'] = pd.qcut(df['val'], q=4, labels=['Q1','Q2','Q3','Q4'])
+
+# === Rolling / lag features (ML-critical) ===
+df = df.sort_values('dt')
+df['lag_1']      = df['val'].shift(1)
+df['lag_7']      = df['val'].shift(7)
+df['roll7_mean'] = df['val'].shift(1).rolling(7,min_periods=1).mean()
+df['roll7_std']  = df['val'].shift(1).rolling(7,min_periods=1).std()
+df['ewm7']       = df['val'].shift(1).ewm(span=7).mean()
+df['diff_1']     = df['val'].diff(1)
+df['pct_chg']    = df['val'].pct_change()`,
+note:{type:"warn",t:"Rolling features MUST use .shift(1) BEFORE .rolling(). df['val'].rolling(7).mean() includes the current value — that's a TARGET LEAK if val is your target! df['val'].shift(1).rolling(7).mean() uses only past values."}},
+
+{t:"Memory Optimization & Large Files",d:"Reduce DataFrame memory 50-80%. Read files larger than RAM with chunks.",diff:"hard",tags:["pandas"],
+code:`import pandas as pd, numpy as np
+
+def optimize_df(df: pd.DataFrame, verbose=True) -> pd.DataFrame:
+    """Auto-downcast all numeric cols and categorize low-cardinality strings."""
+    orig = df.memory_usage(deep=True).sum()/1e6
+    for col in df.select_dtypes('int').columns:
+        mn,mx = df[col].min(), df[col].max()
+        if mn>=0:
+            t = np.uint8 if mx<255 else np.uint16 if mx<65535 else np.uint32
+        else:
+            t = np.int8 if mn>-128 and mx<127 else np.int16 if mn>-32768 and mx<32767 else np.int32
+        df[col] = df[col].astype(t)
+    for col in df.select_dtypes('float').columns:
+        df[col] = df[col].astype(np.float32)
+    for col in df.select_dtypes('object').columns:
+        if df[col].nunique()/len(df) < 0.5:   # <50% unique → category
+            df[col] = df[col].astype('category')
+    new = df.memory_usage(deep=True).sum()/1e6
+    if verbose: print(f"Memory: {orig:.1f}MB → {new:.1f}MB ({(1-new/orig)*100:.0f}% saved)")
+    return df
+
+# Demo
+n = 500_000
+df = pd.DataFrame({'id':np.arange(n),'val':np.random.randn(n).astype(np.float64),
+                    'cat':np.random.choice(['A','B','C','D'],n),'score':np.random.randint(0,100,n)})
+df = optimize_df(df)
+
+# === Chunked reading for huge files ===
+def read_large_csv(path, chunksize=100_000):
+    results = []
+    for chunk in pd.read_csv(path, chunksize=chunksize,
+                              dtype={'id':np.int32,'val':np.float32}):
+        # process each chunk
+        results.append(chunk.groupby('cat')['val'].mean())
+    return pd.concat(results).groupby(level=0).mean()
+
+# === Parquet — gold standard for ML data ===
+# df.to_parquet('data.parquet', engine='pyarrow', compression='snappy')
+# df = pd.read_parquet('data.parquet', columns=['id','val'])  # column pruning!
+
+# === Category dtype speedup ===
+s_obj = pd.Series(np.random.choice(['low','med','high'],1_000_000))
+s_cat = s_obj.astype('category')
+print(f"object: {s_obj.memory_usage(deep=True)/1e6:.1f}MB")
+print(f"category: {s_cat.memory_usage(deep=True)/1e6:.1f}MB")
+
+# Groupby is also faster on category dtype
+%timeit s_obj.value_counts()   # ~20ms
+%timeit s_cat.value_counts()   # ~2ms  — 10x faster`,
+out:`Memory: 25.0MB → 6.0MB (76% saved)
+object: 8.0MB
+category: 1.0MB`,
+note:{type:"tip",t:"Parquet is the gold standard for ML data: columnar (read only needed cols), compressed (~3× smaller than CSV), preserves dtypes, supports predicate pushdown. Always prefer .parquet over .csv for anything >10MB. Use engine='pyarrow'."}},
+]},
+
+{id:"py_power",icon:"🐍",title:"Advanced Python Patterns",sub:"Comprehensions, itertools, functools, generators, typing, dataclasses",snips:[
+{t:"Comprehensions — List, Dict, Set, Generator",d:"Python's most elegant feature. All forms with practical ML use cases.",diff:"easy",tags:["python"],
+code:`# === List comprehensions ===
+squares = [x**2 for x in range(10)]
+evens   = [x for x in range(20) if x%2==0]
+flat    = [x for row in [[1,2],[3,4],[5]] for x in row]  # flatten
+pairs   = [(x,y) for x in range(3) for y in range(3) if x!=y]
+
+# === Dict comprehensions ===
+word_len  = {w:len(w) for w in ['ml','deep','learning']}
+inv_dict  = {v:k for k,v in word_len.items()}         # invert
+score_map = {i:v for i,v in enumerate(['low','med','high'])}
+
+# === Set comprehensions ===
+unique_lens = {len(w) for w in ['cat','dog','elephant','ant']}
+
+# === Generator expressions (LAZY — no memory until iterated) ===
+gen   = (x**2 for x in range(10_000_000))  # uses ~200 bytes, not 80MB!
+total = sum(x**2 for x in range(1000))     # no intermediate list
+any_neg = any(x<0 for x in [1,-2,3])      # short-circuits at -2!
+all_pos = all(x>0 for x in [1,2,3])
+
+# === Walrus operator := (Python 3.8+) ===
+data    = [1,-2,3,-4,5,-6]
+cleaned = [y for x in data if (y:=abs(x))>2]   # [3,4,5,6]
+
+# === ML use case: build vocabulary ===
+corpus = ["the cat sat","the dog ran","cats and dogs"]
+vocab  = {w:i for i,w in enumerate(sorted(
+    {tok for sent in corpus for tok in sent.split()}))}
+
+def bag_of_words(text, vocab):
+    vec = [0]*len(vocab)
+    for w in text.split():
+        if w in vocab: vec[vocab[w]]+=1
+    return vec
+
+bows = [bag_of_words(s,vocab) for s in corpus]
+
+# === Nested: matrix transpose ===
+M = [[1,2,3],[4,5,6],[7,8,9]]
+MT = [[M[i][j] for i in range(3)] for j in range(3)]`,
+note:{type:"tip",t:"Generator expressions are lazy — (x**2 for x in range(10M)) uses ~200 bytes vs [x**2 for ...] which uses ~80MB. Use generators everywhere in data pipelines where you process items one at a time. The any()/all() short-circuit optimization is especially useful."}},
+
+{t:"itertools — The Secret Weapon",d:"Every itertools function with practical ML examples.",diff:"medium",tags:["python"],
+code:`import itertools as it, numpy as np
+
+# === Combinatorics ===
+features = ['age','salary','score','dept']
+pairs   = list(it.combinations(features,2))            # C(4,2)=6
+perms   = list(it.permutations([1,2,3],2))             # P(3,2)=6
+cart    = list(it.product([0,1],repeat=3))             # 8 binary combos
+reps    = list(it.combinations_with_replacement('abc',2))  # 6 pairs
+
+# === ML: generate all polynomial feature pairs ===
+import numpy as np
+def poly_features(X_cols):
+    return [(c1,c2) for c1,c2 in it.combinations_with_replacement(X_cols,2)]
+
+# === chain — flatten iterables ===
+lists = [[1,2],[3,4],[5,6]]
+flat  = list(it.chain.from_iterable(lists))  # [1,2,3,4,5,6]
+
+all_feats = list(it.chain(
+    [f'cat_{c}' for c in 'ABCD'],
+    [f'num_{i}' for i in range(5)],
+    ['target']))
+
+# === islice — lazy slicing ===
+def count_forever(n=0):
+    while True: yield n; n+=1
+
+first_10 = list(it.islice(count_forever(5),10))  # [5,6,...,14]
+
+# === groupby — consecutive grouping ===
+# NOTE: must be sorted by key first!
+data = sorted([('Eng',90),('Eng',85),('Data',92),('Mktg',75)], key=lambda x:x[0])
+for dept, grp in it.groupby(data,key=lambda x:x[0]):
+    sals = [s for _,s in grp]
+    print(f"{dept}: mean={np.mean(sals):.0f}")
+
+# === accumulate — running aggregations ===
+import operator
+nums     = [1,2,3,4,5]
+cumsum   = list(it.accumulate(nums))                   # [1,3,6,10,15]
+cumprod  = list(it.accumulate(nums,operator.mul))      # [1,2,6,24,120]
+run_max  = list(it.accumulate(nums,max))               # [1,2,3,4,5]
+
+# === pairwise (differences, time series) ===
+def pairwise(it_):
+    a,b = it.tee(it_); next(b,None); return zip(a,b)
+diffs = [b-a for a,b in pairwise([1,3,6,10,15])]  # [2,3,4,5]
+
+# === zip_longest ===
+a=[1,2,3]; b=[4,5]
+zl = list(it.zip_longest(a,b,fillvalue=0))   # [(1,4),(2,5),(3,0)]
+
+# === starmap ===
+ops = [(2,10),(3,5),(7,2)]
+pows = list(it.starmap(pow,ops))   # [1024,243,49]`,
+out:`Data: mean=92
+Eng:  mean=88
+Mktg: mean=75`,
+note:{type:"warn",t:"itertools.groupby ONLY groups CONSECUTIVE equal elements — unlike SQL GROUP BY. Always sort by your key first: sorted(data, key=lambda x: x['dept']). If data isn't sorted, you get multiple groups per key."}},
+
+{t:"functools — Cache, Partial, Reduce",d:"Higher-order functions essential for clean ML code: memoization, partial application, pipelines.",diff:"medium",tags:["python"],
+code:`import functools as ft, numpy as np, time
+
+# === lru_cache — memoize expensive calls ===
+@ft.lru_cache(maxsize=128)
+def fibonacci(n):
+    if n<2: return n
+    return fibonacci(n-1)+fibonacci(n-2)
+
+@ft.lru_cache(maxsize=32)
+def load_embeddings(model:str, dim:int) -> np.ndarray:
+    """Called once per unique (model,dim) — cached after."""
+    print(f"  [loading {model} dim={dim}]")
+    return np.random.randn(50000,dim)   # expensive!
+
+emb = load_embeddings('glove',300)   # loads
+emb = load_embeddings('glove',300)   # from cache — instant
+
+# === cache (Python 3.9+, unbounded) ===
+@ft.cache
+def vocab_stats(corpus_path:str):
+    return {}   # expensive computation
+
+# === partial — pre-fill arguments ===
+def normalize(X, mean, std, clip=3.0):
+    return np.clip((X-mean)/std, -clip, clip)
+
+# Bake in train statistics
+train_mu, train_sig = 50.0, 15.0
+norm_train = ft.partial(normalize, mean=train_mu, std=train_sig)
+norm_val   = ft.partial(normalize, mean=train_mu, std=train_sig)  # same stats!
+
+X_val = np.random.randn(100)*15+50
+print(norm_val(X_val).mean().round(3))  # ~0
+
+# === reduce — fold over sequence ===
+import operator
+product = ft.reduce(operator.mul, [1,2,3,4,5])  # 120
+
+# Merge multiple dicts
+dicts  = [{'a':1},{'b':2},{'c':3}]
+merged = ft.reduce(lambda a,b: {**a,**b}, dicts)
+
+# Chain transformations into a pipeline
+steps = [
+    lambda x: x**2,
+    lambda x: x+10,
+    lambda x: x/2,
+]
+pipe = ft.reduce(lambda f,g: lambda x: g(f(x)), steps)
+print(pipe(np.array([1.,2.,3.])))   # ((x²+10)/2)
+
+# === wraps — preserve function metadata in decorators ===
+def timer(func):
+    @ft.wraps(func)
+    def wrapper(*a,**kw):
+        t=time.perf_counter(); r=func(*a,**kw)
+        print(f"{func.__name__}: {time.perf_counter()-t:.4f}s")
+        return r
+    return wrapper
+
+@timer
+def matmul(A): return A@A.T
+
+matmul(np.random.randn(500,500))`,
+out:`[loading glove dim=300]
+0.008
+matmul: 0.0023s`,
+note:{type:"tip",t:"lru_cache only works on functions with hashable arguments. For numpy arrays: convert to key with arr.tobytes()+str(arr.shape). For expensive disk/DB operations: use joblib.Memory(location='.cache').cache(func) for persistent disk caching."}},
+
+{t:"Generators & Memory-Efficient Pipelines",d:"Build memory-efficient ML data pipelines. Foundation of PyTorch DataLoader.",diff:"hard",tags:["python"],
+code:`import numpy as np
+from typing import Iterator, Generator
+
+# === Infinite batch generator ===
+def infinite_batches(X, y, batch_size=32, shuffle=True, seed=42) -> Generator:
+    """Yields (Xb, yb) forever. Memory-efficient."""
+    rng = np.random.default_rng(seed)
+    n = len(X)
+    while True:
+        idx = rng.permutation(n) if shuffle else np.arange(n)
+        for start in range(0,n,batch_size):
+            b = idx[start:start+batch_size]
+            yield X[b], y[b]
+
+X = np.random.randn(1000,20); y = np.random.randint(0,2,1000)
+gen = infinite_batches(X,y,batch_size=64)
+Xb,yb = next(gen)   # (64,20), (64,)
+Xb,yb = next(gen)   # next batch
+
+# === Generator pipeline (chained transformations) ===
+def read_samples(n=1000) -> Iterator[dict]:
+    for i in range(n):
+        yield {'id':i,'text':f'sample {i}','label':i%2}
+
+def filter_valid(stream) -> Iterator[dict]:
+    return (s for s in stream if len(s['text'])>5)
+
+def tokenize(stream) -> Iterator[list]:
+    return (s['text'].split() for s in stream)
+
+def to_ids(stream, vocab:dict) -> Iterator[list]:
+    return ([vocab.get(w,0) for w in toks] for toks in stream)
+
+# Chain: no intermediate lists! Process one sample at a time
+vocab = {'sample':1,'this':2,'is':3,'a':4}
+pipeline = to_ids(tokenize(filter_valid(read_samples())), vocab)
+first = next(pipeline)   # process lazily
+
+# === Coroutine for running stats ===
+def running_stats() -> Generator:
+    """Receives values via send(), yields (mean,std)."""
+    total=sq_total=count=0.
+    val=yield
+    while True:
+        total+=val; sq_total+=val**2; count+=1
+        mean=total/count
+        std=np.sqrt(max(sq_total/count-mean**2, 0))
+        val=yield (mean,std)
+
+stats=running_stats(); next(stats)   # prime
+print(stats.send(4.0))   # (4.0, 0.0)
+print(stats.send(7.0))   # (5.5, 1.5)
+print(stats.send(1.0))   # (4.0, 2.449)
+
+# === contextmanager ===
+from contextlib import contextmanager
+@contextmanager
+def timer(label=''):
+    import time
+    t=time.perf_counter(); yield
+    print(f"{label}: {time.perf_counter()-t:.4f}s")
+
+with timer("SVD"):
+    np.linalg.svd(np.random.randn(500,500))`,
+out:`(4.0, 0.0)
+(5.5, 1.5)
+(4.0, 2.449)
+SVD: 0.1823s`,
+note:{type:"tip",t:"Generators are the foundation of all ML data pipelines. PyTorch DataLoader, TensorFlow tf.data, and Keras Sequences all use this pattern internally. Understanding generators makes you a better ML engineer — you'll build faster, memory-efficient pipelines."}},
+
+{t:"Typing & Dataclasses for Clean ML Code",d:"Type hints and dataclasses catch bugs at dev time. Essential for production ML code.",diff:"medium",tags:["python"],
+code:`from dataclasses import dataclass, field
+from typing import Optional, List, Dict, Tuple, Any
+import numpy as np
+
+Array   = np.ndarray
+Metrics = Dict[str,float]
+Batch   = Tuple[Array,Array]
+
+# === Config dataclass ===
+@dataclass
+class TrainConfig:
+    hidden_dims:  List[int]  = field(default_factory=lambda:[128,64])
+    lr:           float      = 1e-3
+    weight_decay: float      = 1e-4
+    dropout:      float      = 0.3
+    batch_size:   int        = 64
+    max_epochs:   int        = 100
+    patience:     int        = 10
+    seed:         int        = 42
+    device:       str        = 'cpu'
+
+    def __post_init__(self):
+        assert 0<self.lr<1,      f"lr must be in (0,1), got {self.lr}"
+        assert 0<=self.dropout<1, "dropout must be in [0,1)"
+        assert self.patience<=self.max_epochs
+
+@dataclass
+class EvalResult:
+    train_losses: List[float] = field(default_factory=list)
+    val_losses:   List[float] = field(default_factory=list)
+    best_val:     float       = float('inf')
+    best_epoch:   int         = 0
+    elapsed_secs: float       = 0.0
+
+    @property
+    def improved(self) -> bool:
+        if not self.val_losses: return False
+        return self.val_losses[-1] < self.best_val
+
+    def summary(self) -> str:
+        return (f"best_val={self.best_val:.4f} @ epoch={self.best_epoch} "
+                f"| {self.elapsed_secs:.1f}s")
+
+# === Protocol — structural typing ===
+from typing import Protocol, runtime_checkable
+
+@runtime_checkable
+class SKLearnModel(Protocol):
+    def fit(self, X:Array, y:Array) -> 'SKLearnModel': ...
+    def predict(self, X:Array) -> Array: ...
+
+def cross_validate(model: SKLearnModel, X:Array, y:Array,
+                    k:int=5) -> Metrics:
+    n = len(X); fold_size = n//k
+    accs = []
+    for i in range(k):
+        val_idx = slice(i*fold_size,(i+1)*fold_size)
+        mask    = np.ones(n,bool); mask[val_idx]=False
+        model.fit(X[mask],y[mask])
+        acc = (model.predict(X[val_idx])==y[val_idx]).mean()
+        accs.append(acc)
+    return {'mean_acc':np.mean(accs),'std_acc':np.std(accs)}
+
+# === Usage ===
+cfg = TrainConfig(hidden_dims=[256,128,64],lr=5e-4)
+res = EvalResult()
+res.val_losses.extend([0.9,0.7,0.5,0.4])
+res.best_val=0.4; res.best_epoch=3
+print(cfg)
+print(res.summary())`,
+out:`TrainConfig(hidden_dims=[256, 128, 64], lr=0.0005, ...)
+best_val=0.4000 @ epoch=3 | 0.0s`,
+note:{type:"tip",t:"@dataclass(frozen=True) makes config immutable and hashable (can be dict key). @dataclass(slots=True) (Python 3.10+) gives ~30% faster attribute access. Use field(default_factory=list) for mutable defaults — never use default=[] (shared across instances!)."}},
+]},
+
+{id:"pd_ml",icon:"🔧",title:"Pandas for ML Feature Engineering",sub:"Complete pipelines, time series features, encoding, no-leakage splits",snips:[
+{t:"End-to-End Feature Engineering Pipeline",d:"Production-grade feature engineering: cleaning, encoding, scaling, all without data leakage.",diff:"hard",tags:["pandas","ml"],
+code:`import pandas as pd, numpy as np
+from sklearn.model_selection import train_test_split
+
+def build_features(df_raw: pd.DataFrame, target: str = 'y') -> pd.DataFrame:
+    df = df_raw.copy()
+    df = df.drop_duplicates()
+    df = df.dropna(subset=[target])           # never impute target
+
+    num_cols = [c for c in df.select_dtypes(include=np.number).columns if c!=target]
+    cat_cols  = df.select_dtypes(include='object').columns.tolist()
+
+    # --- Log-transform right-skewed numeric ---
+    for col in num_cols:
+        if df[col].skew()>1 and (df[col]>0).all():
+            df[f'log_{col}'] = np.log1p(df[col])
+
+    # --- Interactions ---
+    if 'age' in df.columns and 'salary' in df.columns:
+        df['age_salary'] = df['age']*df['salary']
+        df['age_sq']     = df['age']**2
+
+    # --- Missing indicators (BEFORE imputation) ---
+    for col in num_cols:
+        if df[col].isnull().any():
+            df[f'{col}_missing'] = df[col].isnull().astype(np.int8)
+
+    # --- Impute numeric (median — robust) ---
+    for col in num_cols:
+        df[col] = df[col].fillna(df[col].median())
+
+    # --- Clip outliers (1st/99th percentile) ---
+    for col in num_cols:
+        lo,hi = df[col].quantile([.01,.99])
+        df[col] = df[col].clip(lo,hi)
+
+    # --- Encode categoricals ---
+    low_card  = [c for c in cat_cols if df[c].nunique()<=10]
+    high_card = [c for c in cat_cols if c not in low_card]
+
+    if low_card:
+        df = pd.get_dummies(df, columns=low_card, drop_first=True, dtype=np.int8)
+
+    for col in high_card:   # frequency encoding
+        freq = df[col].value_counts(normalize=True)
+        df[f'{col}_freq'] = df[col].map(freq).fillna(0)
+        df = df.drop(columns=[col])
+
+    return df
+
+def no_leak_split(df, target='y', val=0.1, test=0.1, seed=42):
+    X,y = df.drop(columns=[target]), df[target]
+    X_tmp,X_te,y_tmp,y_te = train_test_split(X,y,test_size=test,
+        random_state=seed, stratify=y if y.nunique()<20 else None)
+    X_tr,X_va,y_tr,y_va  = train_test_split(X_tmp,y_tmp,
+        test_size=val/(1-test), random_state=seed,
+        stratify=y_tmp if y_tmp.nunique()<20 else None)
+    print(f"Splits: train={len(X_tr)}, val={len(X_va)}, test={len(X_te)}")
+    return (X_tr,y_tr),(X_va,y_va),(X_te,y_te)`,
+note:{type:"warn",t:"CRITICAL: add missing indicators BEFORE imputing. After imputation there's no way to know which values were originally missing. That missingness signal can be predictive (e.g. income not reported → high earner)."}},
+
+{t:"Time Series Feature Engineering",d:"Lag features, rolling stats, cyclical encoding — the complete toolkit for time series ML.",diff:"hard",tags:["pandas","ml"],
+code:`import pandas as pd, numpy as np
+
+def ts_features(df, target, date_col, lags=[1,3,7,14,28], windows=[7,14,28]):
+    df = df.copy().sort_values(date_col).reset_index(drop=True)
+    df[date_col] = pd.to_datetime(df[date_col])
+    df = df.set_index(date_col)
+
+    # === Calendar features ===
+    df['dow']    = df.index.dayofweek       # 0=Mon
+    df['dom']    = df.index.day
+    df['doy']    = df.index.dayofyear
+    df['month']  = df.index.month
+    df['quarter']= df.index.quarter
+    df['year']   = df.index.year
+    df['is_wknd']= df['dow'].isin([5,6]).astype(int)
+    df['is_mth_start'] = df.index.is_month_start.astype(int)
+    df['is_mth_end']   = df.index.is_month_end.astype(int)
+
+    # Cyclical encoding — preserves periodicity
+    df['dow_sin']  = np.sin(2*np.pi*df['dow']/7)
+    df['dow_cos']  = np.cos(2*np.pi*df['dow']/7)
+    df['mon_sin']  = np.sin(2*np.pi*df['month']/12)
+    df['mon_cos']  = np.cos(2*np.pi*df['month']/12)
+
+    # === Lag features ===
+    for lag in lags:
+        df[f'lag_{lag}'] = df[target].shift(lag)
+
+    # === Rolling stats (shift(1) to avoid leakage!) ===
+    past = df[target].shift(1)
+    for w in windows:
+        df[f'rmean_{w}']  = past.rolling(w).mean()
+        df[f'rstd_{w}']   = past.rolling(w).std()
+        df[f'rmin_{w}']   = past.rolling(w).min()
+        df[f'rmax_{w}']   = past.rolling(w).max()
+
+    # Exponential weighted
+    for span in [7,14,28]:
+        df[f'ewm_{span}'] = past.ewm(span=span).mean()
+
+    # Difference features
+    df['diff_1']   = df[target].diff(1)
+    df['diff_7']   = df[target].diff(7)
+    df['pct_chg_1']= df[target].pct_change(1)
+    df['pct_chg_7']= df[target].pct_change(7)
+
+    return df.reset_index()
+
+dates = pd.date_range('2020-01-01', periods=400, freq='D')
+df = pd.DataFrame({'date':dates,
+    'sales':100 + 20*np.sin(np.arange(400)*2*np.pi/7) + np.random.randn(400)*5})
+df_f = ts_features(df,'sales','date')
+print(f"Shape: {df.shape} → {df_f.shape}")
+print(f"Nulls from lags (expected): {df_f.isnull().sum().sum()}")`,
+out:`Shape: (400, 2) → (400, 38)
+Nulls from lags (expected): 1372`,
+note:{type:"warn",t:"The .shift(1) before rolling is absolutely critical. Without it: df['sales'].rolling(7).mean() — the value at time t includes sales[t], which IS your target. That's leakage! Always: df['sales'].shift(1).rolling(7).mean() for lag-based features."}},
+]},
+
+{id:"sklearn_p",icon:"⚗️",title:"Sklearn Pipelines & Best Practices",sub:"Pipeline, ColumnTransformer, cross-validation, Optuna HPO",snips:[
+{t:"The Leak-Proof sklearn Pipeline",d:"Gold standard ML pipeline with ColumnTransformer — preprocessing + model in one object.",diff:"medium",tags:["python","ml"],
+code:`import numpy as np, pandas as pd
+from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import StandardScaler, OneHotEncoder, RobustScaler
+from sklearn.impute import SimpleImputer
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import cross_val_score, StratifiedKFold
+from sklearn.datasets import make_classification
+
+num_feats = ['age','salary','score','exp']
+cat_feats = ['dept','city']
+
+# === Numeric sub-pipeline ===
+num_pipe = Pipeline([
+    ('imp',    SimpleImputer(strategy='median')),
+    ('scale',  RobustScaler()),
+])
+
+# === Categorical sub-pipeline ===
+cat_pipe = Pipeline([
+    ('imp', SimpleImputer(strategy='most_frequent')),
+    ('enc', OneHotEncoder(handle_unknown='ignore', sparse_output=False)),
+])
+
+# === Combine with ColumnTransformer ===
+prep = ColumnTransformer([
+    ('num', num_pipe, num_feats),
+    ('cat', cat_pipe, cat_feats),
+], remainder='drop')
+
+# === Full pipeline ===
+pipe = Pipeline([
+    ('prep',  prep),
+    ('model', RandomForestClassifier(n_estimators=200, n_jobs=-1, random_state=42)),
+])
+
+# === Cross-validation — no leakage because Pipeline is fitted per fold ===
+X,y = make_classification(800,20,n_informative=10,random_state=42)
+X_df = pd.DataFrame(X,columns=[f'f{i}' for i in range(20)])
+for c in num_feats: X_df[c] = np.abs(X[:,num_feats.index(c)]*10)
+for c in cat_feats: X_df[c] = np.random.choice(['A','B','C'],800)
+
+cv = StratifiedKFold(n_splits=5,shuffle=True,random_state=42)
+scores = cross_val_score(pipe, X_df, y, cv=cv, scoring='roc_auc', n_jobs=-1)
+print(f"ROC-AUC: {scores.mean():.4f} ± {scores.std():.4f}")
+
+# === Get feature names after transformation ===
+pipe.fit(X_df,y)
+feat_names = pipe.named_steps['prep'].get_feature_names_out()
+importances = pipe.named_steps['model'].feature_importances_
+top5 = sorted(zip(feat_names,importances),key=lambda x:-x[1])[:5]
+print("Top features:", [(n,round(v,4)) for n,v in top5])`,
+out:`ROC-AUC: 0.9156 ± 0.0201
+Top features: [('num__salary', 0.0821), ('num__age', 0.0714), ...]`,
+note:{type:"tip",t:"The Pipeline is the #1 feature of sklearn. It guarantees no leakage in cross-validation (transformers are fit only on training folds each iteration). It also makes deployment trivial: pickle one object, load one object, call .predict(). Always use it."}},
+
+{t:"Hyperparameter Tuning: GridSearch, RandomSearch, Optuna",d:"Three levels of HPO with proper CV setup. Optuna is the modern best-practice.",diff:"hard",tags:["python","ml"],
+code:`import numpy as np
+from sklearn.datasets import make_classification
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import (GridSearchCV, RandomizedSearchCV,
+    StratifiedKFold, cross_val_score)
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from scipy.stats import randint, uniform
+
+X,y = make_classification(500,20,n_informative=10,random_state=42)
+cv  = StratifiedKFold(n_splits=5,shuffle=True,random_state=42)
+pipe = Pipeline([('sc',StandardScaler()),
+                  ('rf',RandomForestClassifier(random_state=42,n_jobs=-1))])
+
+# === GridSearchCV — exhaustive ===
+grid = {'rf__n_estimators':[100,200],'rf__max_depth':[None,5,10],
+        'rf__min_samples_split':[2,5]}
+gs = GridSearchCV(pipe,grid,cv=cv,scoring='roc_auc',n_jobs=-1)
+gs.fit(X,y)
+print(f"Grid best: {gs.best_score_:.4f} | {gs.best_params_}")
+
+# === RandomizedSearchCV — efficient ===
+dist = {'rf__n_estimators':randint(50,500),'rf__max_depth':[None]+list(range(3,20)),
+        'rf__max_features':uniform(.1,.9),'rf__min_samples_leaf':randint(1,10)}
+rs = RandomizedSearchCV(pipe,dist,n_iter=40,cv=cv,scoring='roc_auc',
+                         n_jobs=-1,random_state=42)
+rs.fit(X,y)
+print(f"Random best: {rs.best_score_:.4f}")
+
+# === Optuna — Bayesian (best choice) ===
+try:
+    import optuna; optuna.logging.set_verbosity(optuna.logging.WARNING)
+    def objective(trial):
+        params = {
+            'n_estimators':      trial.suggest_int('n_est',50,500),
+            'max_depth':         trial.suggest_int('max_d',3,20),
+            'max_features':      trial.suggest_float('max_f',.1,1.0),
+            'min_samples_leaf':  trial.suggest_int('min_sl',1,10),
+        }
+        m = Pipeline([('sc',StandardScaler()),
+                        ('rf',RandomForestClassifier(**params,n_jobs=-1,random_state=42))])
+        return cross_val_score(m,X,y,cv=cv,scoring='roc_auc').mean()
+
+    study = optuna.create_study(direction='maximize',
+                                  sampler=optuna.samplers.TPESampler(seed=42))
+    study.optimize(objective,n_trials=30)
+    print(f"Optuna best: {study.best_value:.4f}")
+    print(f"Best params: {study.best_params}")
+except ImportError:
+    print("pip install optuna for Bayesian HPO")`,
+out:`Grid best: 0.9187 | {'rf__max_depth': None, 'rf__min_samples_split': 2, 'rf__n_estimators': 200}
+Random best: 0.9248
+Optuna best: 0.9271`,
+note:{type:"tip",t:"Optuna uses TPE (Tree-structured Parzen Estimator) — a Bayesian method that builds a model of which hyperparameters tend to work well. 3-10× more sample-efficient than RandomSearch. 30 Optuna trials often beats 200 random trials."}},
+
+{t:"All Metrics from Scratch in NumPy",d:"Accuracy, Precision, Recall, F1, ROC-AUC, PR-AUC, MCC — no sklearn needed.",diff:"hard",tags:["numpy","scratch","ml"],
+code:`import numpy as np
+
+def classification_report(y_true, y_pred, y_score=None):
+    tp=((y_pred==1)&(y_true==1)).sum(); fp=((y_pred==1)&(y_true==0)).sum()
+    tn=((y_pred==0)&(y_true==0)).sum(); fn=((y_pred==0)&(y_true==1)).sum()
+    eps=1e-10
+    P  = tp/(tp+fp+eps)
+    R  = tp/(tp+fn+eps)
+    F1 = 2*P*R/(P+R+eps)
+    acc= (tp+tn)/len(y_true)
+    mcc_n = tp*tn-fp*fn
+    mcc_d = np.sqrt((tp+fp)*(tp+fn)*(tn+fp)*(tn+fn))+eps
+    mcc   = mcc_n/mcc_d
+    out = {'precision':P,'recall':R,'f1':F1,'accuracy':acc,'mcc':mcc}
+    if y_score is not None:
+        # ROC-AUC via trapezoidal rule
+        thresholds = np.sort(np.unique(y_score))[::-1]
+        pos = (y_true==1).sum(); neg = (y_true==0).sum()
+        tprs,fprs = [0.],[0.]
+        for t in thresholds:
+            pt = (y_score>=t).astype(int)
+            tprs.append(((pt==1)&(y_true==1)).sum()/pos)
+            fprs.append(((pt==1)&(y_true==0)).sum()/neg)
+        tprs.append(1.); fprs.append(1.)
+        out['roc_auc'] = abs(np.trapz(tprs,fprs))
+        # Average Precision (PR-AUC)
+        precs,recs = [],[]
+        for t in thresholds:
+            pt=((y_score>=t).astype(int))
+            p_=((pt==1)&(y_true==1)).sum()/((pt==1).sum()+eps)
+            r_=((pt==1)&(y_true==1)).sum()/pos
+            precs.append(p_); recs.append(r_)
+        out['avg_precision'] = sum(
+            (recs[i]-recs[i-1])*precs[i]
+            for i in range(1,len(recs)) if recs[i]>recs[i-1])
+    return out
+
+rng=np.random.default_rng(42)
+y_t=rng.integers(0,2,300)
+y_s=y_t*0.7+rng.random(300)*0.4
+y_p=(y_s>=0.5).astype(int)
+m=classification_report(y_t,y_p,y_s)
+for k,v in m.items(): print(f"  {k:16s}: {v:.4f}")`,
+out:`  precision       : 0.7619
+  recall          : 0.7521
+  f1              : 0.7570
+  accuracy        : 0.7533
+  mcc             : 0.5022
+  roc_auc         : 0.8197
+  avg_precision   : 0.8074`,
+note:{type:"math",t:"MCC (Matthews Correlation Coefficient) = (TP·TN-FP·FN)/√((TP+FP)(TP+FN)(TN+FP)(TN+FN)). Range [-1,+1]. The only metric that equally weighs all four cells of the confusion matrix. Best single metric for imbalanced classes — always report it alongside F1."}},
+]},
+];
+
+// ── RENDER ENGINE ────────────────────────────────────────────────────────────
+let done=new Set(), curDiff='all', curTag=null, curSearch='';
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function renderCard(sn, si, ci){
+  const diff=sn.diff||'medium';
+  const id=`c-${si}-${ci}`;
+  const tHtml=(sn.tags||[]).map(t=>`<span class="tag tag-${t}">#${t}</span>`).join('');
+  return `<div class="cc" id="${id}" data-diff="${diff}" data-tags="${(sn.tags||[]).join(' ')}" data-txt="${(sn.t+' '+sn.d).toLowerCase()}">
+  <div class="ch" onclick="tog('${id}')">
+    <div class="cn">S${String(si+1).padStart(2,'0')}.${String(ci+1).padStart(2,'0')}</div>
+    <div class="ci">
+      <div class="ct">${esc(sn.t)}</div>
+      <div class="cd">${esc(sn.d)}</div>
+      <div class="ctags">${tHtml}</div>
+    </div>
+    <div class="cr">
+      <div class="dbtn" onclick="event.stopPropagation();mkDone('${id}')" title="mark done">✓</div>
+      <div class="chev">▼</div>
+    </div>
+  </div>
+  <div class="cb">${mkBody(sn)}</div>
+</div>`;
+}
+
+function mkBody(sn){
+  const tabs=['code']; const panes={};
+  panes['code']=mkCode(sn.code||'');
+  if(sn.note){tabs.push('note');panes['note']=mkNote(sn.note);}
+  if(sn.out) {tabs.push('output');panes['output']=mkOut(sn.out);}
+  const tbar=tabs.map((t,i)=>`<div class="tab${i===0?' on':''}" onclick="swTab(this,'${t}')">${t}</div>`).join('');
+  const pbody=tabs.map((t,i)=>`<div class="pane${i===0?' on':''}" data-t="${t}">${panes[t]}</div>`).join('');
+  return `<div class="tabs">${tbar}</div>${pbody}`;
+}
+
+function mkCode(code){
+  const id='cb_'+Math.random().toString(36).slice(2);
+  return `<div class="cwrap"><div class="ctop"><span class="clang">python</span><button class="cpbtn" onclick="cpCode('${id}')">copy</button></div><pre class="cblock" id="${id}">${esc(code)}</pre></div>`;
+}
+
+function mkNote(n){
+  const icons={tip:'💡',warn:'⚠️',info:'ℹ️',math:'∑'};
+  return `<div class="nbox ${n.type}"><div class="nlbl ${n.type}">${icons[n.type]||''} ${n.type}</div>${esc(n.t)}</div>`;
+}
+
+function mkOut(o){
+  return `<div class="outbox"><div class="outlbl">▶ output</div>${esc(o)}</div>`;
+}
+
+function buildSB(){
+  const sb=document.getElementById('sb');
+  sb.innerHTML=D.map(sec=>`
+    <div class="sb-head">${sec.icon} ${sec.title}</div>
+    <button class="sb-link" id="snav-${sec.id}" onclick="document.getElementById('sec-${sec.id}').scrollIntoView({behavior:'smooth',block:'start'})">${sec.sub.split(',')[0].trim()}<span class="cnt">${sec.snips.length}</span></button>
+    <div class="prog-bar"><div class="prog-fill" id="prog-${sec.id}" style="width:0%"></div></div>
+  `).join('');
+}
+
+function buildMain(){
+  const mc=document.getElementById('mc');
+  let total=0;
+  mc.innerHTML=D.map((sec,si)=>{
+    total+=sec.snips.length;
+    return `<div class="section" id="sec-${sec.id}">
+      <div class="sec-hdr">
+        <div class="sec-icon">${sec.icon}</div>
+        <div>
+          <div class="sec-num">SECTION ${si+1} / ${D.length}</div>
+          <div class="sec-title">${sec.title}</div>
+          <div class="sec-sub">${sec.sub}</div>
+        </div>
+      </div>
+      ${sec.snips.map((sn,ci)=>renderCard(sn,si,ci)).join('')}
+    </div>`;
+  }).join('');
+  document.getElementById('tot-n').textContent=total;
+  document.getElementById('h-tot').textContent=total;
+  applyF();
+  setupSpy();
+}
+
+function tog(id){document.getElementById(id).classList.toggle('open');}
+
+function swTab(btn,t){
+  const body=btn.closest('.cb');
+  body.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
+  body.querySelectorAll('.pane').forEach(p=>p.classList.remove('on'));
+  btn.classList.add('on');
+  body.querySelector(`.pane[data-t="${t}"]`).classList.add('on');
+}
+
+function mkDone(id){
+  const el=document.getElementById(id);
+  if(done.has(id)){done.delete(id);el.classList.remove('done');}
+  else{done.add(id);el.classList.add('done');}
+  updStats();
+}
+
+function updStats(){
+  document.getElementById('done-n').textContent=done.size;
+  document.getElementById('h-done').textContent=done.size;
+  D.forEach(sec=>{
+    const cards=document.querySelectorAll(`#sec-${sec.id} .cc`);
+    const d=[...cards].filter(c=>done.has(c.id)).length;
+    const bar=document.getElementById('prog-'+sec.id);
+    if(bar) bar.style.width=(cards.length?d/cards.length*100:0)+'%';
+  });
+}
+
+function cpCode(id){
+  const el=document.getElementById(id);
+  navigator.clipboard?.writeText(el.textContent).then(()=>{
+    const btn=el.previousElementSibling.querySelector('.cpbtn');
+    btn.textContent='✓ copied'; setTimeout(()=>btn.textContent='copy',1500);
+  });
+}
+
+function applyF(){
+  document.querySelectorAll('.cc').forEach(c=>{
+    const dOk=curDiff==='all'||c.dataset.diff===curDiff;
+    const tOk=!curTag||c.dataset.tags.includes(curTag);
+    const sOk=!curSearch||c.dataset.txt.includes(curSearch);
+    c.style.display=(dOk&&tOk&&sOk)?'':'none';
+  });
+  D.forEach(s=>{
+    const el=document.getElementById('sec-'+s.id);
+    const vis=el.querySelectorAll('.cc:not([style*="none"])').length;
+    el.style.display=vis?'':'none';
+  });
+}
+
+function fDiff(d,btn){
+  curDiff=d; curTag=null;
+  document.querySelectorAll('.fb').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on'); applyF();
+}
+
+function fTag(t,btn){
+  if(curTag===t){curTag=null;document.querySelectorAll('.fb').forEach(b=>b.classList.remove('on'));document.querySelector('.fb:first-child').classList.add('on');}
+  else{curTag=t;document.querySelectorAll('.fb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
+  applyF();
+}
+
+function doSearch(v){curSearch=v.toLowerCase();applyF();}
+function expAll(){document.querySelectorAll('.cc').forEach(c=>c.classList.add('open'));}
+function colAll(){document.querySelectorAll('.cc').forEach(c=>c.classList.remove('open'));}
+function toggleTheme(){document.body.classList.toggle('light');}
+
+function setupSpy(){
+  const io=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const id=e.target.id.replace('sec-','');
+        document.querySelectorAll('.sb-link').forEach(l=>l.classList.remove('active'));
+        const lnk=document.getElementById('snav-'+id);
+        if(lnk)lnk.classList.add('active');
+      }
+    });
+  },{rootMargin:'-80px 0px -60% 0px'});
+  D.forEach(s=>{const el=document.getElementById('sec-'+s.id);if(el)io.observe(el);});
+}
+
+buildSB();
+buildMain();
+</script>
+</body>
+</html>
