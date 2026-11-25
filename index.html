@@ -341,7 +341,7 @@ document.querySelectorAll('[data-n]').forEach(el=>io.observe(el));
 (function(){
 const H=document.documentElement,rm=matchMedia('(prefers-reduced-motion:reduce)').matches,fine=matchMedia('(hover:hover) and (pointer:fine)').matches;
 document.querySelectorAll('h1 b').forEach((b,i)=>b.style.setProperty('--i',i));
-const words=['Supervised Learning','Unsupervised Learning','Feature Engineering','PyTorch','Neural Networks','Sequential Models','NLP','Transformers','RAG','Advanced LLMs','Interview Q&A'];
+const words=['Supervised Learning','Unsupervised Learning','Feature Engineering','PyTorch','Neural Networks','Sequential Models','NLP','Transformers','RAG','Advanced LLMs','MLOps & Serving','ML System Design','Interview Q&A'];
 const row=c=>`<div class="mq-t ${c}">${[0,1].map(()=>words.map(w=>`<span>${w.replace('&','&amp;')}<i>✦</i></span>`).join('')).join('')}</div>`;
 document.getElementById('mq').innerHTML=row('a')+row('b');
 function scramble(el){if(rm)return;const f=el.textContent,ch='01<>/{}=+*#',t0=performance.now();
