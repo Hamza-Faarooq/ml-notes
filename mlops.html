@@ -1,1 +1,911 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MLOps & ML System Design — CDC ML Prep</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,700&family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});"></script>
+<style>
+:root{--accent:#2dd4bf;--accent2:#ff8a4c;--accent3:#9b6bff;--warn:#ff6b6b;--gold:#fbbf24;--green:#34d399;--bg:#070b12;--card:rgba(18,26,40,.76);--solid:#0f1726;--codebg:#0a101c;--border:rgba(148,174,210,.16);--text:#eef3fa;--muted:#9aa9bf;--glow:rgba(45,212,191,.14);--shadow:0 18px 50px rgba(0,0,0,.35);--serif:'Playfair Display',Georgia,serif;--sans:'DM Sans',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+html[data-theme="light"]{--accent:#0d9488;--accent2:#d95f18;--accent3:#6d3fe0;--warn:#d63a3a;--gold:#b7791f;--green:#0f9f6e;--bg:#f6f8fc;--card:rgba(255,255,255,.88);--solid:#fff;--codebg:#f1f5f9;--border:rgba(40,70,110,.15);--text:#0e1a2c;--muted:#475569;--glow:rgba(13,148,136,.12);--shadow:0 16px 40px rgba(60,90,130,.12)}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{background:var(--bg);color:var(--text);font:16px/1.75 var(--sans);overflow-x:hidden;transition:background .4s,color .3s}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(900px 500px at 10% -5%,var(--glow),transparent 65%),radial-gradient(700px 500px at 100% 45%,rgba(155,107,255,.1),transparent 65%)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:8px}
+.prog{position:fixed;top:0;left:0;width:100%;height:3px;z-index:120;transform-origin:0 50%;transform:scaleX(0);background:linear-gradient(90deg,var(--accent),var(--accent3),#ff5d9e)}
+nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);background:color-mix(in srgb,var(--bg) 78%,transparent);border-bottom:1px solid var(--border)}
+.nav-in{max-width:1240px;margin:auto;padding:12px 28px;display:flex;justify-content:space-between;align-items:center;gap:14px}
+.back{color:var(--muted);text-decoration:none;font-size:14px;padding:7px 12px;border-radius:10px;transition:.2s}.back:hover{color:var(--text);background:var(--border)}
+.brand{font-family:var(--serif);font-weight:700;letter-spacing:.01em}
+.tbtn{background:var(--card);border:1px solid var(--border);color:var(--text);padding:7px 12px;border-radius:12px;cursor:pointer;display:flex;align-items:center;gap:8px;font:500 11.5px var(--mono);transition:.25s}.tbtn:hover{border-color:var(--accent)}
+.tbtn svg{width:14px;height:14px;fill:currentColor}
+.hero{position:relative;z-index:1;max-width:980px;margin:auto;padding:76px 28px 36px;text-align:center}
+.badge{display:inline-block;border:1px solid var(--border);background:var(--card);color:var(--accent);font:500 12px var(--mono);padding:7px 16px;border-radius:99px;margin-bottom:24px}
+h1{font-family:var(--serif);font-size:clamp(36px,6.5vw,72px);font-weight:900;line-height:1.08;letter-spacing:-.02em}
+h1 em{font-style:italic;background:linear-gradient(120deg,var(--accent),var(--accent3));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;padding-right:.08em}
+.sub{margin:20px auto 0;max-width:720px;color:var(--muted);font-size:17.5px}
+.chain{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:32px}
+.chain span{font:500 12px var(--mono);padding:7px 13px;border-radius:99px;border:1px solid var(--border);background:var(--card)}
+.chain span:not(:last-child)::after{content:'→';margin-left:10px;color:var(--accent)}
+.layout{position:relative;z-index:1;max-width:1240px;margin:28px auto 0;padding:0 28px 80px;display:grid;grid-template-columns:235px 1fr;gap:38px}
+.toc{position:sticky;top:84px;align-self:start;display:flex;flex-direction:column;gap:3px;border-left:1px solid var(--border);max-height:calc(100vh - 110px);overflow-y:auto}
+.toc a{color:var(--muted);text-decoration:none;font-size:13.2px;padding:6px 14px;margin-left:-1px;border-left:2px solid transparent;transition:.2s;line-height:1.35}
+.toc a:hover,.toc a.on{color:var(--accent);border-left-color:var(--accent);background:color-mix(in srgb,var(--accent) 5%,transparent)}
+section{margin-bottom:32px;padding:38px;border-radius:24px;background:var(--card);border:1px solid var(--border);box-shadow:var(--shadow);backdrop-filter:blur(10px);position:relative;overflow:hidden}
+section::before{content:'';position:absolute;left:38px;top:0;width:64px;height:3px;border-radius:0 0 4px 4px;background:linear-gradient(90deg,var(--accent),var(--accent3))}
+h2{font-family:var(--serif);font-size:clamp(26px,3.5vw,35px);line-height:1.2;margin-bottom:6px}
+.tag{font:500 12px var(--mono);color:var(--accent);margin-bottom:20px;display:block}
+h3{font-family:var(--serif);font-size:21px;margin:28px 0 10px;color:var(--text)}
+h4{font-family:var(--serif);font-size:17px;margin-bottom:6px;color:var(--text)}
+p{color:var(--muted);margin-bottom:13px}p b,li b,td b{color:var(--text)}
+ul,ol{margin:0 0 14px 22px;color:var(--muted)}li{margin-bottom:7px}
+code{font:13px var(--mono);background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent);padding:2px 7px;border-radius:6px}
+pre.code-block{background:var(--codebg);border:1px solid var(--border);border-radius:16px;padding:18px 20px;margin:16px 0;overflow-x:auto;font:13px/1.65 var(--mono);color:var(--text)}
+pre.code-block .cm{color:var(--muted);font-style:italic}
+pre.code-block .kw{color:var(--accent3);font-weight:600}
+pre.code-block .st{color:var(--green)}
+pre.code-block .num{color:var(--gold)}
+.eq{padding:16px 20px;margin:16px 0;border-radius:14px;background:color-mix(in srgb,var(--accent3) 8%,transparent);border:1px solid color-mix(in srgb,var(--accent3) 26%,transparent);overflow-x:auto;color:var(--text);text-align:center}
+.eq-note{font:12.5px var(--mono);color:var(--muted);margin-top:8px;display:block}
+.katex{font-size:1.06em}
+.tw{overflow-x:auto;margin:16px 0;border-radius:14px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:560px}
+th,td{text-align:left;padding:12px 15px;border-bottom:1px solid var(--border);vertical-align:top}
+tr:last-child td{border-bottom:none}
+th{font:600 12px var(--mono);color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,transparent);text-transform:uppercase;letter-spacing:.03em}
+td{color:var(--muted)}td:first-child{color:var(--text);font-weight:600}
+.trap,.tip,.intuition{padding:15px 19px;border-radius:14px;margin:18px 0;font-size:14.5px;color:var(--muted);border:1px solid}
+.trap{border-color:color-mix(in srgb,var(--warn) 45%,transparent);background:color-mix(in srgb,var(--warn) 8%,transparent)}
+.tip{border-color:color-mix(in srgb,var(--green) 45%,transparent);background:color-mix(in srgb,var(--green) 8%,transparent)}
+.intuition{border-color:color-mix(in srgb,var(--accent3) 45%,transparent);background:color-mix(in srgb,var(--accent3) 8%,transparent)}
+.trap b:first-child{color:var(--warn)}.tip b:first-child{color:var(--green)}.intuition b:first-child{color:var(--accent3)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin:16px 0}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin:16px 0}
+.mini{padding:18px;border-radius:16px;border:1px solid var(--border);background:color-mix(in srgb,var(--text) 3%,transparent)}
+.mini p{font-size:14px;margin:0}
+.diagram-wrap{margin:20px 0;padding:20px;border-radius:18px;border:1px solid var(--border);background:var(--solid);overflow-x:auto}
+.diagram-cap{font:12.5px var(--mono);color:var(--muted);text-align:center;margin-top:10px}
+.demo{margin:20px 0;padding:24px;border-radius:18px;border:1px solid var(--border);background:var(--solid)}
+.demo-title{font:600 13px var(--mono);color:var(--accent);text-transform:uppercase;letter-spacing:.04em;margin-bottom:14px;display:block}
+.ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px;margin-bottom:14px}
+.ctl label{font:500 12.5px var(--mono);color:var(--muted);display:flex;justify-content:space-between;margin-bottom:4px}.ctl label b{color:var(--accent)}
+input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
+svg.plot{width:100%;height:auto;display:block}
+.out{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:12px;margin-top:14px}
+.out div{padding:12px 14px;border-radius:14px;border:1px solid var(--border);text-align:center;background:color-mix(in srgb,var(--text) 2%,transparent)}
+.out b{display:block;font:900 22px var(--serif);color:var(--accent)}.out small{font:11.5px var(--mono);color:var(--muted)}
+.quiz-box{margin:24px 0 6px;padding:20px 22px;border-radius:18px;border:1px dashed color-mix(in srgb,var(--gold) 55%,transparent);background:color-mix(in srgb,var(--gold) 6%,transparent)}
+.quiz-hdr{font:600 12px var(--mono);color:var(--gold);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;display:block}
+.quiz-q{color:var(--text);font-weight:600;margin-bottom:12px;font-size:15.5px}
+.quiz-opts{display:grid;gap:8px}
+.q-opt{text-align:left;padding:11px 15px;border-radius:12px;border:1px solid var(--border);background:var(--solid);color:var(--muted);font:14.5px var(--sans);cursor:pointer;transition:.2s}
+.q-opt:hover{border-color:var(--accent);color:var(--text)}
+.q-opt.correct{border-color:var(--green);background:color-mix(in srgb,var(--green) 14%,transparent);color:var(--text);font-weight:500}
+.q-opt.wrong{border-color:var(--warn);background:color-mix(in srgb,var(--warn) 14%,transparent);color:var(--text)}
+.quiz-exp{display:none;margin-top:12px;padding:12px 14px;border-radius:12px;background:var(--solid);border-left:3px solid var(--accent);font-size:14px;color:var(--muted)}
+.quiz-exp.show{display:block}
+details{border:1px solid var(--border);border-radius:14px;margin-bottom:10px;background:color-mix(in srgb,var(--text) 3%,transparent);transition:border-color .25s}
+details[open]{border-color:var(--accent)}
+summary{cursor:pointer;padding:15px 20px;font-weight:600;list-style:none;display:flex;gap:12px;align-items:flex-start}
+summary::-webkit-details-marker{display:none}
+summary::before{content:'Q';font:600 12px var(--mono);color:#04101a;background:var(--accent);border-radius:8px;padding:2px 8px;margin-top:3px;flex-shrink:0}
+details>div{padding:0 20px 18px 56px;color:var(--muted);font-size:15px;line-height:1.7}
+footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:34px;text-align:center;font:13px var(--mono);color:var(--muted)}
+footer a{color:var(--accent);text-decoration:none}
+@media(max-width:920px){.layout{grid-template-columns:1fr}.toc{display:none}section{padding:26px 20px}section::before{left:20px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="prog" id="prog"></div>
+<nav><div class="nav-in">
+  <a class="back" href="index.html">← All modules</a><span class="brand">CDC ML Prep</span>
+  <button class="tbtn" id="tt" aria-label="Toggle theme"><svg id="ti" viewBox="0 0 24 24"></svg><span id="tx">Theme</span></button>
+</div></nav>
 
+<header class="hero">
+  <div class="badge">Module 11 · Comprehensive MLOps &amp; ML System Design</div>
+  <h1>From notebook to <em>production</em></h1>
+  <p class="sub">A first-principles guide to shipping, scaling, monitoring, and designing real-world machine learning systems — built for novices who want senior-level intuition, exact math, and architectural fluency.</p>
+  <div class="chain"><span>Data &amp; Features</span><span>Reproducible Train</span><span>Package</span><span>Serve &amp; Scale</span><span>CI/CD/CT</span><span>Safe Rollout</span><span>Drift &amp; Retrain</span></div>
+</header>
+
+<div class="layout">
+<aside class="toc" id="toc">
+  <a href="#s1">1. Why Production ML Fails</a>
+  <a href="#s2">2. Data &amp; Feature Stores</a>
+  <a href="#s3">3. Packaging &amp; Reproducibility</a>
+  <a href="#s4">4. Serving, Math &amp; Latency</a>
+  <a href="#s5">5. CI/CD/CT &amp; ML Testing</a>
+  <a href="#s6">6. Safe Rollout Strategies</a>
+  <a href="#s7">7. Drift &amp; Statistical Math</a>
+  <a href="#s8">8. ML System Design Playbook</a>
+  <a href="#s9">9. Interview Q&amp;A (16 Deep)</a>
+</aside>
+
+<main>
+
+<!-- ==================== SECTION 1 ==================== -->
+<section id="s1">
+<h2>1. The ML Lifecycle &amp; Why Production ML Fails</h2>
+<span class="tag">// mental model: code + data + model = three moving targets</span>
+
+<p>If you have only ever trained models inside Jupyter Notebooks or Google Colab, your world looks clean: you load a static CSV, run <code>model.fit(X_train, y_train)</code>, check validation accuracy, and celebrate. <b>Production ML is a completely different sport.</b></p>
+
+<p>In traditional Software Engineering (SWE), if you push a bug, the server throws a <code>500 Internal Server Error</code>, alerts fire immediately, and engineers fix it. In Machine Learning, your code can be 100% bug-free, return HTTP <code>200 OK</code> in 12 milliseconds, and still silently bleed crores of rupees because an upstream engineer changed a currency column from rupees to paise, or user behavior shifted during a festival sale.</p>
+
+<div class="intuition">
+<b>The Core Rule of MLOps:</b> Traditional software is just <b>Code</b>. An ML system is <b>Code + Data + Trained Weights</b>. Changing any one of the three changes system behavior—and Data changes every single second without anyone opening a pull request.
+</div>
+
+<h3>Hidden Technical Debt in ML Systems</h3>
+<p>In a famous Google paper (<i>Sculley et al., NeurIPS 2015</i>), engineers showed that the actual ML modeling code (PyTorch, XGBoost, scikit-learn) makes up less than <b>5%</b> of a real production system. The remaining 95% is data ingestion, validation, feature extraction, serving infrastructure, and monitoring.</p>
+
+<div class="diagram-wrap">
+<svg viewBox="0 0 760 220" style="width:100%;height:auto;display:block" role="img" aria-label="Hidden technical debt in ML systems">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,1 L10,5 L0,9 z" fill="var(--accent)"/>
+    </marker>
+  </defs>
+  <!-- Surrounding infra boxes -->
+  <rect x="10" y="15" width="130" height="58" rx="10" fill="rgba(45,212,191,.10)" stroke="var(--accent)" stroke-width="1.3"/>
+  <text x="75" y="40" text-anchor="middle" fill="var(--text)" font-size="12" font-family="monospace" font-weight="600">Data Collection</text>
+  <text x="75" y="57" text-anchor="middle" fill="var(--muted)" font-size="10" font-family="sans-serif">Kafka, Logs, DBs</text>
+
+  <rect x="155" y="15" width="135" height="58" rx="10" fill="rgba(45,212,191,.10)" stroke="var(--accent)" stroke-width="1.3"/>
+  <text x="222" y="40" text-anchor="middle" fill="var(--text)" font-size="12" font-family="monospace" font-weight="600">Data Validation</text>
+  <text x="222" y="57" text-anchor="middle" fill="var(--muted)" font-size="10" font-family="sans-serif">Schemas, Nulls, Drift</text>
+
+  <rect x="305" y="15" width="145" height="58" rx="10" fill="rgba(155,107,255,.12)" stroke="var(--accent3)" stroke-width="1.3"/>
+  <text x="377" y="40" text-anchor="middle" fill="var(--text)" font-size="12" font-family="monospace" font-weight="600">Feature Pipeline</text>
+  <text x="377" y="57" text-anchor="middle" fill="var(--muted)" font-size="10" font-family="sans-serif">Offline &amp; Online Store</text>
+
+  <rect x="465" y="15" width="135" height="58" rx="10" fill="rgba(45,212,191,.10)" stroke="var(--accent)" stroke-width="1.3"/>
+  <text x="532" y="40" text-anchor="middle" fill="var(--text)" font-size="12" font-family="monospace" font-weight="600">Serving Infra</text>
+  <text x="532" y="57" text-anchor="middle" fill="var(--muted)" font-size="10" font-family="sans-serif">FastAPI, Triton, K8s</text>
+
+  <rect x="615" y="15" width="135" height="58" rx="10" fill="rgba(255,107,107,.10)" stroke="var(--warn)" stroke-width="1.3"/>
+  <text x="682" y="40" text-anchor="middle" fill="var(--text)" font-size="12" font-family="monospace" font-weight="600">Monitoring</text>
+  <text x="682" y="57" text-anchor="middle" fill="var(--muted)" font-size="10" font-family="sans-serif">PSI, KS, Latency, SLA</text>
+
+  <!-- Tiny ML Code box in center -->
+  <rect x="325" y="92" width="110" height="44" rx="8" fill="var(--accent)" opacity="0.92"/>
+  <text x="380" y="118" text-anchor="middle" fill="#04101a" font-size="13" font-family="monospace" font-weight="700">ML Code (5%)</text>
+
+  <!-- Bottom glue boxes -->
+  <rect x="10" y="152" width="175" height="52" rx="10" fill="rgba(148,174,210,.08)" stroke="var(--border)"/>
+  <text x="97" y="175" text-anchor="middle" fill="var(--text)" font-size="11.5" font-family="monospace">Configuration &amp; Secrets</text>
+  <text x="97" y="191" text-anchor="middle" fill="var(--muted)" font-size="10" font-family="sans-serif">Hyperparams, Feature Flags</text>
+
+  <rect x="200" y="152" width="175" height="52" rx="10" fill="rgba(148,174,210,.08)" stroke="var(--border)"/>
+  <text x="287" y="175" text-anchor="middle" fill="var(--text)" font-size="11.5" font-family="monospace">Experiment &amp; Registry</text>
+  <text x="287" y="191" text-anchor="middle" fill="var(--muted)" font-size="10" font-family="sans-serif">MLflow, W&amp;B, Lineage</text>
+
+  <rect x="390" y="152" width="175" height="52" rx="10" fill="rgba(148,174,210,.08)" stroke="var(--border)"/>
+  <text x="477" y="175" text-anchor="middle" fill="var(--text)" font-size="11.5" font-family="monospace">CI / CD / CT Automation</text>
+  <text x="477" y="191" text-anchor="middle" fill="var(--muted)" font-size="10" font-family="sans-serif">Tests, Docker, Retraining</text>
+
+  <rect x="580" y="152" width="170" height="52" rx="10" fill="rgba(148,174,210,.08)" stroke="var(--border)"/>
+  <text x="665" y="175" text-anchor="middle" fill="var(--text)" font-size="11.5" font-family="monospace">Resource Management</text>
+  <text x="665" y="191" text-anchor="middle" fill="var(--muted)" font-size="10" font-family="sans-serif">GPU Autoscaling, Cost</text>
+</svg>
+<div class="diagram-cap">Figure 1.1 — The "ML Code" is a tiny fraction of a production ML system. MLOps exists to keep the surrounding 95% reliable.</div>
+</div>
+
+<h3>MLOps Maturity Levels (Google Cloud Framework)</h3>
+<div class="grid3">
+  <div class="mini">
+    <h4>Level 0 — Manual Process</h4>
+    <p>Everything lives in notebooks. Data scientists manually export CSVs, train locally, and hand a <code>model.pkl</code> file to engineers over Slack. <b>Breaks down when:</b> data changes weekly and nobody remembers which notebook version produced the live model.</p>
+  </div>
+  <div class="mini">
+    <h4>Level 1 — Pipeline Automation (CT)</h4>
+    <p>The <b>training pipeline itself</b> is automated. New data arrives → triggers validation → retrains → evaluates against current model → registers if better. Ideal when data drifts frequently (e.g., food delivery ETAs, ads CTR).</p>
+  </div>
+  <div class="mini">
+    <h4>Level 2 — Full CI/CD/CT</h4>
+    <p>Automated testing and deployment of the <b>pipeline code itself</b>. Engineers push a new feature or architecture to Git → CI runs unit/data/model tests → CD deploys the updated pipeline → CT runs it continuously on live data.</p>
+  </div>
+</div>
+
+<div class="tip"><b>Interview Shortcut:</b> Memorize the three letters: <b>CI</b> tests code &amp; data, <b>CD</b> ships the serving service/pipeline safely, and <b>CT (Continuous Training)</b> automatically retrains and re-validates the model on fresh data.</div>
+
+<div class="quiz-box" data-ans="1">
+  <span class="quiz-hdr">Checkpoint 1 · Quick Sanity Check</span>
+  <div class="quiz-q">Your fraud model's API has 99.99% uptime and 15 ms latency, yet fraud losses doubled this week. What is this called, and why did standard SWE monitoring miss it?</div>
+  <div class="quiz-opts">
+    <button class="q-opt" data-i="0">A) A cold-start latency spike; SWE monitors only CPU usage.</button>
+    <button class="q-opt" data-i="1">B) A silent ML failure; the API returns valid HTTP 200 predictions, so infra alerts stay green even as prediction quality collapses.</button>
+    <button class="q-opt" data-i="2">C) A Docker dependency mismatch; the container failed to build.</button>
+  </div>
+  <div class="quiz-exp"><b>Correct: B.</b> Unlike traditional software that crashes with stack traces, ML models almost always output a plausible-looking probability (e.g., <code>0.12</code>) even when input distributions or upstream schemas break. That is why ML requires data-quality and drift monitoring on top of infra monitoring.</div>
+</div>
+</section>
+
+<!-- ==================== SECTION 2 ==================== -->
+<section id="s2">
+<h2>2. Data Pipelines, Feature Stores &amp; Point-in-Time Joins</h2>
+<span class="tag">// garbage in, garbage out — and the silent killer called leakage</span>
+
+<p>Before a single gradient step runs, production data must pass through two gates: <b>Data Validation</b> (is today's data structurally sane?) and <b>Data Versioning</b> (can we recreate the exact training set 6 months from now?).</p>
+
+<ul>
+  <li><b>Data Validation (Great Expectations, TFDV, Pandera):</b> Automatically checks schema types, value bounds (e.g., <code>age &gt; 0</code>), null-rate spikes (e.g., nulls jumped from 0.2% to 18%), and unexpected categories before training or inference.</li>
+  <li><b>Data Versioning (DVC, LakeFS, Delta Lake / Iceberg):</b> Git breaks on multi-gigabyte datasets. Data versioning stores lightweight metadata pointers/hashes in Git while keeping raw Parquet files in S3/GCS, letting you run <code>git checkout</code> to recover the exact dataset snapshot tied to any model.</li>
+</ul>
+
+<h3>What is a Feature Store? (Novice Mental Model)</h3>
+<p>Imagine Swiggy predicts delivery time using a feature called <code>restaurant_avg_prep_time_last_1hr</code>. During <b>training</b>, you need this feature computed over 50 million historical orders (high throughput, latency doesn't matter — takes 20 minutes in Spark/BigQuery). During <b>online serving</b>, when a user opens the app, you need the exact same feature for 1 restaurant in <b>under 5 milliseconds</b> (low latency — needs Redis or DynamoDB).</p>
+
+<p>Without a Feature Store, data scientists write Python/SQL for training, and backend engineers rewrite it in Java/Go for production. The two implementations inevitably diverge. A <b>Feature Store</b> (e.g., Feast, Tecton) lets you define the transformation <b>once</b> and syncs it to two storage engines:</p>
+
+<div class="diagram-wrap">
+<svg viewBox="0 0 760 230" style="width:100%;height:auto;display:block" role="img" aria-label="Feature Store Offline and Online Architecture">
+  <defs><marker id="ar2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9 z" fill="var(--accent)"/></marker></defs>
+  <!-- Raw Sources -->
+  <rect x="10" y="25" width="135" height="65" rx="10" fill="rgba(148,174,210,.08)" stroke="var(--border)"/>
+  <text x="77" y="53" text-anchor="middle" fill="var(--text)" font-size="12" font-family="monospace" font-weight="600">Batch Sources</text>
+  <text x="77" y="71" text-anchor="middle" fill="var(--muted)" font-size="10.5">Snowflake, S3, SQL</text>
+
+  <rect x="10" y="135" width="135" height="65" rx="10" fill="rgba(148,174,210,.08)" stroke="var(--border)"/>
+  <text x="77" y="163" text-anchor="middle" fill="var(--text)" font-size="12" font-family="monospace" font-weight="600">Stream Sources</text>
+  <text x="77" y="181" text-anchor="middle" fill="var(--muted)" font-size="10.5">Kafka, Kinesis, Clicks</text>
+
+  <!-- Single Feature Definition -->
+  <rect x="185" y="65" width="150" height="95" rx="12" fill="rgba(155,107,255,.14)" stroke="var(--accent3)" stroke-width="1.5"/>
+  <text x="260" y="102" text-anchor="middle" fill="var(--text)" font-size="12.5" font-family="monospace" font-weight="700">Feature Registry</text>
+  <text x="260" y="120" text-anchor="middle" fill="var(--muted)" font-size="10.5">Single Source of Truth</text>
+  <text x="260" y="136" text-anchor="middle" fill="var(--accent3)" font-size="10" font-family="monospace">1 Transformation Code</text>
+
+  <!-- Offline Store -->
+  <rect x="380" y="20" width="165" height="75" rx="10" fill="rgba(45,212,191,.10)" stroke="var(--accent)" stroke-width="1.4"/>
+  <text x="462" y="46" text-anchor="middle" fill="var(--text)" font-size="12.5" font-family="monospace" font-weight="600">Offline Store</text>
+  <text x="462" y="64" text-anchor="middle" fill="var(--muted)" font-size="10.5">Parquet / BigQuery / S3</text>
+  <text x="462" y="80" text-anchor="middle" fill="var(--accent)" font-size="10" font-family="monospace">High Throughput (TB)</text>
+
+  <!-- Online Store -->
+  <rect x="380" y="130" width="165" height="75" rx="10" fill="rgba(255,138,76,.12)" stroke="var(--accent2)" stroke-width="1.4"/>
+  <text x="462" y="156" text-anchor="middle" fill="var(--text)" font-size="12.5" font-family="monospace" font-weight="600">Online Store</text>
+  <text x="462" y="174" text-anchor="middle" fill="var(--muted)" font-size="10.5">Redis / DynamoDB</text>
+  <text x="462" y="190" text-anchor="middle" fill="var(--accent2)" font-size="10" font-family="monospace">Low Latency (&lt;5 ms)</text>
+
+  <!-- Consumers -->
+  <rect x="590" y="28" width="155" height="60" rx="10" fill="rgba(52,211,153,.10)" stroke="var(--green)"/>
+  <text x="667" y="54" text-anchor="middle" fill="var(--text)" font-size="12" font-family="monospace" font-weight="600">Model Training</text>
+  <text x="667" y="71" text-anchor="middle" fill="var(--muted)" font-size="10">Point-in-Time Joins</text>
+
+  <rect x="590" y="138" width="155" height="60" rx="10" fill="rgba(52,211,153,.10)" stroke="var(--green)"/>
+  <text x="667" y="164" text-anchor="middle" fill="var(--text)" font-size="12" font-family="monospace" font-weight="600">Online Serving</text>
+  <text x="667" y="181" text-anchor="middle" fill="var(--muted)" font-size="10">Latest Feature Lookup</text>
+
+  <!-- Arrows -->
+  <line x1="145" y1="57" x2="183" y2="95" stroke="var(--accent)" stroke-width="1.6" marker-end="url(#ar2)"/>
+  <line x1="145" y1="167" x2="183" y2="130" stroke="var(--accent)" stroke-width="1.6" marker-end="url(#ar2)"/>
+  <line x1="335" y1="95" x2="378" y2="62" stroke="var(--accent)" stroke-width="1.6" marker-end="url(#ar2)"/>
+  <line x1="335" y1="130" x2="378" y2="162" stroke="var(--accent)" stroke-width="1.6" marker-end="url(#ar2)"/>
+  <line x1="545" y1="58" x2="588" y2="58" stroke="var(--accent)" stroke-width="1.6" marker-end="url(#ar2)"/>
+  <line x1="545" y1="168" x2="588" y2="168" stroke="var(--accent)" stroke-width="1.6" marker-end="url(#ar2)"/>
+</svg>
+<div class="diagram-cap">Figure 2.1 — Dual-storage Feature Store architecture eliminates duplicate transformation code between training and serving.</div>
+</div>
+
+<h3>Point-in-Time Correctness (ASOF Joins) — Worked Example</h3>
+<p>Suppose you are training a credit-default model. You have a table of loan applications (events) and a table of user credit scores that updates every month. If you do a naive SQL <code>LEFT JOIN</code> on <code>user_id</code>, you accidentally attach the user's <b>current</b> credit score (which already dropped <i>because</i> they defaulted!) to their historical application row. That is <b>time-travel data leakage</b>.</p>
+
+<div class="tw">
+<table>
+  <tr><th>Event Table (Loan Application)</th><th>Feature Log (Credit Score History)</th><th>Naive Join (LEAKAGE!)</th><th>Point-in-Time ASOF Join (CORRECT)</th></tr>
+  <tr>
+    <td>User 42 applies on <b>Mar 10</b><br>Label: Defaulted in May</td>
+    <td>Feb 01: Score = <b>740</b><br>Jun 01: Score = <b>510</b> (post-default)</td>
+    <td>Joins latest score = <b style="color:var(--warn)">510</b>.<br>Model gets 0.99 AUC offline, fails in production!</td>
+    <td>Finds max timestamp $\le$ Mar 10 → Score = <b style="color:var(--green)">740</b>.<br>Reflects exact knowledge at decision time.</td>
+  </tr>
+</table>
+</div>
+
+<h3>Training–Serving Skew: All 4 Root Causes</h3>
+<p><b>Training–serving skew</b> occurs whenever the distribution or semantics of feature values fed to the model in production differ from what it saw during training:</p>
+<ol>
+  <li><b>Code Duplication Skew:</b> Training normalizes text using Python's <code>re</code> library, while production uses Java's regex engine with slightly different whitespace/Unicode handling.</li>
+  <li><b>Null / Missing Value Skew:</b> Training drops rows with nulls or imputes with the training median; production receives a missing Redis key and silently passes <code>0.0</code>.</li>
+  <li><b>Staleness Skew:</b> Offline training computes exact rolling 1-hour aggregates; online serving reads a cached table updated only once every 24 hours.</li>
+  <li><b>Time-Travel Leakage:</b> Offline features accidentally peek into the future (fixed via Point-in-Time joins).</li>
+</ol>
+
+<div class="trap"><b>Interview Trap:</b> Never say "I'll just run a random 80/20 train/test split" on user/transaction data. On time-series or behavioral data, random splits leak future patterns into training. Always use a <b>temporal split</b> (train on Months 1–5, validate on Month 6, test on Month 7).</div>
+</section>
+
+<!-- ==================== SECTION 3 ==================== -->
+<section id="s3">
+<h2>3. Model Packaging, Containers &amp; Reproducibility</h2>
+<span class="tag">// "it works on my laptop" is not a deployment strategy</span>
+
+<h3>How to Save a Model (Stop Using Raw Pickle!)</h3>
+<p>Novices default to Python's <code>pickle.dump()</code>. In production, <b>pickle is dangerous</b> for two reasons: (1) loading an untrusted pickle file can execute arbitrary malicious code on your server, and (2) pickle is tightly coupled to exact Python and library versions (a model pickled in <code>scikit-learn 1.3</code> often crashes in <code>1.5</code>).</p>
+
+<div class="grid3">
+  <div class="mini"><h4>ONNX (Open Neural Network Exchange)</h4><p>Framework-agnostic computational graph. Train in PyTorch/XGBoost, export to <code>.onnx</code>, and run in C++/Rust/Java via <b>ONNX Runtime</b> — often 2–4× faster on CPU.</p></div>
+  <div class="mini"><h4>SafeTensors</h4><p>Hugging Face's modern weight format. Zero arbitrary code execution, supports zero-copy memory mapping (loads multi-GB LLMs in milliseconds instead of minutes).</p></div>
+  <div class="mini"><h4>TorchScript / SavedModel</h4><p>Native serialized graph formats for PyTorch and TensorFlow that decouple inference from your Python source files.</p></div>
+</div>
+
+<h3>Docker for ML Novices (Line-by-Line Annotated)</h3>
+<p>A <b>Docker Container</b> packages your Python interpreter, OS libraries (like CUDA/cuDNN), pinned pip packages, and FastAPI server into one immutable image so it runs identically on your laptop, staging, and AWS/GCP. Below is a production-ready <code>Dockerfile</code>:</p>
+
+<pre class="code-block"><span class="cm"># 1. Start from a slim, pinned base image (never use ':latest' — it breaks reproducibility)</span>
+<span class="kw">FROM</span> python:<span class="num">3.11</span>-slim
+
+<span class="cm"># 2. Prevent Python from writing .pyc files &amp; force unbuffered logs (crucial for K8s logs)</span>
+<span class="kw">ENV</span> PYTHONDONTWRITEBYTECODE=<span class="num">1</span> PYTHONUNBUFFERED=<span class="num">1</span>
+
+<span class="kw">WORKDIR</span> /app
+
+<span class="cm"># 3. Copy ONLY requirements first so Docker caches pip install across code edits!</span>
+<span class="kw">COPY</span> requirements.txt .
+<span class="kw">RUN</span> pip install --no-cache-dir -r requirements.txt
+
+<span class="cm"># 4. Copy app code &amp; model artifact (often fetched from Model Registry at build/startup)</span>
+<span class="kw">COPY</span> app/ ./app/
+<span class="kw">COPY</span> artifacts/model.onnx ./artifacts/
+
+<span class="cm"># 5. Security best practice: never run a production container as root</span>
+<span class="kw">RUN</span> useradd -m mluser &amp;&amp; chown -R mluser /app
+<span class="kw">USER</span> mluser
+
+<span class="kw">EXPOSE</span> <span class="num">8000</span>
+<span class="kw">CMD</span> [<span class="st">"uvicorn"</span>, <span class="st">"app.main:app"</span>, <span class="st">"--host"</span>, <span class="st">"0.0.0.0"</span>, <span class="st">"--port"</span>, <span class="st">"8000"</span>, <span class="st">"--workers"</span>, <span class="st">"2"</span>]</pre>
+
+<div class="tip"><b>Rookie Mistake to Avoid:</b> Copying your entire codebase (<code>COPY . .</code>) <i>before</i> running <code>pip install</code>. If you do that, every 1-line edit to your Python code invalidates Docker's layer cache and forces a 5-minute reinstall of PyTorch on every build!</div>
+
+<h3>Experiment Tracking &amp; Model Registry (MLflow / W&amp;B)</h3>
+<p>Reproducibility requires logging <b>5 pillars</b> for every training run: (1) <b>Git commit SHA</b>, (2) <b>Data version hash</b>, (3) <b>Hyperparameter config</b>, (4) <b>Container / lockfile</b>, and (5) <b>Random seeds</b>. The <b>Model Registry</b> then acts as a governed warehouse linking each versioned model (<code>fraud-xgb v14</code>) to its exact training run, evaluation slices, and lifecycle alias (<code>@staging</code>, <code>@champion</code>, <code>@archived</code>).</p>
+
+<p><b>Bit-exact vs. Statistical Reproducibility:</b> Parallel GPU atomic operations (like <code>atomicAdd</code> in CUDA backward passes) introduce tiny floating-point non-determinism. When bit-exact reproducibility hurts training speed by 30%, production teams enforce <b>statistical reproducibility</b>: re-running the pipeline yields validation metrics within an acceptable $\pm \epsilon$ variance band.</p>
+</section>
+
+<!-- ==================== SECTION 4 ==================== -->
+<section id="s4">
+<h2>4. Model Serving, Queuing Math &amp; Inference Optimization</h2>
+<span class="tag">// latency, throughput, tail percentiles, and GPU economics</span>
+
+<p>Training happens offline; <b>inference pays the bills</b>. In large-scale ML (especially LLMs and recommenders), 80–90% of lifetime compute cost goes to serving predictions, not training.</p>
+
+<div class="tw">
+<table>
+  <tr><th>Serving Mode</th><th>Architecture</th><th>Latency SLA</th><th>Real-World Examples</th><th>Key Trade-off</th></tr>
+  <tr><td><b>Batch</b></td><td>Cron / Airflow scores all entities nightly; writes predictions to DB/Redis</td><td>Hours (lookup is &lt;5 ms)</td><td>Netflix homepage rows, churn risk lists, email targeting</td><td>Cheapest &amp; simplest, zero live GPU stress; cannot react to live session clicks</td></tr>
+  <tr><td><b>Online (Real-Time)</b></td><td>REST (HTTP/JSON) or <b>gRPC</b> (HTTP/2 + Protobuf) microservice</td><td>10 ms – 150 ms</td><td>UPI/Card fraud check, Uber surge/ETA, Search ranking</td><td>Always fresh, but strict uptime, autoscaling, and tail-latency engineering</td></tr>
+  <tr><td><b>Streaming</b></td><td>Kafka → Flink/Spark Streaming updates state &amp; scores event-by-event</td><td>100 ms – 2 s</td><td>Real-time anomaly detection, live ad pacing</td><td>Handles continuous windowed aggregations; hard state recovery</td></tr>
+  <tr><td><b>Edge / On-Device</b></td><td>TFLite, CoreML, ONNX Mobile directly on phone/car</td><td>&lt;10 ms (offline)</td><td>FaceID, wake-word detection, keyboard autocomplete</td><td>Zero server cost &amp; full privacy; tiny RAM/battery budget</td></tr>
+</table>
+</div>
+
+<h3>Why Tail Latency (p95 / p99) Rules Production</h3>
+<p>Never quote <b>mean latency</b> in an interview. Latency distributions are heavily right-skewed (a few slow requests due to garbage collection, cache misses, or queuing). Worse, in a microservice architecture where a single user page fans out to $N$ parallel ML services, if each service has a $p99$ tail probability of $0.01$, the probability that the user experiences at least one slow call is:</p>
+
+<div class="eq">
+$$P(\text{user hits tail}) = 1 - (1 - 0.01)^N$$
+<span class="eq-note">For $N = 20$ parallel services, $1 - 0.99^{20} \approx 18.2\%$ of users experience slow tail latency!</span>
+</div>
+
+<h3>Queuing Theory for ML Serving: Little's Law &amp; The Utilization Cliff</h3>
+<p>Two equations let you size any ML serving cluster on a whiteboard:</p>
+<div class="eq">
+$$L = \lambda \cdot W \qquad \text{and} \qquad W_{\text{M/M/1}} = \frac{1}{\mu - \lambda} = \frac{T_{\text{service}}}{1 - \rho}, \quad \rho = \frac{\lambda}{\mu} < 1$$
+<span class="eq-note">$L$: avg concurrent requests in flight · $\lambda$: arrival rate (QPS) · $W$: total time in system (queue + inference) · $\mu$: max server throughput (QPS) · $\rho$: server utilization.</span>
+</div>
+
+<p>Notice the denominator $(1 - \rho)$: as utilization $\rho$ climbs from $50\%$ to $90\%$ to $95\%$, latency does <b>not</b> grow linearly—it explodes asymptotically toward infinity! That is why production engineers autoscale GPU/CPU replicas around $\rho \approx 60\%\text{–}70\%$, never $95\%$.</p>
+
+<!-- INTERACTIVE DEMO 1: SERVING LATENCY & BATCHING SIMULATOR -->
+<div class="demo">
+  <span class="demo-title">Interactive Lab 1 · Serving Capacity, Queuing Cliff &amp; Dynamic Batching</span>
+  <div class="ctl">
+    <div><label>Traffic Rate $\lambda$ (QPS) <b id="vLam">60</b></label><input type="range" id="rLam" min="10" max="180" step="5" value="60"></div>
+    <div><label>Single-Req GPU Time (ms) <b id="vInf">12</b></label><input type="range" id="rInf" min="4" max="30" step="1" value="12"></div>
+    <div><label>Dynamic Batch Size $B$ <b id="vBat">4</b></label><input type="range" id="rBat" min="1" max="16" step="1" value="4"></div>
+  </div>
+  <svg class="plot" id="latPlot" viewBox="0 0 640 215" role="img" aria-label="Latency vs Traffic QPS curve"></svg>
+  <div class="out">
+    <div><b id="oMu">0</b><small>Max Capacity $\mu$ (QPS)</small></div>
+    <div><b id="oRho">0%</b><small>Utilization $\rho = \lambda/\mu$</small></div>
+    <div><b id="oP99">0 ms</b><small>Est. p99 Latency</small></div>
+    <div><b id="oL">0</b><small>In-Flight ($L = \lambda W$)</small></div>
+  </div>
+  <p style="font-size:13px;margin:12px 0 0;color:var(--muted)"><b>Try this:</b> Set Traffic $\lambda = 100$ QPS and Batch Size $B = 1$ (red cliff!). Now increase Batch Size $B$ to $4$ or $8$ — GPUs process batches sub-linearly, raising capacity $\mu$ dramatically at the cost of a small batch-assembly wait.</p>
+</div>
+
+<h3>Making Inference Faster (The 5 Core Levers)</h3>
+<ul>
+  <li><b>Quantization (FP32 → FP16 / INT8 / INT4):</b> Shrinks weights 2–4× and unlocks faster Tensor Core INT8/FP16 instructions. Affine (asymmetric) INT8 quantization maps a real weight $x \in [x_{\min}, x_{\max}]$ to an integer $q \in [-128, 127]$ via scale $S$ and zero-point $Z$:
+  <div class="eq">$$q = \text{clip}\!\left(\text{round}\!\left(\frac{x}{S}\right) + Z,\; -128,\; 127\right), \qquad S = \frac{x_{\max} - x_{\min}}{255}$$</div>
+  Use <b>PTQ (Post-Training Quantization)</b> first; switch to <b>QAT (Quantization-Aware Training)</b> if accuracy drops too much.</li>
+  <li><b>Knowledge Distillation:</b> Train a compact "student" model (e.g., DistilBERT, 6 layers) to mimic the soft probability logits of a huge "teacher" model (e.g., 24-layer BERT) using temperature-scaled KL divergence.</li>
+  <li><b>Graph Compilation:</b> Fuse operators (e.g., Conv + BatchNorm + ReLU into one GPU kernel) via <code>torch.compile</code>, <b>ONNX Runtime</b>, or <b>NVIDIA TensorRT</b> to eliminate memory-bandwidth round-trips.</li>
+  <li><b>Dynamic Batching (NVIDIA Triton):</b> Wait up to e.g. 5 ms to group incoming single requests into a mini-batch before firing one GPU kernel — trading 5 ms of wait time for 5–10× higher throughput.</li>
+  <li><b>Modern LLM Serving Metrics &amp; KV-Cache Math:</b> LLM inference has two distinct phases: <b>Prefill</b> (compute-bound, determines <b>TTFT</b> — Time To First Token) and <b>Decode</b> (memory-bandwidth-bound, determines <b>TPOT</b> — Time Per Output Token). To avoid recomputing attention keys/values at every token, servers cache them in VRAM (<b>KV-Cache</b>):
+  <div class="eq">$$\text{KV-Cache Memory} = 2 \times n_{\text{layers}} \times n_{\text{kv\_heads}} \times d_{\text{head}} \times L_{\text{seq}} \times B \times \text{bytes}$$
+  <span class="eq-note">Factor of 2 = K and V tensors. Techniques like <b>GQA</b> (fewer KV heads) and <b>PagedAttention (vLLM)</b> prevent VRAM fragmentation and boost throughput 2–4×.</span></div></li>
+</ul>
+
+<div class="quiz-box" data-ans="2">
+  <span class="quiz-hdr">Checkpoint 2 · Capacity &amp; Serving Math</span>
+  <div class="quiz-q">Your recommendation API handles 200 requests/sec and has an average end-to-end latency of 50 ms (0.05 s). By Little's Law, how many requests are concurrently in flight on average?</div>
+  <div class="quiz-opts">
+    <button class="q-opt" data-i="0">A) 4 requests</button>
+    <button class="q-opt" data-i="1">B) 40 requests</button>
+    <button class="q-opt" data-i="2">C) 10 requests</button>
+  </div>
+  <div class="quiz-exp"><b>Correct: C.</b> $L = \lambda \cdot W = 200\text{ req/s} \times 0.05\text{ s} = 10$ concurrent requests. Always match units (seconds with req/sec)!</div>
+</div>
+</section>
+
+<!-- ==================== SECTION 5 ==================== -->
+<section id="s5">
+<h2>5. CI/CD/CT, ML Behavioral Testing &amp; Orchestration</h2>
+<span class="tag">// testing a probabilistic system that doesn't have exact right answers</span>
+
+<p>In regular software, you write <code>assert add(2, 2) == 4</code>. In ML, you cannot assert that a classifier outputs <code>0.8732</code>. Instead, production ML uses a <b>3-layer testing pyramid</b> inside CI/CD:</p>
+
+<div class="grid3">
+  <div class="mini">
+    <h4>1. Code &amp; Pipeline Tests</h4>
+    <p>Unit tests for feature transforms, loss math, and tensor shapes. Plus a <b>smoke test</b>: train the full pipeline for 2 epochs on 50 synthetic rows to verify it converges (loss decreases) and exports cleanly.</p>
+  </div>
+  <div class="mini">
+    <h4>2. Data Validation Tests</h4>
+    <p>Automated assertions on incoming batches: column schema, zero NaNs in critical features, freshness check (latest timestamp &lt; 1 hr old). <b>Fail fast</b> before burning GPU money on corrupted data.</p>
+  </div>
+  <div class="mini">
+    <h4>3. Model Behavioral Tests</h4>
+    <p>Gate promotion on: (a) beats current champion on holdout, (b) <b>slice metrics</b> (e.g., new users, rural regions, minority classes), (c) latency &amp; memory ceiling, and (d) CheckList behavioral tests below.</p>
+  </div>
+</div>
+
+<h3>CheckList Behavioral Testing (Ribeiro et al., ACL 2020)</h3>
+<ul>
+  <li><b>Minimum Functionality Test (MFT):</b> Simple sanity inputs the model must get right (e.g., sentiment model on <i>"I hated this product"</i> must predict Negative).</li>
+  <li><b>Invariance Test (INV):</b> Perturbations that <b>must NOT</b> change the prediction (e.g., changing a loan applicant's name from <i>Rahul</i> to <i>Aisha</i>, or fixing a typo in a review).</li>
+  <li><b>Directional Expectation Test (DIR):</b> Perturbations that must move the prediction in a <b>known direction</b> (e.g., doubling a user's debt-to-income ratio must never <i>lower</i> their predicted default probability).</li>
+</ul>
+
+<div class="trap"><b>Interview Trap — Slice-Based Evaluation:</b> Overall accuracy can rise from 91% to 93% while accuracy on your highest-value customer segment (or a critical minority slice) drops from 85% to 62%. Always evaluate on <b>business-critical slices</b>, never just one global average.</div>
+
+<h3>Orchestration &amp; Kubernetes (Novice Mental Model)</h3>
+<p><b>Orchestrators</b> (Airflow, Prefect, Kubeflow Pipelines) execute your ML workflow as a <b>DAG (Directed Acyclic Graph)</b>: <code>Ingest → Validate → Featurize → Train → Eval Gate → Register</code>. If any step fails, the DAG halts and retries cleanly.</p>
+<p><b>Kubernetes (K8s)</b> manages your deployed Docker containers at scale. Think of it in 4 simple layers: a <b>Container</b> is your app; a <b>Pod</b> is the smallest deployable wrapper around a container; a <b>Deployment</b> keeps $N$ identical Pods alive (restarting any that crash); and an <b>HPA (Horizontal Pod Autoscaler)</b> automatically adds or removes Pods when CPU, GPU utilization, or request queue depth crosses a threshold.</p>
+</section>
+
+<!-- ==================== SECTION 6 ==================== -->
+<section id="s6">
+<h2>6. Safe Deployment &amp; Rollout Strategies</h2>
+<span class="tag">// shipping models without waking up the on-call engineer at 3 AM</span>
+
+<p>Never replace 100% of production traffic with a brand-new model overnight. Even if offline metrics look stellar, production traffic has edge cases, latency spikes, and feedback loops. Use progressive rollout patterns:</p>
+
+<div class="diagram-wrap">
+<svg viewBox="0 0 760 195" style="width:100%;height:auto;display:block" role="img" aria-label="Shadow vs Canary vs A/B Traffic Routing">
+  <defs><marker id="ar3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9 z" fill="var(--accent)"/></marker></defs>
+  <!-- Shadow -->
+  <rect x="10" y="14" width="235" height="168" rx="14" fill="rgba(148,174,210,.05)" stroke="var(--border)"/>
+  <text x="127" y="38" text-anchor="middle" fill="var(--accent)" font-size="13" font-family="monospace" font-weight="700">1. SHADOW MODE</text>
+  <rect x="26" y="60" width="60" height="32" rx="6" fill="var(--card)" stroke="var(--border)"/>
+  <text x="56" y="80" text-anchor="middle" fill="var(--text)" font-size="11" font-family="monospace">100%</text>
+  <rect x="132" y="52" width="96" height="30" rx="6" fill="rgba(52,211,153,.16)" stroke="var(--green)"/>
+  <text x="180" y="71" text-anchor="middle" fill="var(--text)" font-size="11" font-family="monospace">Old → User</text>
+  <rect x="132" y="102" width="96" height="30" rx="6" fill="rgba(155,107,255,.16)" stroke="var(--accent3)" stroke-dasharray="4 3"/>
+  <text x="180" y="121" text-anchor="middle" fill="var(--text)" font-size="11" font-family="monospace">New → Logs</text>
+  <line x1="86" y1="72" x2="130" y2="67" stroke="var(--green)" stroke-width="1.6" marker-end="url(#ar3)"/>
+  <line x1="86" y1="80" x2="130" y2="115" stroke="var(--accent3)" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#ar3)"/>
+  <text x="127" y="162" text-anchor="middle" fill="var(--muted)" font-size="11">Zero user risk · Tests latency &amp; bugs</text>
+
+  <!-- Canary -->
+  <rect x="262" y="14" width="235" height="168" rx="14" fill="rgba(148,174,210,.05)" stroke="var(--border)"/>
+  <text x="379" y="38" text-anchor="middle" fill="var(--gold)" font-size="13" font-family="monospace" font-weight="700">2. CANARY ROLLOUT</text>
+  <rect x="278" y="68" width="58" height="32" rx="6" fill="var(--card)" stroke="var(--border)"/>
+  <text x="307" y="88" text-anchor="middle" fill="var(--text)" font-size="11" font-family="monospace">Router</text>
+  <rect x="384" y="52" width="96" height="30" rx="6" fill="rgba(52,211,153,.16)" stroke="var(--green)"/>
+  <text x="432" y="71" text-anchor="middle" fill="var(--text)" font-size="11" font-family="monospace">Old (95%)</text>
+  <rect x="384" y="102" width="96" height="30" rx="6" fill="rgba(251,191,36,.16)" stroke="var(--gold)"/>
+  <text x="432" y="121" text-anchor="middle" fill="var(--text)" font-size="11" font-family="monospace">New (5%)</text>
+  <line x1="336" y1="78" x2="382" y2="67" stroke="var(--green)" stroke-width="2" marker-end="url(#ar3)"/>
+  <line x1="336" y1="88" x2="382" y2="115" stroke="var(--gold)" stroke-width="1.5" marker-end="url(#ar3)"/>
+  <text x="379" y="162" text-anchor="middle" fill="var(--muted)" font-size="11">Ramp 1% → 5% → 25% → 100%</text>
+
+  <!-- A/B Test -->
+  <rect x="514" y="14" width="235" height="168" rx="14" fill="rgba(148,174,210,.05)" stroke="var(--border)"/>
+  <text x="631" y="38" text-anchor="middle" fill="var(--accent3)" font-size="13" font-family="monospace" font-weight="700">3. A/B EXPERIMENT</text>
+  <rect x="530" y="68" width="60" height="32" rx="6" fill="var(--card)" stroke="var(--border)"/>
+  <text x="560" y="88" text-anchor="middle" fill="var(--text)" font-size="10.5" font-family="monospace">Hash(ID)</text>
+  <rect x="636" y="52" width="96" height="30" rx="6" fill="rgba(45,212,191,.16)" stroke="var(--accent)"/>
+  <text x="684" y="71" text-anchor="middle" fill="var(--text)" font-size="11" font-family="monospace">Ctrl (50%)</text>
+  <rect x="636" y="102" width="96" height="30" rx="6" fill="rgba(155,107,255,.16)" stroke="var(--accent3)"/>
+  <text x="684" y="121" text-anchor="middle" fill="var(--text)" font-size="11" font-family="monospace">Trt (50%)</text>
+  <line x1="590" y1="78" x2="634" y2="67" stroke="var(--accent)" stroke-width="1.6" marker-end="url(#ar3)"/>
+  <line x1="590" y1="88" x2="634" y2="115" stroke="var(--accent3)" stroke-width="1.6" marker-end="url(#ar3)"/>
+  <text x="631" y="162" text-anchor="middle" fill="var(--muted)" font-size="11">Proves causal business lift</text>
+</svg>
+<div class="diagram-cap">Figure 6.1 — Standard promotion ladder: Shadow (infra check) → Canary (blast-radius control) → A/B Test (causal business impact).</div>
+</div>
+
+<div class="tw">
+<table>
+  <tr><th>Strategy</th><th>Mechanism</th><th>Pros</th><th>Limitations</th></tr>
+  <tr><td><b>Shadow</b></td><td>Duplicates live requests asynchronously to new model; discards response to user</td><td>Zero user impact; verifies real latency, memory, and prediction sanity</td><td>2× compute cost; cannot measure user clicks or downstream business lift</td></tr>
+  <tr><td><b>Canary</b></td><td>Routes 1–5% of live traffic to new model; ramps up if error/latency guardrails stay green</td><td>Limits blast radius; catches real-world bugs early</td><td>Not powered for subtle statistical business metrics</td></tr>
+  <tr><td><b>Blue–Green</b></td><td>Two identical environments; router flips 100% traffic instantly</td><td>Sub-second rollback by flipping router back</td><td>2× idle infra cost; full blast radius if a bug slips through</td></tr>
+  <tr><td><b>A/B Test</b></td><td>Deterministic user-level hashing splits traffic 50/50; compares North Star + Guardrail metrics</td><td>Gold standard for causal business impact</td><td>Requires sample size calculation, watch out for novelty/network effects</td></tr>
+  <tr><td><b>Multi-Armed Bandit</b></td><td>Dynamically shifts traffic toward better-performing model (Thompson Sampling / UCB)</td><td>Minimizes regret when testing many variants (e.g., headlines, ads)</td><td>Harder to run standard hypothesis tests; struggles with delayed rewards</td></tr>
+</table>
+</div>
+
+<div class="trap"><b>Classic Interview Question — Why did Offline AUC improve (+2%), but Online A/B Revenue stayed flat (or dropped)?</b>
+<ul style="margin-top:8px;margin-bottom:0">
+  <li><b>Offline–Online Metric Misalignment:</b> Optimizing click-through rate (CTR) offline promoted clickbait items that users bounce from immediately, hurting purchase conversion.</li>
+  <li><b>Latency Tax:</b> The heavier ensemble increased p99 latency by 120 ms, causing impatient mobile users to abandon the page before seeing the better predictions.</li>
+  <li><b>Selection / Position Bias:</b> Offline test data only contains labels for items the <i>old</i> model chose to show at the top.</li>
+  <li><b>Training–Serving Skew:</b> A subtle feature bug only manifested in live production serving.</li>
+</ul></div>
+</section>
+
+<!-- ==================== SECTION 7 ==================== -->
+<section id="s7">
+<h2>7. Monitoring, Drift Detection &amp; Statistical Math</h2>
+<span class="tag">// entropy applies to machine learning: every deployed model decays</span>
+
+<p>From the moment you deploy a model, the real world starts moving away from the snapshot it was trained on. Let $X$ be the input features and $Y$ be the ground-truth label. Using the joint distribution $P(X, Y) = P(Y \mid X)\,P(X)$, every failure mode falls into one of three mathematical buckets:</p>
+
+<div class="grid3">
+  <div class="mini">
+    <h4>Covariate (Data) Drift</h4>
+    <p>$P(X)$ changes while $P(Y \mid X)$ stays fixed. <b>Example:</b> Your app expands to Tier-3 cities, so user income and device distributions shift, even though the underlying relationship between features and churn hasn't changed. <i>Detectable without labels.</i></p>
+  </div>
+  <div class="mini">
+    <h4>Label (Prior) Drift</h4>
+    <p>$P(Y)$ changes while $P(X \mid Y)$ stays fixed. <b>Example:</b> A new scam ring doubles the base fraud rate from 0.3% to 0.6%. Your model's predicted probabilities become systematically under-calibrated. <i>Detectable via output distribution &amp; labels.</i></p>
+  </div>
+  <div class="mini">
+    <h4>Concept Drift</h4>
+    <p>$P(Y \mid X)$ changes: the exact same input $X$ now maps to a different label $Y$. <b>Example:</b> During COVID-19 or a sudden fashion trend, historical buying signals stopped predicting demand. <i>Hardest to catch — requires ground-truth labels or fast proxies.</i></p>
+  </div>
+</div>
+
+<h3>Mathematical Statistics for Drift Detection</h3>
+<p>Suppose $P$ is the reference (training) distribution and $Q$ is the current production window. Here are the 4 metrics interviewers expect you to know cold:</p>
+
+<ol>
+  <li><b>Population Stability Index (PSI):</b> Partition a feature into $B$ bins (typically 10 deciles from training data) with proportions $p_i$ and $q_i$:
+  <div class="eq">$$\text{PSI} = \sum_{i=1}^{B} (q_i - p_i)\,\ln\!\left(\frac{q_i}{p_i}\right) = D_{\text{KL}}(Q \| P) + D_{\text{KL}}(P \| Q)$$
+  <span class="eq-note">Rule of thumb: $\text{PSI} < 0.10$ stable · $0.10\text{–}0.25$ moderate shift · $> 0.25$ significant drift. Notice PSI is literally the symmetric Jeffrey's divergence! Always add smoothing ($\epsilon = 10^{-6}$) to avoid $\ln(0)$.</span></div></li>
+
+  <li><b>Kolmogorov–Smirnov (KS) Statistic:</b> Non-parametric test for 1D continuous features (no arbitrary binning!). It measures the maximum vertical gap between the two empirical Cumulative Distribution Functions (CDFs):
+  <div class="eq">$$D_{\text{KS}} = \sup_{x} \left| F_{\text{ref}}(x) - F_{\text{prod}}(x) \right| \in [0, 1]$$</div></li>
+
+  <li><b>KL vs. Jensen–Shannon (JS) Divergence:</b> KL divergence $D_{\text{KL}}(P \| Q) = \sum p_i \ln(p_i / q_i)$ is asymmetric and explodes to $+\infty$ if $q_i = 0$ where $p_i > 0$. <b>JS Divergence</b> fixes both by measuring KL against the midpoint distribution $M = \frac{1}{2}(P + Q)$:
+  <div class="eq">$$D_{\text{JS}}(P \| Q) = \frac{1}{2} D_{\text{KL}}(P \| M) + \frac{1}{2} D_{\text{KL}}(Q \| M) \in [0, \ln 2]$$</div></li>
+
+  <li><b>Wasserstein-1 (Earth Mover's) Distance:</b> Measures the minimum "work" (mass × distance) needed to reshape $P$ into $Q$. Unlike KL/JS, it stays smooth and informative even when the two distributions have <b>zero overlap</b>:
+  <div class="eq">$$W_1(P, Q) = \int_{-\infty}^{\infty} \left| F_{\text{ref}}(x) - F_{\text{prod}}(x) \right| dx$$</div></li>
+</ol>
+
+<p><b>What about high-dimensional features or embeddings (e.g., 768-dim BERT vectors)?</b> Univariate tests like PSI/KS miss multivariate correlation shifts! Instead, train a <b>Domain Classifier</b> (label training rows $0$, production rows $1$): if a simple classifier achieves $\text{ROC-AUC} > 0.65$, your distributions have drifted—and its feature importances tell you <i>exactly which features drifted</i>. Alternatively, compute <b>Maximum Mean Discrepancy (MMD)</b>.</p>
+
+<!-- INTERACTIVE DEMO 2: DUAL PDF + CDF DRIFT LAB -->
+<div class="demo">
+  <span class="demo-title">Interactive Lab 2 · Dual PDF &amp; CDF Distribution Drift Observatory</span>
+  <div class="ctl">
+    <div><label>Production Mean Shift $\mu$ <b id="vm">0.0</b></label><input type="range" id="rm" min="-2.2" max="2.2" step="0.1" value="0"></div>
+    <div><label>Production Std Dev $\sigma$ <b id="vs">1.0</b></label><input type="range" id="rs" min="0.5" max="2.2" step="0.1" value="1"></div>
+  </div>
+  <svg class="plot" id="plot" viewBox="0 0 640 310" role="img" aria-label="PDF and CDF reference versus production distribution"></svg>
+  <div class="out">
+    <div><b id="oP">0.000</b><small>PSI (10-bin)</small></div>
+    <div><b id="oK">0.000</b><small>KS $\sup|F_r - F_p|$</small></div>
+    <div><b id="oJ">0.000</b><small>JS Divergence</small></div>
+    <div><b id="oV" style="font-size:17px">Stable</b><small>PSI Verdict</small></div>
+  </div>
+</div>
+
+<h3>Delayed Labels &amp; Degenerate Feedback Loops</h3>
+<p>In credit default (90-day delay) or chargeback fraud (30-day delay), you cannot wait months to know if your model broke. Monitor <b>proxy signals</b> immediately: (1) input data quality &amp; drift, (2) predicted score distribution shift (if average predicted fraud probability jumps 3× overnight, investigate immediately), and (3) fast human proxies (manual review escalation rate, customer support tickets).</p>
+<p><b>Feedback Loops:</b> If your loan model rejects everyone from a certain zip code, you never observe whether they would have repaid—starving future training sets of positive examples from that group. Fix this with controlled <b>exploration</b> (random small approval slice) or <b>Inverse Propensity Scoring (IPS)</b> reweighting.</p>
+
+<div class="quiz-box" data-ans="0">
+  <span class="quiz-hdr">Checkpoint 3 · Drift Diagnostics</span>
+  <div class="quiz-q">A feature's PSI jumps to 0.38 after a marketing campaign brings in younger users, yet your model's ROC-AUC on fresh labels remains unchanged at 0.89. Should you trigger an emergency rollback?</div>
+  <div class="quiz-opts">
+    <button class="q-opt" data-i="0">A) No — covariate drift does not automatically equal performance degradation. Log it, monitor slices for the new cohort, and schedule a normal retrain if needed.</button>
+    <button class="q-opt" data-i="1">B) Yes — any PSI above 0.25 proves concept drift has occurred.</button>
+    <button class="q-opt" data-i="2">C) Yes — you must immediately retrain on only the last 24 hours of data.</button>
+  </div>
+  <div class="quiz-exp"><b>Correct: A.</b> Drift is a <i>diagnostic signal</i>, not proof of degradation. If the shifted feature has low importance or the model generalizes cleanly into that region of feature space, performance stays intact. Never alert/rollback blindly on input drift without checking performance or critical slices.</div>
+</div>
+</section>
+
+<!-- ==================== SECTION 8 ==================== -->
+<section id="s8">
+<h2>8. End-to-End ML System Design Playbook</h2>
+<span class="tag">// how to structure and ace a 45-minute open-ended design round</span>
+
+<p>In an ML System Design interview (e.g., <i>"Design YouTube Recommendations"</i>, <i>"Design Swiggy Delivery ETA"</i>, <i>"Design UPI Fraud Detection"</i>), interviewers are not looking for a magical neural network. They evaluate whether you can translate a messy business problem into a scalable, measurable engineering system.</p>
+
+<h3>The 7-Step 45-Minute Blueprint</h3>
+<ol>
+  <li><b>Clarify Requirements &amp; Scale (5 min):</b> Business objective, user journey, QPS (reads/writes), latency SLA (e.g., &lt;100 ms), data volume, cold-start constraints, privacy/compliance.</li>
+  <li><b>Frame as ML Task &amp; Metrics (5 min):</b> Classification vs. Regression vs. Ranking. Define <b>Offline Metrics</b> (PR-AUC, LogLoss, NDCG@K, RMSE) AND <b>Online Business + Guardrail Metrics</b> (CTR, GMV, retention; guardrails: latency, bounce rate, false-positive complaints).</li>
+  <li><b>Data &amp; Labeling Strategy (7 min):</b> Explicit vs. implicit labels, label delay, class imbalance (downsampling + calibration!), negative sampling, temporal train/test split.</li>
+  <li><b>Feature Engineering &amp; Modeling (10 min):</b> Group features into User, Item, Context, and Cross/Interaction features. Always propose a <b>simple baseline first</b> (Logistic Regression / LightGBM), then justify deep architectures (Two-Tower, DeepFM, Transformers).</li>
+  <li><b>Serving Architecture &amp; Latency Budget (8 min):</b> Batch vs. Online, Feature Store (Redis), multi-stage funnel (Retrieval → Ranking), caching, and deterministic <b>fallbacks</b> if the ML service times out.</li>
+  <li><b>Evaluation &amp; Rollout (5 min):</b> Offline slice evals → Shadow → Canary → A/B test with power analysis.</li>
+  <li><b>Monitoring &amp; Iteration (5 min):</b> Drift (PSI/KS), delayed labels, retraining cadence, feedback loops.</li>
+</ol>
+
+<h3>Worked Architecture 1: Large-Scale Recommendation System (Two-Tower + Ranking)</h3>
+<p><b>Problem:</b> Recommend 20 videos/products from a catalog of 10 million items in <b>&lt;100 ms</b>. You cannot score 10M items with a heavy neural network in 100 ms! Solution: a <b>Multi-Stage Funnel</b>.</p>
+
+<div class="diagram-wrap">
+<svg viewBox="0 0 760 190" style="width:100%;height:auto;display:block" role="img" aria-label="Multi-stage recommendation funnel">
+  <defs><marker id="ar4" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9 z" fill="var(--accent)"/></marker></defs>
+  <!-- Stage 1 -->
+  <rect x="8" y="25" width="165" height="140" rx="14" fill="rgba(45,212,191,.10)" stroke="var(--accent)" stroke-width="1.4"/>
+  <text x="90" y="50" text-anchor="middle" fill="var(--accent)" font-size="12" font-family="monospace" font-weight="700">1. RETRIEVAL</text>
+  <text x="90" y="70" text-anchor="middle" fill="var(--text)" font-size="13" font-weight="700">10M → 500 items</text>
+  <text x="90" y="92" text-anchor="middle" fill="var(--muted)" font-size="11">Two-Tower + ANN</text>
+  <text x="90" y="108" text-anchor="middle" fill="var(--muted)" font-size="11">(FAISS / ScaNN)</text>
+  <text x="90" y="132" text-anchor="middle" fill="var(--accent)" font-size="10.5" font-family="monospace">Budget: ~15 ms</text>
+  <text x="90" y="150" text-anchor="middle" fill="var(--muted)" font-size="10.5" font-family="monospace">Metric: Recall@500</text>
+
+  <!-- Stage 2 -->
+  <rect x="200" y="33" width="168" height="124" rx="14" fill="rgba(155,107,255,.12)" stroke="var(--accent3)" stroke-width="1.4"/>
+  <text x="284" y="56" text-anchor="middle" fill="var(--accent3)" font-size="12" font-family="monospace" font-weight="700">2. HEAVY RANKER</text>
+  <text x="284" y="76" text-anchor="middle" fill="var(--text)" font-size="13" font-weight="700">500 → 50 items</text>
+  <text x="284" y="96" text-anchor="middle" fill="var(--muted)" font-size="11">GBDT / DeepFM / DCN</text>
+  <text x="284" y="112" text-anchor="middle" fill="var(--muted)" font-size="11">Rich Cross Features</text>
+  <text x="284" y="134" text-anchor="middle" fill="var(--accent3)" font-size="10.5" font-family="monospace">Budget: ~45 ms · AUC</text>
+
+  <!-- Stage 3 -->
+  <rect x="395" y="42" width="168" height="106" rx="14" fill="rgba(255,138,76,.12)" stroke="var(--accent2)" stroke-width="1.4"/>
+  <text x="479" y="64" text-anchor="middle" fill="var(--accent2)" font-size="12" font-family="monospace" font-weight="700">3. RE-RANKING</text>
+  <text x="479" y="84" text-anchor="middle" fill="var(--text)" font-size="13" font-weight="700">50 → 20 items</text>
+  <text x="479" y="104" text-anchor="middle" fill="var(--muted)" font-size="11">Diversity (MMR), Freshness</text>
+  <text x="479" y="120" text-anchor="middle" fill="var(--muted)" font-size="11">Policy / Ads / Dedupe</text>
+  <text x="479" y="138" text-anchor="middle" fill="var(--accent2)" font-size="10.5" font-family="monospace">Budget: ~15 ms · NDCG</text>
+
+  <!-- Final -->
+  <rect x="590" y="56" width="160" height="78" rx="14" fill="rgba(52,211,153,.12)" stroke="var(--green)" stroke-width="1.4"/>
+  <text x="670" y="82" text-anchor="middle" fill="var(--green)" font-size="12" font-family="monospace" font-weight="700">FINAL FEED</text>
+  <text x="670" y="102" text-anchor="middle" fill="var(--text)" font-size="12">Top 20 Shown</text>
+  <text x="670" y="120" text-anchor="middle" fill="var(--muted)" font-size="10.5">Total &lt; 80 ms</text>
+
+  <line x1="173" y1="95" x2="198" y2="95" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#ar4)"/>
+  <line x1="368" y1="95" x2="393" y2="95" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#ar4)"/>
+  <line x1="563" y1="95" x2="588" y2="95" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#ar4)"/>
+</svg>
+<div class="diagram-cap">Figure 8.1 — The industry-standard 3-stage RecSys funnel balances catalog scale (10M items) with strict &lt;100 ms latency.</div>
+</div>
+
+<ul>
+  <li><b>Why Two-Tower for Retrieval?</b> User features go into a User Tower $u = f_{\theta}(x_{\text{user}}) \in \mathbb{R}^{d}$ and Item features into an Item Tower $v = g_{\phi}(x_{\text{item}}) \in \mathbb{R}^{d}$. Because the towers are decoupled, all 10M item vectors are <b>precomputed offline</b> and indexed in an ANN index (FAISS / HNSW). At request time, you run 1 forward pass of the User Tower and do a 5 ms dot-product nearest-neighbor lookup!</li>
+  <li><b>Why a Heavy Ranker next?</b> Two-Tower cannot model fine-grained user×item interaction features (e.g., <i>"user clicked this exact brand 3 times today"</i>). On just 500 candidates, a multi-task neural ranker (predicting $P(\text{click})$, $P(\text{watch})$, $P(\text{buy})$) can use rich cross features from Redis.</li>
+  <li><b>Why Re-ranking?</b> Pointwise rankers often return 10 nearly identical items. Re-ranking enforces listwise diversity (MMR), freshness boosts, and business rules.</li>
+</ul>
+
+<h3>Worked Architecture 2: Real-Time Card / UPI Fraud Detection</h3>
+<ul>
+  <li><b>Constraints &amp; Imbalance:</b> Latency &lt; 80 ms; fraud rate is &lt; 0.2%. Never use accuracy (predicting "not fraud" gets 99.8%!). Use <b>PR-AUC</b> and <b>Recall at Fixed Precision</b> (or Fixed False-Positive Rate, since blocking genuine users hurts trust).</li>
+  <li><b>High-Signal Velocity Features:</b> Computed via Kafka + Flink into Redis: <i>transactions by this card in last 5 min</i>, <i>distance from previous swipe / time delta (impossible travel speed)</i>, <i>distinct cards used on this device ID in 24h</i>.</li>
+  <li><b>Model &amp; Calibration:</b> LightGBM / XGBoost excels on tabular velocity features and runs in &lt;5 ms on CPU. If you downsample negatives during training by factor $r$, you <b>must recalibrate</b> predicted probabilities back to true odds before applying cost thresholds:
+  <div class="eq">$$p_{\text{cal}} = \frac{p_{\text{model}}}{p_{\text{model}} + \frac{1 - p_{\text{model}}}{r}}$$</div></li>
+  <li><b>Fallback &amp; Adversarial Drift:</b> Always keep a deterministic <b>Rules Engine</b> fallback (e.g., block if amount &gt; 10× user max AND foreign IP) if the ML service times out. Retrain frequently because fraudsters actively probe and adapt to your decision boundary.</li>
+</ul>
+
+<div class="quiz-box" data-ans="1">
+  <span class="quiz-hdr">Checkpoint 4 · System Design Trade-off</span>
+  <div class="quiz-q">Why can't you put user-item cross features (like "number of times this user bought from this seller") inside the Item Tower of a Two-Tower retrieval model?</div>
+  <div class="quiz-opts">
+    <button class="q-opt" data-i="0">A) PyTorch does not support integer count features.</button>
+    <button class="q-opt" data-i="1">B) It breaks tower decoupling — item embeddings would now depend on the user, making it impossible to precompute and index them in FAISS offline.</button>
+    <button class="q-opt" data-i="2">C) Cross features always cause data leakage.</button>
+  </div>
+  <div class="quiz-exp"><b>Correct: B.</b> The entire speed advantage of Two-Tower retrieval comes from precomputing item embeddings $v_j$ once offline. Put user-item cross features in Stage 2 (the Heavy Ranker), where you only score ~500 candidates!</div>
+</div>
+</section>
+
+<!-- ==================== SECTION 9 ==================== -->
+<section id="s9">
+<h2>9. Senior-Level Interview Q&amp;A</h2>
+<span class="tag">// 16 high-frequency questions — click to reveal structured model answers</span>
+
+<details><summary>1. What is training–serving skew and how do you systematically prevent it?</summary><div>It is any mismatch between feature values seen during offline training versus online serving. Prevent it by: (1) sharing a single transformation code path (or a Feature Store), (2) validating schemas and null rates at serving time, (3) using point-in-time joins offline, and (4) <b>logging served features</b> directly from production inference requests and using those logged features to build future training sets.</div></details>
+
+<details><summary>2. Explain Point-in-Time (ASOF) joins with a concrete example.</summary><div>When joining historical event labels (e.g., a transaction on March 10) with slowly changing feature tables (e.g., user account balance or credit score), a point-in-time join selects the most recent feature record whose timestamp is $\le$ the event timestamp. Without it, future updates leak into historical training rows, inflating offline AUC while causing production failure.</div></details>
+
+<details><summary>3. Distinguish Covariate, Label, and Concept drift. Which requires ground-truth labels?</summary><div><b>Covariate drift:</b> $P(X)$ changes, $P(Y|X)$ stable. <b>Label drift:</b> $P(Y)$ changes. <b>Concept drift:</b> $P(Y|X)$ changes. Covariate drift can be detected immediately on unlabeled production inputs (PSI, KS, domain classifier). Concept drift fundamentally requires ground-truth labels (or a strongly correlated proxy metric) to confirm.</div></details>
+
+<details><summary>4. Compare PSI, KS, JS Divergence, and Wasserstein Distance. When would you pick each?</summary><div><b>PSI</b> is standard in finance/tabular monitoring (easy thresholds: 0.1 / 0.25) but sensitive to binning and empty bins. <b>KS</b> is bin-free for 1D continuous features, measuring max CDF gap, though less sensitive to tail shifts. <b>JS Divergence</b> is a symmetric, bounded $[0, \ln 2]$ fix for KL. <b>Wasserstein-1</b> works cleanly even when reference and production supports do not overlap at all. For high-dimensional embeddings, use a <b>Domain Classifier</b> or <b>MMD</b>.</div></details>
+
+<details><summary>5. Why is p99 latency more important than mean latency in ML serving?</summary><div>Latency is right-skewed; averages hide severe slowdowns. Moreover, when a user request fans out to $N$ microservices in parallel, the user waits for the slowest call: $P(\text{tail}) = 1 - (1 - 0.01)^N$. At $N=20$, nearly 1 in 5 users hits a p99 delay.</div></details>
+
+<details><summary>6. How does Dynamic Batching improve GPU throughput, and what is the trade-off?</summary><div>GPUs have thousands of cores that sit idle during batch-size-1 inference (memory-bandwidth bound). Dynamic batching buffers incoming requests for a tiny window (e.g., 5–10 ms) and executes them in one matrix multiplication, increasing throughput 5–10× at the cost of a small, bounded increase in individual request latency.</div></details>
+
+<details><summary>7. Shadow vs. Canary vs. A/B Testing — when do you use each?</summary><div><b>Shadow:</b> duplicates live traffic to the new model without showing results to users (zero risk; tests infra, latency, crashes). <b>Canary:</b> exposes 1–5% of live traffic to catch regressions with bounded blast radius. <b>A/B test:</b> randomizes users (usually 50/50) to measure statistically significant causal impact on business metrics.</div></details>
+
+<details><summary>8. Offline metrics improved significantly, but the online A/B test showed no lift (or dropped). Debug it.</summary><div>Check 5 suspects in order: (1) <b>Training–serving skew</b> (compare logged served features vs. training), (2) <b>Latency regression</b> (slower model hurting conversion), (3) <b>Metric mismatch</b> (offline proxy like CTR doesn't align with revenue/retention), (4) <b>Selection/position bias</b> in offline logs, and (5) <b>Novelty / primacy effects</b> or slice-level regressions.</div></details>
+
+<details><summary>9. You downsampled the negative class 10× to handle 0.1% fraud imbalance. What happens to predicted probabilities?</summary><div>The model's output probabilities become heavily inflated (over-confident on positives). Ranking metrics like ROC-AUC/PR-AUC are unaffected, but if downstream systems multiply probability by transaction value to compute expected loss, you <b>must recalibrate</b> using the analytical prior-shift formula $p_{\text{cal}} = p / (p + (1-p)/r)$ or isotonic/Platt scaling.</div></details>
+
+<details><summary>10. How do you monitor a model when ground-truth labels arrive 30–90 days late?</summary><div>Layer 3 monitors: (1) immediate data-quality &amp; input drift (null rates, PSI/KS), (2) prediction score distribution drift (e.g., sudden jump in % flagged as high risk), and (3) fast proxy metrics (manual analyst override rate, user complaints, early repayment milestones). Backfill true performance as labels mature.</div></details>
+
+<details><summary>11. Why should you avoid Python's pickle for production model serving?</summary><div>(1) <b>Security risk:</b> unpickling executes arbitrary code (RCE vulnerability). (2) <b>Fragility:</b> tightly bound to exact Python and library minor versions. Prefer <b>ONNX</b> (portable, fast C++ runtime), <b>SafeTensors</b> (safe, zero-copy mmap), or native graph formats like TorchScript.</div></details>
+
+<details><summary>12. What is the difference between Prefill and Decode in LLM serving, and what is KV-Cache?</summary><div><b>Prefill</b> processes the entire input prompt in parallel (compute-bound → drives Time To First Token, TTFT). <b>Decode</b> generates one token autoregressively at a time (memory-bandwidth bound → drives Time Per Output Token, TPOT). <b>KV-Cache</b> stores previous tokens' Key/Value attention tensors in GPU VRAM so decode doesn't recompute the full prompt every step; its VRAM footprint scales linearly with batch size and sequence length.</div></details>
+
+<details><summary>13. How do you handle the Cold-Start problem in a recommendation system?</summary><div><b>New User:</b> fall back to popularity/trending by geo &amp; device, ask lightweight onboarding preferences, and use fast session-based bandits/real-time click features. <b>New Item:</b> use content-based embeddings (title, image, category metadata) inside the Item Tower + allocate a dedicated exploration traffic slice so new items gather interaction data.</div></details>
+
+<details><summary>14. When should a model be retrained: on a schedule or on drift triggers?</summary><div>Use <b>scheduled retraining</b> (daily/weekly) for domains with steady, predictable seasonality (ads, food delivery). Add <b>event-triggered retraining</b> (drift alarm, metric drop, or $N$ new labeled samples) for volatile/adversarial domains (fraud). Regardless of trigger, always pass the candidate through automated evaluation gates before promotion.</div></details>
+
+<details><summary>15. How do you design an instant rollback mechanism for a bad ML release?</summary><div>Keep the previous champion artifact versioned in the Model Registry and warm behind an API gateway/router (blue-green or weighted traffic split). Bind automated guardrail alerts (5xx error spike, p99 latency breach, score-distribution anomaly) to flip the traffic weight back to 100% on the previous version within seconds.</div></details>
+
+<details><summary>16. Give a complete reproducibility checklist for a production ML experiment.</summary><div>(1) Exact Git commit SHA, (2) immutable dataset version/hash (DVC/Delta), (3) full hyperparameter &amp; feature config YAML, (4) Docker image digest / pinned lockfile, (5) random seeds, (6) hardware/CUDA notes, (7) logged step metrics + slice evaluations, and (8) Model Registry entry linking the artifact back to the run ID.</div></details>
+</section>
+
+</main></div>
+
+<footer><a href="index.html">← Back to all modules</a> &nbsp;|&nbsp; Built for CDC Placements · IIT Kharagpur &nbsp;|&nbsp; Muhammad Hamza</footer>
+
+<script>
+/* 1. Progress bar + TOC active highlight */
+const pg=document.getElementById('prog');
+addEventListener('scroll',()=>{pg.style.transform='scaleX('+scrollY/((document.documentElement.scrollHeight-innerHeight)||1)+')'},{passive:true});
+const links=[...document.querySelectorAll('#toc a')];
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+e.target.id))}),{rootMargin:'-25% 0px -65% 0px'});
+document.querySelectorAll('section[id]').forEach(s=>io.observe(s));
+
+/* 2. Interactive Lab 1: Serving Capacity, Queuing Cliff & Dynamic Batching */
+function drawLat(){
+  const lam=+rLam.value, t1=+rInf.value, B=+rBat.value;
+  vLam.textContent=lam; vInf.textContent=t1; vBat.textContent=B;
+  // Sub-linear GPU batch execution time: t(B) = t1 * (1 + 0.22*(B-1))
+  const tBatch = t1 * (1 + 0.22 * (B - 1));
+  const mu = (B / (tBatch / 1000)); // max QPS
+  const rho = lam / mu;
+  const waitBatch = B > 1 ? Math.min(12, ((B - 1) / (2 * lam)) * 1000) : 0;
+  const meanW = rho < 0.98 ? (tBatch / (1 - rho)) + waitBatch : 999;
+  const p99 = rho < 0.98 ? Math.min(999, meanW * (1.8 + 1.5 * rho)) : 999;
+  const L = lam * (meanW / 1000);
+
+  oMu.textContent = Math.round(mu);
+  oRho.textContent = (rho * 100).toFixed(0) + '%';
+  oRho.style.color = rho < 0.7 ? 'var(--green)' : rho < 0.88 ? 'var(--gold)' : 'var(--warn)';
+  oP99.textContent = rho >= 0.98 ? 'SATURATED' : Math.round(p99) + ' ms';
+  oP99.style.color = p99 < 80 ? 'var(--green)' : p99 < 180 ? 'var(--gold)' : 'var(--warn)';
+  oL.textContent = rho >= 0.98 ? '∞' : L.toFixed(1);
+
+  const W=640, H=215, padL=48, padR=20, padT=20, padB=32;
+  const maxQ = Math.max(200, Math.ceil(mu * 1.15 / 20) * 20);
+  const maxY = 300;
+  const X = q => padL + (q / maxQ) * (W - padL - padR);
+  const Y = ms => H - padB - (Math.min(ms, maxY) / maxY) * (H - padT - padB);
+
+  let d = '';
+  for(let q = 5; q < mu * 0.98; q += maxQ / 90){
+    const r = q / mu;
+    const wb = B > 1 ? Math.min(12, ((B - 1) / (2 * q)) * 1000) : 0;
+    const mW = (tBatch / (1 - r)) + wb;
+    const p = mW * (1.8 + 1.5 * r);
+    d += (d ? 'L' : 'M') + X(q).toFixed(1) + ',' + Y(p).toFixed(1);
+  }
+  const curX = X(Math.min(lam, maxQ)), curY = Y(p99);
+  const capX = X(Math.min(mu, maxQ));
+  const slaY = Y(100);
+
+  latPlot.innerHTML = `
+    <line x1="${padL}" y1="${H-padB}" x2="${W-padR}" y2="${H-padB}" stroke="currentColor" opacity=".25"/>
+    <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${H-padB}" stroke="currentColor" opacity=".25"/>
+    <line x1="${padL}" y1="${slaY}" x2="${W-padR}" y2="${slaY}" stroke="var(--gold)" stroke-dasharray="5 4" opacity=".6"/>
+    <text x="${W-padR-4}" y="${slaY-6}" text-anchor="end" fill="var(--gold)" font-size="11" font-family="monospace">100 ms SLA budget</text>
+    <line x1="${capX}" y1="${padT}" x2="${capX}" y2="${H-padB}" stroke="var(--warn)" stroke-dasharray="4 4" opacity=".65"/>
+    <text x="${Math.min(capX-6, W-90)}" y="${padT+12}" text-anchor="end" fill="var(--warn)" font-size="11" font-family="monospace">Capacity μ=${Math.round(mu)} QPS</text>
+    <path d="${d}" fill="none" stroke="var(--accent)" stroke-width="2.6"/>
+    <circle cx="${curX.toFixed(1)}" cy="${curY.toFixed(1)}" r="6" fill="${rho>=0.88?'var(--warn)':'var(--accent)'}" stroke="var(--solid)" stroke-width="2"/>
+    <text x="${padL-8}" y="${Y(100)+4}" text-anchor="end" fill="var(--muted)" font-size="10.5" font-family="monospace">100</text>
+    <text x="${padL-8}" y="${Y(250)+4}" text-anchor="end" fill="var(--muted)" font-size="10.5" font-family="monospace">250</text>
+    <text x="${padL-8}" y="${H-padB+4}" text-anchor="end" fill="var(--muted)" font-size="10.5" font-family="monospace">0ms</text>
+    <text x="${W/2}" y="${H-6}" text-anchor="middle" fill="var(--muted)" font-size="11" font-family="monospace">Incoming Traffic λ (Queries Per Second)</text>
+  `;
+}
+rLam.oninput = rInf.oninput = rBat.oninput = drawLat;
+drawLat();
+
+/* 3. Interactive Lab 2: Dual PDF + CDF Drift Observatory */
+const erf=x=>{const s=Math.sign(x);x=Math.abs(x);const t=1/(1+.3275911*x);return s*(1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-.284496736)*t+.254829592)*t*Math.exp(-x*x))};
+const Phi=(x,m=0,s=1)=>.5*(1+erf((x-m)/(s*Math.SQRT2)));
+const pdf=(x,m,s)=>Math.exp(-.5*((x-m)/s)**2)/(s*Math.sqrt(2*Math.PI));
+const E=[-Infinity,-2,-1.5,-1,-.5,0,.5,1,1.5,2,Infinity];
+
+function drawDrift(){
+  const m=+rm.value, s=+rs.value;
+  vm.textContent=m.toFixed(1); vs.textContent=s.toFixed(1);
+  let psi=0, js=0;
+  for(let i=0;i<10;i++){
+    const p=Math.max(Phi(E[i+1])-Phi(E[i]),1e-6);
+    const q=Math.max(Phi(E[i+1],m,s)-Phi(E[i],m,s),1e-6);
+    const mid=0.5*(p+q);
+    psi += (q-p)*Math.log(q/p);
+    js += 0.5*p*Math.log(p/mid) + 0.5*q*Math.log(q/mid);
+  }
+  let ks=0, ksX=0;
+  for(let x=-5;x<=5;x+=.04){
+    const diff=Math.abs(Phi(x)-Phi(x,m,s));
+    if(diff>ks){ks=diff; ksX=x;}
+  }
+  oP.textContent=psi.toFixed(3);
+  oK.textContent=ks.toFixed(3);
+  oJ.textContent=js.toFixed(3);
+  const v=psi<.1?['Stable','var(--green)']:psi<.25?['Moderate Shift','var(--gold)']:['Significant Drift','var(--warn)'];
+  oV.textContent=v[0]; oV.style.color=v[1];
+
+  const W=640, X=x=>20+(x+4.5)/9*(W-40);
+  // Top subplot: PDF (y: 15..145)
+  const Yp=y=>142-y*260;
+  const pathP=(mu,sd)=>{let d='';for(let x=-4.5;x<=4.501;x+=.1)d+=(d?'L':'M')+X(x).toFixed(1)+','+Yp(pdf(x,mu,sd)).toFixed(1);return d};
+  // Bottom subplot: CDF (y: 175..290)
+  const Yc=y=>288-y*105;
+  const pathC=(mu,sd)=>{let d='';for(let x=-4.5;x<=4.501;x+=.1)d+=(d?'L':'M')+X(x).toFixed(1)+','+Yc(Phi(x,mu,sd)).toFixed(1);return d};
+  const kx=X(ksX), ky1=Yc(Phi(ksX)), ky2=Yc(Phi(ksX,m,s));
+
+  plot.innerHTML=`
+    <text x="20" y="16" fill="var(--muted)" font-size="11.5" font-family="monospace">PDF: Probability Density (Reference vs. Production)</text>
+    <line x1="20" y1="142" x2="${W-20}" y2="142" stroke="currentColor" opacity=".25"/>
+    <path d="${pathP(0,1)}L${W-20},142L20,142Z" fill="var(--accent)" opacity=".20"/>
+    <path d="${pathP(0,1)}" fill="none" stroke="var(--accent)" stroke-width="2.4"/>
+    <path d="${pathP(m,s)}L${W-20},142L20,142Z" fill="var(--accent2)" opacity=".18"/>
+    <path d="${pathP(m,s)}" fill="none" stroke="var(--accent2)" stroke-width="2.4" stroke-dasharray="6 4"/>
+    <text x="${W-24}" y="22" text-anchor="end" fill="var(--accent)" font-size="11.5" font-family="monospace">— Reference N(0,1)</text>
+    <text x="${W-24}" y="39" text-anchor="end" fill="var(--accent2)" font-size="11.5" font-family="monospace">- - Production N(${m.toFixed(1)}, ${s.toFixed(1)}²)</text>
+
+    <text x="20" y="172" fill="var(--muted)" font-size="11.5" font-family="monospace">CDF: Cumulative Distribution (Red bar = exact KS gap)</text>
+    <line x1="20" y1="288" x2="${W-20}" y2="288" stroke="currentColor" opacity=".25"/>
+    <path d="${pathC(0,1)}" fill="none" stroke="var(--accent)" stroke-width="2.2"/>
+    <path d="${pathC(m,s)}" fill="none" stroke="var(--accent2)" stroke-width="2.2" stroke-dasharray="6 4"/>
+    ${ks>0.015?`<line x1="${kx.toFixed(1)}" y1="${ky1.toFixed(1)}" x2="${kx.toFixed(1)}" y2="${ky2.toFixed(1)}" stroke="var(--warn)" stroke-width="3"/>
+    <circle cx="${kx.toFixed(1)}" cy="${ky1.toFixed(1)}" r="3.5" fill="var(--warn)"/>
+    <circle cx="${kx.toFixed(1)}" cy="${ky2.toFixed(1)}" r="3.5" fill="var(--warn)"/>
+    <text x="${Math.min(kx+8,W-110).toFixed(1)}" y="${((ky1+ky2)/2+4).toFixed(1)}" fill="var(--warn)" font-size="11.5" font-family="monospace" font-weight="700">KS=${ks.toFixed(2)}</text>`:''}
+  `;
+}
+rm.oninput=rs.oninput=drawDrift;
+drawDrift();
+
+/* 4. Interactive Checkpoint Quizzes */
+document.querySelectorAll('.quiz-box').forEach(box=>{
+  const ans = +box.dataset.ans;
+  const opts = box.querySelectorAll('.q-opt');
+  const exp = box.querySelector('.quiz-exp');
+  opts.forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      opts.forEach(b=>b.classList.remove('correct','wrong'));
+      const picked = +btn.dataset.i;
+      if(picked === ans){ btn.classList.add('correct'); }
+      else { btn.classList.add('wrong'); opts[ans].classList.add('correct'); }
+      exp.classList.add('show');
+    });
+  });
+});
+
+/* 5. Theme Toggle (shared with index) */
+const sun='<path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1z"/>';
+const moon='<path d="M12.3 2a10 10 0 0 0-1.9 14 10 10 0 0 0 14-1.9 1 1 0 0 0-1.3-1.3 8 8 0 1 1-9.8-9.8 1 1 0 0 0-1.3-1.3z"/>';
+function paint(t){ti.innerHTML=t==='light'?moon:sun;tx.textContent=t==='light'?'Dark Mode':'Light Mode'}
+let th='dark';try{th=localStorage.getItem('global-ui-theme')||'dark'}catch(e){}
+document.documentElement.setAttribute('data-theme',th);paint(th);
+tt.onclick=()=>{const t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',t);try{localStorage.setItem('global-ui-theme',t)}catch(e){}paint(t)};
+</script>
+</body>
+</html>
